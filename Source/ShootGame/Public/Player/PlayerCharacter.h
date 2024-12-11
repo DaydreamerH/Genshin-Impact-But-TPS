@@ -24,10 +24,8 @@ public:
 	// Replicated回调函数
 	UFUNCTION()
 	void OnRep_PlayerIndex();
-
-	// 用于同步PlayerIndex的复制
+	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
 protected:
 	virtual void BeginPlay() override;
 
@@ -41,7 +39,8 @@ protected:
 	void OnActionLookRight(const FInputActionValue& InputActionValue);
 	UFUNCTION()
 	void OnActionJump(const FInputActionValue& InputActionValue);
-	
+
+	void UpdateMPC() const;
 private:
 	
 	// 相机模块
@@ -71,6 +70,12 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UWidgetComponent* OverheadWidget;
-public:	
 
+	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
+	class AWeapon* OverlappingWeapon;
+
+	UFUNCTION()
+	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
+public:	
+	void SetOverlappingWeapon(AWeapon* Weapon);
 };

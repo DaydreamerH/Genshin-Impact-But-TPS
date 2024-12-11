@@ -12,6 +12,7 @@
 #include "Materials/MaterialParameterCollection.h"
 #include "Materials/MaterialParameterCollectionInstance.h"
 #include "Net/UnrealNetwork.h"
+#include "Weapon/Weapon.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -50,6 +51,7 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(APlayerCharacter, PlayerIndex);
+	DOREPLIFETIME_CONDITION(APlayerCharacter, OverlappingWeapon, COND_OwnerOnly);
 }
 
 void APlayerCharacter::BeginPlay()
@@ -67,6 +69,15 @@ void APlayerCharacter::BeginPlay()
 			PlayerIndex = sGM->GetPlayerIndex();
 		}
 	}
+}
+
+void APlayerCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+	this->UpdateMPC();
+
+	
 }
 
 void APlayerCharacter::OnActionMoveForward(const FInputActionValue& InputActionValue)
@@ -112,43 +123,20 @@ void APlayerCharacter::OnActionJump(const FInputActionValue& InputActionValue)
 	Jump();
 }
 
-void APlayerCharacter::Tick(float DeltaTime)
+void APlayerCharacter::UpdateMPC() const
 {
-	Super::Tick(DeltaTime);
-	if(this->PlayerIndex!=-1)
+	if(PlayerIndex!=-1)
 	{
-		if (GEngine)
-		{
-			FString DebugMessage = FString::Printf(TEXT("In Player Index. PlayerIndex: %d"), PlayerIndex);
-			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, DebugMessage);
-		}
 		USkeletalMeshComponent* mesh = GetMesh();
 		if(mesh)
 		{
-			if (GEngine)
-			{
-				FString DebugMessage = FString::Printf(TEXT("In mesh. PlayerIndex: %d"), PlayerIndex);
-				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, DebugMessage);
-			}
 			FVector location = mesh->GetComponentLocation();
 
 			if(MPC_Position)
 			{
-				if (GEngine)
-				{
-					FString DebugMessage = FString::Printf(TEXT("In MPC. PlayerIndex: %d"), PlayerIndex);
-					GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, DebugMessage);
-				}
-				
 				FLinearColor NewColor(location.X, location.Y, location.Z);
 				if(UMaterialParameterCollectionInstance* mpcInst = GetWorld()->GetParameterCollectionInstance(MPC_Position))
 				{
-					if (GEngine)
-					{
-						FString DebugMessage = FString::Printf(TEXT("In MPC Inst. PlayerIndex: %d"), PlayerIndex);
-						GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, DebugMessage);
-					}
-					
 					FString ParameterNameString = FString::Printf(TEXT("Position_%d"), PlayerIndex);
 					FName ParameterName = FName(*ParameterNameString);
 
@@ -158,6 +146,34 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 	}
 }
+
+void APlayerCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
+{
+	if(OverlappingWeapon)
+	{
+		OverlappingWeapon->ShowPickupWidget(true);
+	}
+	if(LastWeapon)
+	{
+		LastWeapon->ShowPickupWidget(false);
+	}
+}
+
+void APlayerCharacter::SetOverlappingWeapon(AWeapon* Weapon)
+{
+	if(OverlappingWeapon)
+	{
+		OverlappingWeapon->ShowPickupWidget(false);
+	}
+	
+	OverlappingWeapon = Weapon;
+	if(IsLocallyControlled())
+	{
+		if(OverlappingWeapon)
+			OverlappingWeapon->ShowPickupWidget(true);
+	}
+}
+
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
