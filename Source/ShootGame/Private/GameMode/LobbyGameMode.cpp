@@ -8,10 +8,10 @@
 void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-
+	
 	int32 numberOfPlayers =  GameState.Get()->PlayerArray.Num();
 
-	if(numberOfPlayers == 2)
+	if(numberOfPlayers == 3)
 	{
 		UWorld* world = GetWorld();
 		if(world)
@@ -21,3 +21,15 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 		}
 	}
 }
+
+int ALobbyGameMode::GetPlayerIndex()
+{
+	return NextPlayerIndex++;
+}
+
+ALobbyGameMode::ALobbyGameMode()
+{
+	NextPlayerIndex = 0;
+}
+
+

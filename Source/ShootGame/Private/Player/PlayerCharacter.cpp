@@ -4,8 +4,14 @@
 #include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameMode/LobbyGameMode.h"
+#include "GameMode/ShootGameMode.h"
+#include "Materials/MaterialParameterCollection.h"
+#include "Materials/MaterialParameterCollectionInstance.h"
+#include "Net/UnrealNetwork.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -22,12 +28,45 @@ APlayerCharacter::APlayerCharacter()
 
 	bUseControllerRotationYaw = false; // Player此时不应该和控制器一起旋转，他朝自己的方向而非控制器方向移动
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	bReplicates = true;
+
+	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
+	OverheadWidget->SetupAttachment(RootComponent);
+}
+
+void APlayerCharacter::OnRep_PlayerIndex() 
+{
+	if (GEngine)
+	{
+		FString DebugMessage = FString::Printf(TEXT("OnRep_PlayerIndex called. PlayerIndex: %d"), this->PlayerIndex);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, DebugMessage);
+	}
+	this->PlayerIndex = PlayerIndex;
+}
+
+void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APlayerCharacter, PlayerIndex);
 }
 
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if(HasAuthority())
+	{
+		if (ALobbyGameMode* lGM = Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode()))
+		{
+			PlayerIndex = lGM->GetPlayerIndex();
+		}
+		else if(AShootGameMode* sGM = Cast<AShootGameMode>(GetWorld()->GetAuthGameMode()))
+		{
+			PlayerIndex = sGM->GetPlayerIndex();
+		}
+	}
 }
 
 void APlayerCharacter::OnActionMoveForward(const FInputActionValue& InputActionValue)
@@ -76,7 +115,48 @@ void APlayerCharacter::OnActionJump(const FInputActionValue& InputActionValue)
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if(this->PlayerIndex!=-1)
+	{
+		if (GEngine)
+		{
+			FString DebugMessage = FString::Printf(TEXT("In Player Index. PlayerIndex: %d"), PlayerIndex);
+			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, DebugMessage);
+		}
+		USkeletalMeshComponent* mesh = GetMesh();
+		if(mesh)
+		{
+			if (GEngine)
+			{
+				FString DebugMessage = FString::Printf(TEXT("In mesh. PlayerIndex: %d"), PlayerIndex);
+				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, DebugMessage);
+			}
+			FVector location = mesh->GetComponentLocation();
 
+			if(MPC_Position)
+			{
+				if (GEngine)
+				{
+					FString DebugMessage = FString::Printf(TEXT("In MPC. PlayerIndex: %d"), PlayerIndex);
+					GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, DebugMessage);
+				}
+				
+				FLinearColor NewColor(location.X, location.Y, location.Z);
+				if(UMaterialParameterCollectionInstance* mpcInst = GetWorld()->GetParameterCollectionInstance(MPC_Position))
+				{
+					if (GEngine)
+					{
+						FString DebugMessage = FString::Printf(TEXT("In MPC Inst. PlayerIndex: %d"), PlayerIndex);
+						GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, DebugMessage);
+					}
+					
+					FString ParameterNameString = FString::Printf(TEXT("Position_%d"), PlayerIndex);
+					FName ParameterName = FName(*ParameterNameString);
+
+					mpcInst->SetVectorParameterValue(ParameterName, NewColor);
+				}
+			}
+		}
+	}
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

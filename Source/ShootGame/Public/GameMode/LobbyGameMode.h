@@ -13,6 +13,12 @@ UCLASS()
 class SHOOTGAME_API ALobbyGameMode : public AGameMode
 {
 	GENERATED_BODY()
+private:
+	int NextPlayerIndex;
 public:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+	int GetPlayerIndex();
+	ALobbyGameMode();
 };
+
+

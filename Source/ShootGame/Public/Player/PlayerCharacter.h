@@ -17,7 +17,17 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	
+	// 玩家索引，服务器与客户端同步
+	UPROPERTY(ReplicatedUsing=OnRep_PlayerIndex)
+	int32 PlayerIndex = -1;
+
+	// Replicated回调函数
+	UFUNCTION()
+	void OnRep_PlayerIndex();
+
+	// 用于同步PlayerIndex的复制
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -54,6 +64,13 @@ private:
 	class UInputAction* IA_Jump;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* InputMappingContext;
+
+	// 获取MPC
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
+	class UMaterialParameterCollection* MPC_Position;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UWidgetComponent* OverheadWidget;
 public:	
 
 };
