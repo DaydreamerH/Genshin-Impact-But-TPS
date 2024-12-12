@@ -4,6 +4,7 @@
 #include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CombatComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -34,6 +35,11 @@ APlayerCharacter::APlayerCharacter()
 
 	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverheadWidget->SetupAttachment(RootComponent);
+
+	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	Combat->SetIsReplicated(true);
+
+	
 }
 
 void APlayerCharacter::OnRep_PlayerIndex() 
@@ -52,6 +58,17 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(APlayerCharacter, PlayerIndex);
 	DOREPLIFETIME_CONDITION(APlayerCharacter, OverlappingWeapon, COND_OwnerOnly);
+}
+
+void APlayerCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if(Combat)
+	{
+		Combat->Character = this;
+		
+	}
 }
 
 void APlayerCharacter::BeginPlay()
@@ -121,6 +138,14 @@ void APlayerCharacter::OnActionLookRight(const FInputActionValue& InputActionVal
 void APlayerCharacter::OnActionJump(const FInputActionValue& InputActionValue)
 {
 	Jump();
+}
+
+void APlayerCharacter::OnActionEquip(const FInputActionValue& InputActionValue)
+{
+	if(HasAuthority())
+	{
+		
+	}
 }
 
 void APlayerCharacter::UpdateMPC() const
@@ -215,6 +240,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		if(IA_Jump)
 		{
 			inputComponent->BindAction(IA_Jump, ETriggerEvent::Triggered, this, &ThisClass::OnActionJump);
+		}
+
+		if(IA_Equip)
+		{
+			inputComponent->BindAction(IA_Equip, ETriggerEvent::Triggered, this, &ThisClass::OnActionEquip);
 		}
 	}
 	

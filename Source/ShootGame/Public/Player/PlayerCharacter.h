@@ -26,6 +26,8 @@ public:
 	void OnRep_PlayerIndex();
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void PostInitializeComponents() override;
 protected:
 	virtual void BeginPlay() override;
 
@@ -39,6 +41,8 @@ protected:
 	void OnActionLookRight(const FInputActionValue& InputActionValue);
 	UFUNCTION()
 	void OnActionJump(const FInputActionValue& InputActionValue);
+	UFUNCTION()
+	void OnActionEquip(const FInputActionValue& InputActionValue);
 
 	void UpdateMPC() const;
 private:
@@ -62,6 +66,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* IA_Jump;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* IA_Equip;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* InputMappingContext;
 
 	// 获取MPC
@@ -76,6 +82,9 @@ private:
 
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
+
+	UPROPERTY(VisibleAnywhere)
+	class UCombatComponent* Combat;
 public:	
 	void SetOverlappingWeapon(AWeapon* Weapon);
 };
