@@ -30,7 +30,29 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = Character)
 	bool bIsAccelerating;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	bool bIsMoving = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	bool bWeaponEquipped = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	bool bIsCrouched;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	bool bAiming;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	float YawOffset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	float Lean;
+
+
+	FRotator CharacterRotationLastFrame;
+
+	FRotator CharacterRotation;
+
+	FRotator DeltaRotation;
 private:
 };

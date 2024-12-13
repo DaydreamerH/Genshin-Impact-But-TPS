@@ -17,12 +17,24 @@ public:
 
 	friend class APlayerCharacter;
 
-	void EquipWeapon(class AWeapon* WeaponToEquipped);
+	void EquipWeapon(class AWeapon* WeaponToEquip);
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 protected:
 	virtual void BeginPlay() override;
+	void SetAiming(bool bIsAiming);
+	UFUNCTION(Server, Reliable)
+	void ServerSetAiming(bool bIsAiming);
+	UFUNCTION()
+	void OnRep_EquippedWeapon();
 private:
 	class APlayerCharacter* Character;
+
+	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;
+
+	UPROPERTY(Replicated)
+	bool bAiming;
 public:	
 	
 		

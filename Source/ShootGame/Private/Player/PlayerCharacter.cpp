@@ -40,15 +40,12 @@ APlayerCharacter::APlayerCharacter()
 	Combat->SetIsReplicated(true);
 	
 	GetCharacterMovement()->JumpZVelocity = 500.0f;  // 调整这个值来控制跳跃高度
+
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 }
 
 void APlayerCharacter::OnRep_PlayerIndex() 
 {
-	if (GEngine)
-	{
-		FString DebugMessage = FString::Printf(TEXT("OnRep_PlayerIndex called. PlayerIndex: %d"), this->PlayerIndex);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, DebugMessage);
-	}
 	this->PlayerIndex = PlayerIndex;
 }
 
@@ -67,7 +64,6 @@ void APlayerCharacter::PostInitializeComponents()
 	if(Combat)
 	{
 		Combat->Character = this;
-		
 	}
 }
 
@@ -144,7 +140,50 @@ void APlayerCharacter::OnActionEquip(const FInputActionValue& InputActionValue)
 {
 	if(HasAuthority())
 	{
-		
+		if(Combat)
+		{
+			Combat->EquipWeapon(OverlappingWeapon);
+		}
+	}
+	else
+	{
+		ServerOnActionEquip();
+	}
+}
+
+void APlayerCharacter::OnActionCrouch(const FInputActionValue& InputActionValue)
+{
+	if(bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Crouch();
+	}
+}
+
+void APlayerCharacter::OnActionAimPressed(const FInputActionValue& InputActionValue)
+{
+	if (Combat)
+	{
+		Combat->SetAiming(true);
+	}
+}
+
+void APlayerCharacter::OnActionAimReleased(const FInputActionValue& InputActionValue)
+{
+	if (Combat)
+	{
+		Combat->SetAiming(false);
+	}
+}
+
+void APlayerCharacter::ServerOnActionEquip_Implementation()
+{
+	if(Combat)
+	{
+		Combat->EquipWeapon(OverlappingWeapon);
 	}
 }
 
@@ -200,6 +239,8 @@ void APlayerCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 }
 
 
+
+
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -239,14 +280,36 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		if(IA_Jump)
 		{
-			inputComponent->BindAction(IA_Jump, ETriggerEvent::Triggered, this, &ThisClass::OnActionJump);
+			inputComponent->BindAction(IA_Jump, ETriggerEvent::Started, this, &ThisClass::OnActionJump);
 		}
 
 		if(IA_Equip)
 		{
 			inputComponent->BindAction(IA_Equip, ETriggerEvent::Triggered, this, &ThisClass::OnActionEquip);
 		}
+
+		if(IA_Crouch)
+		{
+			inputComponent->BindAction(IA_Crouch, ETriggerEvent::Started, this, &ThisClass::OnActionCrouch);
+		}
+
+		if(IA_Aim)
+		{
+			inputComponent->BindAction(IA_Aim, ETriggerEvent::Started, this, &ThisClass::OnActionAimPressed);
+			inputComponent->BindAction(IA_Aim, ETriggerEvent::Completed, this, &ThisClass::OnActionAimReleased);
+		}
 	}
 	
 }
+
+bool APlayerCharacter::IsWeaponEquipped() const
+{
+	return (Combat && Combat->EquippedWeapon);
+}
+
+bool APlayerCharacter::IsAiming() const
+{
+	return (Combat && Combat->bAiming);
+}
+
 

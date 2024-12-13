@@ -43,7 +43,13 @@ protected:
 	void OnActionJump(const FInputActionValue& InputActionValue);
 	UFUNCTION()
 	void OnActionEquip(const FInputActionValue& InputActionValue);
-
+	UFUNCTION()
+	void OnActionCrouch(const FInputActionValue& InputActionValue);
+	UFUNCTION()
+	void OnActionAimPressed(const FInputActionValue& InputActionValue);
+	UFUNCTION()
+	void OnActionAimReleased(const FInputActionValue& InputActionValue);
+	
 	void UpdateMPC() const;
 private:
 	
@@ -68,6 +74,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* IA_Equip;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* IA_Crouch;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* IA_Aim;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* InputMappingContext;
 
 	// 获取MPC
@@ -85,6 +95,13 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	class UCombatComponent* Combat;
+
+	UFUNCTION(Server, Reliable)
+	void ServerOnActionEquip();
 public:	
 	void SetOverlappingWeapon(AWeapon* Weapon);
+
+	bool IsWeaponEquipped() const;
+
+	bool IsAiming() const;
 };
