@@ -38,8 +38,8 @@ APlayerCharacter::APlayerCharacter()
 
 	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	Combat->SetIsReplicated(true);
-
 	
+	GetCharacterMovement()->JumpZVelocity = 500.0f;  // 调整这个值来控制跳跃高度
 }
 
 void APlayerCharacter::OnRep_PlayerIndex() 
