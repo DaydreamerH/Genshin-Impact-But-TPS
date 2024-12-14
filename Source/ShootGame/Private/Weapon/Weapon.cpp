@@ -4,7 +4,6 @@
 
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
-#include "DataWrappers/ChaosVDQueryDataWrappers.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/PlayerCharacter.h"
 
