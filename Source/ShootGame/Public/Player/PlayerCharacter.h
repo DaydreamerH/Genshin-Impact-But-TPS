@@ -49,6 +49,8 @@ protected:
 	void OnActionAimPressed(const FInputActionValue& InputActionValue);
 	UFUNCTION()
 	void OnActionAimReleased(const FInputActionValue& InputActionValue);
+
+	void AimOffset(float DeltaTime);
 	
 	void UpdateMPC() const;
 private:
@@ -98,10 +100,18 @@ private:
 
 	UFUNCTION(Server, Reliable)
 	void ServerOnActionEquip();
+
+	float AO_Yaw;
+	float AO_Pitch;
+	FRotator StartingAimRotation;
 public:	
 	void SetOverlappingWeapon(AWeapon* Weapon);
 
 	bool IsWeaponEquipped() const;
 
 	bool IsAiming() const;
+
+	FORCEINLINE float GetAO_Yaw() const {return AO_Yaw; }
+	FORCEINLINE float GetAO_Pitch() const {return AO_Pitch; }
+	AWeapon* GetEuippedWeapon() const;
 };

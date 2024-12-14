@@ -35,7 +35,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	bool bWeaponEquipped = false;
-
+	
+	class AWeapon* EquippedWeapon;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	bool bIsCrouched;
 
@@ -54,5 +56,12 @@ public:
 	FRotator CharacterRotation;
 
 	FRotator DeltaRotation;
+
+	UPROPERTY(BlueprintReadOnly, Category=Movement)
+	float AO_Yaw;
+	UPROPERTY(BlueprintReadOnly, Category=Movement)
+	float AO_Pitch;
+	UPROPERTY(BlueprintReadOnly, Category=Movement)
+	FTransform LeftHandTransform;
 private:
 };

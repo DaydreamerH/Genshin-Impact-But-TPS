@@ -11,6 +11,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameMode/LobbyGameMode.h"
 #include "GameMode/ShootGameMode.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Materials/MaterialParameterCollection.h"
 #include "Materials/MaterialParameterCollectionInstance.h"
 #include "Net/UnrealNetwork.h"
@@ -22,7 +23,7 @@ APlayerCharacter::APlayerCharacter()
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetMesh());
-	CameraBoom->TargetArmLength = 500.f;
+	CameraBoom->TargetArmLength = 400.f;
 	CameraBoom->bUsePawnControlRotation = true;
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
@@ -91,7 +92,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	
 	this->UpdateMPC();
-
+	AimOffset(DeltaTime);
 	
 }
 
@@ -178,6 +179,36 @@ void APlayerCharacter::OnActionAimReleased(const FInputActionValue& InputActionV
 	if (Combat)
 	{
 		Combat->SetAiming(false);
+	}
+}
+
+void APlayerCharacter::AimOffset(float DeltaTime)
+{
+	if(Combat && Combat->EquippedWeapon==nullptr)return;
+	FVector Velocity = GetVelocity();
+	Velocity.Z = 0.f;
+	float Speed = Velocity.Size();
+	bool bIsInAir = GetCharacterMovement()->IsFalling();
+	if(Speed == 0.f && !bIsInAir)
+	{
+		FRotator CurrentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		FRotator DeltaAimRotation =
+			UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
+		AO_Yaw = DeltaAimRotation.Yaw;
+		bUseControllerRotationYaw = false;
+	}
+	if(Speed>0.f||bIsInAir)
+	{
+		StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		bUseControllerRotationYaw = true;
+	}
+
+	AO_Pitch = GetBaseAimRotation().Pitch;
+	if(!IsLocallyControlled() && AO_Pitch>90.f)
+	{
+		FVector2D InRange(270.f, 360.f);
+		FVector2D OutRange(-90.f, 0.f);
+		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
 	}
 }
 
@@ -312,6 +343,12 @@ bool APlayerCharacter::IsWeaponEquipped() const
 bool APlayerCharacter::IsAiming() const
 {
 	return (Combat && Combat->bAiming);
+}
+
+AWeapon* APlayerCharacter::GetEuippedWeapon() const
+{
+	if(Combat == nullptr)return nullptr;
+	return Combat->EquippedWeapon;
 }
 
 
