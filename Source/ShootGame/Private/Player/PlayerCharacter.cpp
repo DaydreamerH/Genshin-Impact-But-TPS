@@ -45,6 +45,10 @@ APlayerCharacter::APlayerCharacter()
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+	TurningInPlace = ETurningInPlace::ETIP_NotTurning;
+	NetUpdateFrequency = 66.f;
+	MinNetUpdateFrequency = 33.f;
 }
 
 void APlayerCharacter::OnRep_PlayerIndex() 
@@ -159,6 +163,7 @@ void APlayerCharacter::OnActionCrouch(const FInputActionValue& InputActionValue)
 	if(bIsCrouched)
 	{
 		UnCrouch();
+		
 	}
 	else
 	{
@@ -195,12 +200,18 @@ void APlayerCharacter::AimOffset(float DeltaTime)
 		FRotator DeltaAimRotation =
 			UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
 		AO_Yaw = DeltaAimRotation.Yaw;
-		bUseControllerRotationYaw = false;
+		bUseControllerRotationYaw = true;
+		if(TurningInPlace == ETurningInPlace::ETIP_NotTurning)
+		{
+			InterpAO_Yaw = AO_Yaw;
+		}
+		TurnInPlace(DeltaTime);
 	}
 	if(Speed>0.f||bIsInAir)
 	{
 		StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		bUseControllerRotationYaw = true;
+		TurningInPlace = ETurningInPlace::ETIP_NotTurning;
 	}
 
 	AO_Pitch = GetBaseAimRotation().Pitch;
@@ -231,16 +242,39 @@ void APlayerCharacter::UpdateMPC() const
 
 			if(MPC_Position)
 			{
-				FLinearColor NewColor(location.X, location.Y, location.Z);
 				if(UMaterialParameterCollectionInstance* mpcInst = GetWorld()->GetParameterCollectionInstance(MPC_Position))
 				{
 					FString ParameterNameString = FString::Printf(TEXT("Position_%d"), PlayerIndex);
 					FName ParameterName = FName(*ParameterNameString);
-
+					
+					FLinearColor NewColor(location.X, location.Y, location.Z);
 					mpcInst->SetVectorParameterValue(ParameterName, NewColor);
+					ParameterNameString = FString::Printf(TEXT("Radius_%d"), PlayerIndex);
+					ParameterName = FName(*ParameterNameString);
+					if(bIsCrouched)
+					{
+						mpcInst->SetScalarParameterValue(ParameterName, 300.f);
+					}
+					else
+					{
+						mpcInst->SetScalarParameterValue(ParameterName, 600.f);
+					}
+								
 				}
 			}
 		}
+	}
+}
+
+void APlayerCharacter::Jump()
+{
+	if(bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Super::Jump();
 	}
 }
 
@@ -253,6 +287,28 @@ void APlayerCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 	if(LastWeapon)
 	{
 		LastWeapon->ShowPickupWidget(false);
+	}
+}
+
+void APlayerCharacter::TurnInPlace(float DeltaTime)
+{
+	if(AO_Yaw>=90.f)
+	{
+		TurningInPlace = ETurningInPlace::ETIP_Right;
+	}
+	else if(AO_Yaw<=-90.f)
+	{
+		TurningInPlace = ETurningInPlace::ETIP_Left;
+	}
+	if(TurningInPlace != ETurningInPlace::ETIP_NotTurning)
+	{
+		InterpAO_Yaw = FMath::FInterpTo(InterpAO_Yaw, 0.f, DeltaTime, 10.f);
+		AO_Yaw = InterpAO_Yaw;
+		if(FMath::Abs(AO_Yaw)<3.f)
+		{
+			TurningInPlace = ETurningInPlace::ETIP_NotTurning;
+		}
+		StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 	}
 }
 

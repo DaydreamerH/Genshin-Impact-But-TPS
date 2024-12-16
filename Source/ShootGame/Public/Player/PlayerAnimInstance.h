@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TurningPlace.h"
 #include "Animation/AnimInstance.h"
 #include "PlayerAnimInstance.generated.h"
 
@@ -31,10 +32,10 @@ public:
 	bool bIsAccelerating;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-	bool bIsMoving = false;
+	bool bIsMoving;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-	bool bWeaponEquipped = false;
+	bool bWeaponEquipped;
 	
 	class AWeapon* EquippedWeapon;
 	
@@ -63,5 +64,8 @@ public:
 	float AO_Pitch;
 	UPROPERTY(BlueprintReadOnly, Category=Movement)
 	FTransform LeftHandTransform;
+
+	UPROPERTY(BlueprintReadOnly, Category=Movement)
+	ETurningInPlace TurningInPlace;
 private:
 };

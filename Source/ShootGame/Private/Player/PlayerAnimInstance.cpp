@@ -13,7 +13,8 @@ void UPlayerAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 
 	PlayerCharacter = Cast<APlayerCharacter>(TryGetPawnOwner());
-	
+	bIsMoving = false;
+	bWeaponEquipped = false;
 }
 
 void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -37,12 +38,15 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bIsCrouched = PlayerCharacter->bIsCrouched;
 	bAiming = PlayerCharacter->IsAiming();
 	EquippedWeapon = PlayerCharacter->GetEuippedWeapon();
+	TurningInPlace = PlayerCharacter->GetTurningInPlace();
 
 	FRotator AimRotation = PlayerCharacter->GetBaseAimRotation();
+	UE_LOG(LogTemp, Log, TEXT("%f"), AimRotation.Yaw);
 	FRotator MoveMentRotation = UKismetMathLibrary::MakeRotFromX(PlayerCharacter->GetVelocity());
 	FRotator DeltaRote = UKismetMathLibrary::NormalizedDeltaRotator(MoveMentRotation, AimRotation);
-	DeltaRotation = FMath::RInterpTo(DeltaRotation, DeltaRote, DeltaSeconds, 15.f);
+	DeltaRotation = FMath::RInterpTo(DeltaRotation, DeltaRote, DeltaSeconds, 5.f);
 	YawOffset= DeltaRotation.Yaw;
+	UE_LOG(LogTemp, Log, TEXT("%f"), YawOffset);
 	
 	CharacterRotationLastFrame = CharacterRotation;
 	CharacterRotation = PlayerCharacter->GetActorRotation();
