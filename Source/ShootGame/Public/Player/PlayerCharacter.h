@@ -88,6 +88,7 @@ private:
 	class UInputAction* IA_Aim;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* IA_Fire;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* InputMappingContext;
 

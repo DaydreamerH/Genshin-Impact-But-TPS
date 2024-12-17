@@ -4,13 +4,14 @@
 
 #include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/PlayerCharacter.h"
 #include "Weapon/Weapon.h"
 
 UCombatComponent::UCombatComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 	EquippedWeapon = nullptr;
 	bAiming = false;
 	Character = nullptr;
@@ -61,16 +62,66 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 	}
 }
 
+void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
+{
+	FVector2d ViewPortSize;
+	if(GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->GetViewportSize(ViewPortSize);
+	}
+
+	FVector2d CrossHairLocation(ViewPortSize.X/2, ViewPortSize.Y/2);
+	FVector CrossHairWorldPosition;
+	FVector CrossHairWoldDirection;
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(this, 0),
+		CrossHairLocation,
+		CrossHairWorldPosition,
+		CrossHairWoldDirection
+	);
+	if(bScreenToWorld)
+	{
+		FVector Start = CrossHairWorldPosition;
+		FVector End = Start + CrossHairWoldDirection * TRACE_LENGTH;
+		
+		GetWorld()->LineTraceSingleByChannel(
+			TraceHitResult,
+			Start,
+			End,
+			ECC_Visibility
+		);
+
+		if(!TraceHitResult.bBlockingHit)
+		{
+			TraceHitResult.ImpactPoint = End;
+
+		}
+		else
+		{
+			DrawDebugSphere(
+				GetWorld(),
+				TraceHitResult.ImpactPoint,
+				12.f,
+				12,
+				FColor::Red);
+			FString ActorName = TraceHitResult.GetActor()->GetName();
+			UE_LOG(LogTemp, Log, TEXT("Hit Actor: %s"), *ActorName);
+		}
+		
+		HitTarget = TraceHitResult.ImpactPoint;
+
+	}
+}
+
 void UCombatComponent::MuliticastFire_Implementation()
 {
-	UE_LOG(LogTemp, Log, TEXT("MultiFire"));
+
 	Character->PlayFireMontage(bAiming);
-	EquippedWeapon->Fire();
+	EquippedWeapon->Fire(HitTarget);
 }
 
 void UCombatComponent::ServerFire_Implementation()
 {
-	UE_LOG(LogTemp, Log, TEXT("ServerFire"));
 	if(EquippedWeapon == nullptr)return;
 	if(Character)
 	{
@@ -92,6 +143,8 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	FHitResult HitResult;
+	TraceUnderCrosshairs(HitResult);
 }
 
 void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
