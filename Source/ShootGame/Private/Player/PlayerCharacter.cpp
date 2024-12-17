@@ -297,16 +297,13 @@ void APlayerCharacter::Jump()
 void APlayerCharacter::PlayFireMontage(bool bAiming) const
 {
 	if(Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
-
+	UE_LOG(LogTemp, Log, TEXT("PlayFire"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if(AnimInstance && FireWeaponMontage)
+	if(AnimInstance && FireWeaponMontage && !AnimInstance->Montage_IsPlaying(FireWeaponMontage))
 	{
-		UE_LOG(LogTemp, Log, TEXT("MonStart"));
 		AnimInstance->Montage_Play(FireWeaponMontage);
 		FName SectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
 		AnimInstance->Montage_JumpToSection(SectionName, FireWeaponMontage);
-		FName CurrentSection = AnimInstance->Montage_GetCurrentSection(FireWeaponMontage);
-		UE_LOG(LogTemp, Log, TEXT("%s"), *CurrentSection.ToString());
 	}
 }
 
@@ -422,7 +419,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		if(IA_Fire)
 		{
-			inputComponent->BindAction(IA_Fire, ETriggerEvent::Started, this, &ThisClass::OnActionFirePressed);
+			inputComponent->BindAction(IA_Fire, ETriggerEvent::Triggered, this, &ThisClass::OnActionFirePressed);
 			inputComponent->BindAction(IA_Fire, ETriggerEvent::Completed, this, &ThisClass::OnActionFireReleased);
 		}
 	}

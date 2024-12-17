@@ -63,15 +63,16 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 
 void UCombatComponent::MuliticastFire_Implementation()
 {
-
+	UE_LOG(LogTemp, Log, TEXT("MultiFire"));
 	Character->PlayFireMontage(bAiming);
 	EquippedWeapon->Fire();
 }
 
 void UCombatComponent::ServerFire_Implementation()
 {
+	UE_LOG(LogTemp, Log, TEXT("ServerFire"));
 	if(EquippedWeapon == nullptr)return;
-	if(Character && bFireButtonPressed)
+	if(Character)
 	{
 		MuliticastFire();
 	}
