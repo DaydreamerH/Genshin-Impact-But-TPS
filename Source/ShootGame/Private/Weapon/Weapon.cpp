@@ -111,7 +111,7 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 
 void AWeapon::Fire()
 {
-	if(FireAnimation)
+	if(FireAnimation && !WeaponMesh->IsPlaying())
 	{
 		WeaponMesh->PlayAnimation(FireAnimation, false);
 	}
