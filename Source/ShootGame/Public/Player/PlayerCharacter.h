@@ -50,6 +50,10 @@ protected:
 	void OnActionAimPressed(const FInputActionValue& InputActionValue);
 	UFUNCTION()
 	void OnActionAimReleased(const FInputActionValue& InputActionValue);
+	UFUNCTION()
+	void OnActionFirePressed(const FInputActionValue& InputActionValue);
+	UFUNCTION()
+	void OnActionFireReleased(const FInputActionValue& InputActionValue);
 
 	void AimOffset(float DeltaTime);
 	
@@ -83,6 +87,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* IA_Aim;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* IA_Fire;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* InputMappingContext;
 
 	// 获取MPC
@@ -96,7 +102,7 @@ private:
 	class AWeapon* OverlappingWeapon;
 
 	UFUNCTION()
-	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
+	void OnRep_OverlappingWeapon(AWeapon* LastWeapon) const;
 
 	UPROPERTY(VisibleAnywhere)
 	class UCombatComponent* Combat;
@@ -112,6 +118,9 @@ private:
 	void TurnInPlace(float DeltaTime);
 
 	float InterpAO_Yaw;
+
+	UPROPERTY(EditAnywhere, Category=Combat)
+	class UAnimMontage* FireWeaponMontage;
 public:	
 	void SetOverlappingWeapon(AWeapon* Weapon);
 
@@ -124,4 +133,6 @@ public:
 	AWeapon* GetEuippedWeapon() const;
 
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const {return TurningInPlace; }
+
+	void PlayFireMontage(bool bAiming) const;
 };

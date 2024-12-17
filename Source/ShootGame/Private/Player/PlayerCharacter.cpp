@@ -187,6 +187,22 @@ void APlayerCharacter::OnActionAimReleased(const FInputActionValue& InputActionV
 	}
 }
 
+void APlayerCharacter::OnActionFirePressed(const FInputActionValue& InputActionValue)
+{
+	if(Combat)
+	{
+		Combat->FireButtonPressed(true);
+	}
+}
+
+void APlayerCharacter::OnActionFireReleased(const FInputActionValue& InputActionValue)
+{
+	if(Combat)
+	{
+		Combat->FireButtonPressed(false);
+	}
+}
+
 void APlayerCharacter::AimOffset(float DeltaTime)
 {
 	if(Combat && Combat->EquippedWeapon==nullptr)return;
@@ -278,7 +294,23 @@ void APlayerCharacter::Jump()
 	}
 }
 
-void APlayerCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
+void APlayerCharacter::PlayFireMontage(bool bAiming) const
+{
+	if(Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance && FireWeaponMontage)
+	{
+		UE_LOG(LogTemp, Log, TEXT("MonStart"));
+		AnimInstance->Montage_Play(FireWeaponMontage);
+		FName SectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
+		AnimInstance->Montage_JumpToSection(SectionName, FireWeaponMontage);
+		FName CurrentSection = AnimInstance->Montage_GetCurrentSection(FireWeaponMontage);
+		UE_LOG(LogTemp, Log, TEXT("%s"), *CurrentSection.ToString());
+	}
+}
+
+void APlayerCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon) const
 {
 	if(OverlappingWeapon)
 	{
@@ -386,6 +418,12 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		{
 			inputComponent->BindAction(IA_Aim, ETriggerEvent::Started, this, &ThisClass::OnActionAimPressed);
 			inputComponent->BindAction(IA_Aim, ETriggerEvent::Completed, this, &ThisClass::OnActionAimReleased);
+		}
+
+		if(IA_Fire)
+		{
+			inputComponent->BindAction(IA_Fire, ETriggerEvent::Started, this, &ThisClass::OnActionFirePressed);
+			inputComponent->BindAction(IA_Fire, ETriggerEvent::Completed, this, &ThisClass::OnActionFireReleased);
 		}
 	}
 	

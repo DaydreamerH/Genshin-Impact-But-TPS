@@ -41,12 +41,11 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	TurningInPlace = PlayerCharacter->GetTurningInPlace();
 
 	FRotator AimRotation = PlayerCharacter->GetBaseAimRotation();
-	UE_LOG(LogTemp, Log, TEXT("%f"), AimRotation.Yaw);
 	FRotator MoveMentRotation = UKismetMathLibrary::MakeRotFromX(PlayerCharacter->GetVelocity());
 	FRotator DeltaRote = UKismetMathLibrary::NormalizedDeltaRotator(MoveMentRotation, AimRotation);
 	DeltaRotation = FMath::RInterpTo(DeltaRotation, DeltaRote, DeltaSeconds, 5.f);
 	YawOffset= DeltaRotation.Yaw;
-	UE_LOG(LogTemp, Log, TEXT("%f"), YawOffset);
+
 	
 	CharacterRotationLastFrame = CharacterRotation;
 	CharacterRotation = PlayerCharacter->GetActorRotation();

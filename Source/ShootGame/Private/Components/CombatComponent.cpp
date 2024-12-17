@@ -51,6 +51,32 @@ void UCombatComponent::OnRep_EquippedWeapon()
 	}
 }
 
+void UCombatComponent::FireButtonPressed(bool bPressed)
+{
+	bFireButtonPressed = bPressed;
+
+	if(bFireButtonPressed)
+	{
+		ServerFire();
+	}
+}
+
+void UCombatComponent::MuliticastFire_Implementation()
+{
+
+	Character->PlayFireMontage(bAiming);
+	EquippedWeapon->Fire();
+}
+
+void UCombatComponent::ServerFire_Implementation()
+{
+	if(EquippedWeapon == nullptr)return;
+	if(Character && bFireButtonPressed)
+	{
+		MuliticastFire();
+	}
+}
+
 void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
 {
 	bAiming = bIsAiming;
