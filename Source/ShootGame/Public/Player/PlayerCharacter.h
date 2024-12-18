@@ -57,7 +57,7 @@ protected:
 
 	void AimOffset(float DeltaTime);
 	
-	void UpdateMPC() const;
+	void UpdateMPC();
 
 	virtual void Jump() override;
 private:
@@ -122,6 +122,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category=Combat)
 	class UAnimMontage* FireWeaponMontage;
+
+	float CurrentRadius;
 public:	
 	void SetOverlappingWeapon(AWeapon* Weapon);
 

@@ -247,9 +247,9 @@ void APlayerCharacter::ServerOnActionEquip_Implementation()
 	}
 }
 
-void APlayerCharacter::UpdateMPC() const
+void APlayerCharacter::UpdateMPC()
 {
-	if(PlayerIndex!=-1)
+	if(PlayerIndex != -1)
 	{
 		USkeletalMeshComponent* mesh = GetMesh();
 		if(mesh)
@@ -262,25 +262,36 @@ void APlayerCharacter::UpdateMPC() const
 				{
 					FString ParameterNameString = FString::Printf(TEXT("Position_%d"), PlayerIndex);
 					FName ParameterName = FName(*ParameterNameString);
-					
+                    
 					FLinearColor NewColor(location.X, location.Y, location.Z);
 					mpcInst->SetVectorParameterValue(ParameterName, NewColor);
-					ParameterNameString = FString::Printf(TEXT("Radius_%d"), PlayerIndex);
-					ParameterName = FName(*ParameterNameString);
-					if(bIsCrouched)
+
+					// 计算目标的 Radius 值
+					float TargetRadius = (bIsCrouched) ? 300.f : 600.f;
+
+					// 当前和目标的差值插值
+					if (FMath::IsNearlyEqual(CurrentRadius, TargetRadius, 1.f)) 
 					{
-						mpcInst->SetScalarParameterValue(ParameterName, 300.f);
+						// 当差值很小的时候，直接使用目标值，避免不必要的插值
+						CurrentRadius = TargetRadius;
 					}
 					else
 					{
-						mpcInst->SetScalarParameterValue(ParameterName, 600.f);
+						// 使用插值因子（例如，每帧平滑过渡）
+						CurrentRadius = FMath::FInterpTo(CurrentRadius, TargetRadius, GetWorld()->GetDeltaSeconds(), 5.f); // 5.f 是插值速度，可以调整
 					}
-								
+
+					// 设置插值后的 Radius 值
+					ParameterNameString = FString::Printf(TEXT("Radius_%d"), PlayerIndex);
+					ParameterName = FName(*ParameterNameString);
+					mpcInst->SetScalarParameterValue(ParameterName, CurrentRadius);
 				}
 			}
 		}
 	}
 }
+
+
 
 void APlayerCharacter::Jump()
 {

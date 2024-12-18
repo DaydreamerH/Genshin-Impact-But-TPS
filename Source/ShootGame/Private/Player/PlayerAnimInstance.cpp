@@ -45,7 +45,6 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	FRotator DeltaRote = UKismetMathLibrary::NormalizedDeltaRotator(MoveMentRotation, AimRotation);
 	DeltaRotation = FMath::RInterpTo(DeltaRotation, DeltaRote, DeltaSeconds, 5.f);
 	YawOffset= DeltaRotation.Yaw;
-
 	
 	CharacterRotationLastFrame = CharacterRotation;
 	CharacterRotation = PlayerCharacter->GetActorRotation();
