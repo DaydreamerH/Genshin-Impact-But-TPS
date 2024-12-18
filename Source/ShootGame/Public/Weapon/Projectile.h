@@ -28,5 +28,5 @@ private:
 	UPROPERTY(EditAnywhere)
 	class UParticleSystem* Tracer;
 
-	class UParticleSystemComponent TracerComponent;
+	class UParticleSystemComponent* TracerComponent;
 };

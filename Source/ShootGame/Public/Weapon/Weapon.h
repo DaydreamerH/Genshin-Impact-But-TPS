@@ -45,9 +45,11 @@ protected:
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex
 	);
-private:
+	UPROPERTY(EditAnywhere, Category="Weapon Properties")
+	class UAnimationAsset* FireAnimation;
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
 	USkeletalMeshComponent* WeaponMesh;
+private:
 
 	UPROPERTY(VisibleAnywhere, Category="WeaponProperties")
 	class USphereComponent* AreaSphere;
@@ -60,9 +62,6 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
 	class UWidgetComponent* PickupWidget;
-
-	UPROPERTY(EditAnywhere, Category="Weapon Properties")
-	class UAnimationAsset* FireAnimation;
 public:
 	FORCEINLINE void SetWeaponState(EWeaponState State);
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
