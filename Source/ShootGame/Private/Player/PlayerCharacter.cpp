@@ -229,7 +229,7 @@ void APlayerCharacter::AimOffset(float DeltaTime)
 		bUseControllerRotationYaw = true;
 		TurningInPlace = ETurningInPlace::ETIP_NotTurning;
 	}
-
+	
 	AO_Pitch = GetBaseAimRotation().Pitch;
 	if(!IsLocallyControlled() && AO_Pitch>90.f)
 	{

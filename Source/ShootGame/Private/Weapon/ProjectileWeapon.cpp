@@ -4,6 +4,7 @@
 #include "Weapon/ProjectileWeapon.h"
 
 #include "Engine/SkeletalMeshSocket.h"
+#include "Weapon/BulletShell.h"
 #include "Weapon/Projectile.h"
 
 void AProjectileWeapon::Fire(const FVector& HitTarget)
@@ -34,6 +35,24 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 						TargetRotation,
 						SpawnParameters
 					);
+				}
+			}
+			if(BulletShellClass)
+			{
+				const USkeletalMeshSocket* AmmoEjectSocket = 
+					WeaponMesh->GetSocketByName(FName("AmmoEject"));
+				if(AmmoEjectSocket)
+				{
+					FTransform AmmoSocketTransform = AmmoEjectSocket->GetSocketTransform(WeaponMesh);
+					if(UWorld* World = GetWorld())
+					{
+						World->SpawnActor<ABulletShell>(
+							BulletShellClass,
+							AmmoSocketTransform.GetLocation(),
+							AmmoSocketTransform.GetRotation().Rotator()
+							);
+					}
+			
 				}
 			}
 		}

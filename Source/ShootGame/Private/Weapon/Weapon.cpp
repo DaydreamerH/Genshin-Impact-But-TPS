@@ -4,8 +4,10 @@
 
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Engine/SkeletalMeshSocket.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/PlayerCharacter.h"
+#include "Weapon/BulletShell.h"
 
 AWeapon::AWeapon()
 {
@@ -114,6 +116,24 @@ void AWeapon::Fire(const FVector& HitTarget)
 	if(FireAnimation && !WeaponMesh->IsPlaying())
 	{
 		WeaponMesh->PlayAnimation(FireAnimation, false);
+	}
+	if(BulletShellClass)
+	{
+		const USkeletalMeshSocket* AmmoEjectSocket = 
+			WeaponMesh->GetSocketByName(FName("AmmoEject"));
+		if(AmmoEjectSocket)
+		{
+			FTransform SocketTransform = AmmoEjectSocket->GetSocketTransform(WeaponMesh);
+			if(UWorld* World = GetWorld())
+			{
+				World->SpawnActor<ABulletShell>(
+					BulletShellClass,
+					SocketTransform.GetLocation(),
+					SocketTransform.GetRotation().Rotator()
+					);
+			}
+			
+		}
 	}
 }
 
