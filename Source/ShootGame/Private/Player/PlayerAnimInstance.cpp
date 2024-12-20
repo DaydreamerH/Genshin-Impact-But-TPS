@@ -63,8 +63,25 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			->GetSocketTransform(FName("LeftHandSocket"), RTS_World);
 		FVector OutPosition;
 		FRotator OutRotation;
-		PlayerCharacter->GetMesh()->TransformToBoneSpace(FName(TEXT("右手首")), LeftHandTransform.GetLocation(), FRotator::ZeroRotator, OutPosition, OutRotation);
+		PlayerCharacter->GetMesh()->
+			TransformToBoneSpace(FName(TEXT("右手首")), LeftHandTransform.GetLocation(), FRotator::ZeroRotator, OutPosition, OutRotation);
 		LeftHandTransform.SetLocation(OutPosition);
 		LeftHandTransform.SetRotation(FQuat(OutRotation));
+
+		if(PlayerCharacter->IsLocallyControlled())
+		{
+			FTransform RightHandTransform = PlayerCharacter->GetMesh()
+			->GetSocketTransform(FName("RightHandSocket"), RTS_World);
+			FRotator RightHandRotation = UKismetMathLibrary::FindLookAtRotation(RightHandTransform.GetLocation(),
+				PlayerCharacter->GetHitTarget());
+			RightHandTransform.SetRotation(FQuat(RightHandRotation));
+			FVector PlayerY(FRotationMatrix(RightHandTransform.GetRotation().Rotator()).GetUnitAxis(EAxis::Y));
+			FVector WeaponLocation =
+				PlayerCharacter->GetEuippedWeapon()->GetWeaponMesh()->GetSocketLocation(FName("Root_Bone1"));
+			FRotator WeaponRotation =
+				UKismetMathLibrary::MakeRotFromXY(-PlayerY, PlayerCharacter->GetHitTarget()-WeaponLocation);
+			PlayerCharacter->GetEuippedWeapon()->GetWeaponMesh()->SetWorldRotation(WeaponRotation);
+		}
 	}
 }
+

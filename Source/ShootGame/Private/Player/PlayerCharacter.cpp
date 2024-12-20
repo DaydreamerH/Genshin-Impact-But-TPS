@@ -318,6 +318,12 @@ void APlayerCharacter::PlayFireMontage(bool bAiming) const
 	}
 }
 
+FVector APlayerCharacter::GetHitTarget() const
+{
+	if(Combat == nullptr)return  FVector();
+	return Combat->HitTarget;
+}
+
 void APlayerCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon) const
 {
 	if(OverlappingWeapon)

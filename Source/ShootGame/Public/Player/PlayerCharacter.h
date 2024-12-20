@@ -138,4 +138,6 @@ public:
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const {return TurningInPlace; }
 
 	void PlayFireMontage(bool bAiming) const;
+	
+	FVector GetHitTarget() const;
 };
