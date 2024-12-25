@@ -122,8 +122,15 @@ private:
 
 	UPROPERTY(EditAnywhere, Category=Combat)
 	class UAnimMontage* FireWeaponMontage;
+	UPROPERTY(EditAnywhere, Category=Combat)
+	UAnimMontage* HitReactMontage;
 
 	float CurrentRadius;
+
+	void HideCamera();
+	UPROPERTY(EditAnywhere)
+	float CameraThreshold = 200.f;
+
 public:	
 	void SetOverlappingWeapon(AWeapon* Weapon);
 
@@ -138,6 +145,14 @@ public:
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const {return TurningInPlace; }
 
 	void PlayFireMontage(bool bAiming) const;
+	void PlayHitReactMontage() const;
 	
 	FVector GetHitTarget() const;
+
+	FORCEINLINE UCameraComponent* GetFollowCamera() const {return FollowCamera;}
+
+	void SetCrosshairShootingFactor() const;
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastHit();
 };

@@ -15,6 +15,7 @@
 #include "Materials/MaterialParameterCollection.h"
 #include "Materials/MaterialParameterCollectionInstance.h"
 #include "Net/UnrealNetwork.h"
+#include "ShootGame/ShootGame.h"
 #include "Weapon/Weapon.h"
 
 APlayerCharacter::APlayerCharacter()
@@ -44,8 +45,10 @@ APlayerCharacter::APlayerCharacter()
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetMesh()->SetCollisionObjectType(ECC_SkeletalMesh);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
-
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	
 	TurningInPlace = ETurningInPlace::ETIP_NotTurning;
 	NetUpdateFrequency = 66.f;
 	MinNetUpdateFrequency = 33.f;
@@ -97,7 +100,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	
 	this->UpdateMPC();
 	AimOffset(DeltaTime);
-	
+	HideCamera();
 }
 
 void APlayerCharacter::OnActionMoveForward(const FInputActionValue& InputActionValue)
@@ -304,13 +307,24 @@ void APlayerCharacter::Jump()
 void APlayerCharacter::PlayFireMontage(bool bAiming) const
 {
 	if(Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
-	UE_LOG(LogTemp, Log, TEXT("PlayFire"));
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if(AnimInstance && FireWeaponMontage && !AnimInstance->Montage_IsPlaying(FireWeaponMontage))
 	{
 		AnimInstance->Montage_Play(FireWeaponMontage);
-		FName SectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
-		AnimInstance->Montage_JumpToSection(SectionName, FireWeaponMontage);
+		const FName SectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
+		AnimInstance->Montage_JumpToSection(SectionName);
+	}
+}
+
+void APlayerCharacter::PlayHitReactMontage() const
+{
+	if(Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance && HitReactMontage)
+	{
+		AnimInstance->Montage_Play(HitReactMontage);
+		const FName SectionName ("FromFront");
+		AnimInstance->Montage_JumpToSection(SectionName);
 	}
 }
 
@@ -318,6 +332,14 @@ FVector APlayerCharacter::GetHitTarget() const
 {
 	if(Combat == nullptr)return  FVector();
 	return Combat->HitTarget;
+}
+
+void APlayerCharacter::SetCrosshairShootingFactor() const
+{
+	if(Combat && Combat->EquippedWeapon)
+	{
+		Combat->SetCrosshairShootingFactor(Combat->EquippedWeapon->GetDeltaCrosshairShootingFactor());
+	}
 }
 
 void APlayerCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon) const
@@ -354,6 +376,32 @@ void APlayerCharacter::TurnInPlace(float DeltaTime)
 	}
 }
 
+void APlayerCharacter::HideCamera()
+{
+	if(!IsLocallyControlled())return;
+	if((FollowCamera->GetComponentLocation()-GetActorLocation()).Size()<CameraThreshold)
+	{
+		GetMesh()->SetVisibility(false);
+		if(Combat&&Combat->EquippedWeapon&&Combat->EquippedWeapon->GetWeaponMesh())
+		{
+			Combat->EquippedWeapon->GetWeaponMesh()->bOwnerNoSee = true;
+		}
+	}
+	else
+	{
+		GetMesh()->SetVisibility(true);
+		if(Combat&&Combat->EquippedWeapon&&Combat->EquippedWeapon->GetWeaponMesh())
+		{
+			Combat->EquippedWeapon->GetWeaponMesh()->bOwnerNoSee = false;
+		}
+	}
+}
+
+void APlayerCharacter::MulticastHit_Implementation()
+{
+	PlayHitReactMontage();
+}
+
 void APlayerCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 {
 	if(OverlappingWeapon)
@@ -368,9 +416,6 @@ void APlayerCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 			OverlappingWeapon->ShowPickupWidget(true);
 	}
 }
-
-
-
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
