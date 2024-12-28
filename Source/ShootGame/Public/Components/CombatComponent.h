@@ -15,7 +15,7 @@ class SHOOTGAME_API UCombatComponent : public UActorComponent
 public:	
 	UCombatComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
+	
 	friend class APlayerCharacter;
 
 	void EquipWeapon(class AWeapon* WeaponToEquip);

@@ -37,6 +37,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bWeaponEquipped = PlayerCharacter->IsWeaponEquipped();
 	bIsCrouched = PlayerCharacter->bIsCrouched;
 	bAiming = PlayerCharacter->IsAiming();
+	bElimmed = PlayerCharacter->IsElimmed();
 	EquippedWeapon = PlayerCharacter->GetEuippedWeapon();
 	TurningInPlace = PlayerCharacter->GetTurningInPlace();
 
@@ -68,20 +69,26 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		LeftHandTransform.SetLocation(OutPosition);
 		LeftHandTransform.SetRotation(FQuat(OutRotation));
 
-		if(PlayerCharacter->IsLocallyControlled())
+		if (PlayerCharacter && PlayerCharacter->IsLocallyControlled())
 		{
-			FTransform RightHandTransform = PlayerCharacter->GetMesh()
-			->GetSocketTransform(FName("RightHandSocket"), RTS_World);
-			FRotator RightHandRotation = UKismetMathLibrary::FindLookAtRotation(RightHandTransform.GetLocation(),
-				PlayerCharacter->GetHitTarget());
+			FTransform RightHandTransform = PlayerCharacter->GetMesh()->GetSocketTransform(FName("RightHandSocket"), RTS_World);
+
+			FRotator RightHandRotation = UKismetMathLibrary::FindLookAtRotation(RightHandTransform.GetLocation(), PlayerCharacter->GetHitTarget());
 			RightHandTransform.SetRotation(FQuat(RightHandRotation));
+
 			FVector PlayerY(FRotationMatrix(RightHandTransform.GetRotation().Rotator()).GetUnitAxis(EAxis::Y));
-			FVector WeaponLocation =
-				PlayerCharacter->GetEuippedWeapon()->GetWeaponMesh()->GetSocketLocation(FName("Root_Bone1"));
-			FRotator WeaponRotation =
-				UKismetMathLibrary::MakeRotFromXY(-PlayerY, PlayerCharacter->GetHitTarget()-WeaponLocation);
-			PlayerCharacter->GetEuippedWeapon()->GetWeaponMesh()->SetWorldRotation(WeaponRotation);
+
+			FVector WeaponLocation = EquippedWeapon->GetWeaponMesh()->GetSocketLocation(FName("Root_Bone1"));
+			FRotator WeaponRotation = UKismetMathLibrary::MakeRotFromXY(-PlayerY, PlayerCharacter->GetHitTarget() - WeaponLocation);
+
+			FRotator CurrentWeaponRotation = EquippedWeapon->GetWeaponMesh()->GetComponentRotation();
+
+			float DeltaTime = GetWorld()->GetDeltaSeconds();
+			FRotator SmoothedWeaponRotation = FMath::RInterpTo(CurrentWeaponRotation, WeaponRotation, DeltaTime, 10.0f);
+
+			EquippedWeapon->GetWeaponMesh()->SetWorldRotation(SmoothedWeaponRotation);
 		}
+
 	}
 }
 

@@ -18,4 +18,9 @@ private:
 public:
 	int GetPlayerIndex();
 	AShootGameMode();
+	virtual void PlayerEliminated
+	(class APlayerCharacter* EliminatedCharacter,
+		class AMyPlayerController* VictimController,
+		class AMyPlayerController* AttackController);
+	virtual void RequestRespawn(class ACharacter* ElimmedCharacter, AController* ElimmedController);
 };

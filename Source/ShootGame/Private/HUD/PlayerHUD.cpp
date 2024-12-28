@@ -3,10 +3,14 @@
 
 #include "HUD/PlayerHUD.h"
 
+#include "Blueprint/UserWidget.h"
+#include "HUD/CharacterOverlay.h"
+
 void APlayerHUD::DrawHUD()
 {
 	Super::DrawHUD();
 
+	
 	FVector2d ViewportSize;
 	if(GEngine)
 	{
@@ -40,6 +44,23 @@ void APlayerHUD::DrawHUD()
 			FVector2d Spread(0.f, SpreadScaled);
 			DrawCrosshair(HUDPackage.CrosshairsBottom, ViewportCenter, Spread);
 		}
+	}
+}
+
+void APlayerHUD::BeginPlay()
+{
+	Super::BeginPlay();
+
+	AddCharacterOverlay();
+}
+
+void APlayerHUD::AddCharacterOverlay()
+{
+	APlayerController* PlayerController = GetOwningPlayerController();
+	if(PlayerController && CharacterOverlayClass)
+	{
+		CharacterOverlay = CreateWidget<UCharacterOverlay>(PlayerController, CharacterOverlayClass);
+		CharacterOverlay->AddToViewport();
 	}
 }
 

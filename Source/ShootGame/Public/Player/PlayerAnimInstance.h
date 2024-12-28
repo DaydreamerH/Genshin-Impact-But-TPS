@@ -36,6 +36,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	bool bWeaponEquipped;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	bool bElimmed = false;
 	
 	class AWeapon* EquippedWeapon;
 	

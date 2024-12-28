@@ -13,5 +13,12 @@ UCLASS()
 class SHOOTGAME_API AMyPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
+public:
+	void SetHUDHealth(float Health, float MaxHealth) const;
+	void ResetCrosshair() const;
+	void ResetHUD() const;
+protected:
+	virtual void BeginPlay() override;
+private:
+	class APlayerHUD* PlayerHUD;
 };

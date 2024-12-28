@@ -56,6 +56,7 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	}
 }
 
+
 void UCombatComponent::SetAiming(bool bIsAiming)
 {
 	bAiming = bIsAiming;
@@ -134,6 +135,10 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 
 void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 {
+	if(EquippedWeapon == nullptr)
+	{
+		
+	}
 	if(Character == nullptr || Character->Controller == nullptr)return;
 	Controller = Controller == nullptr?Cast<AMyPlayerController>(Character->Controller):Controller;
 
@@ -142,8 +147,12 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 		HUD = HUD == nullptr? Cast<APlayerHUD>(Controller->GetHUD()):HUD;
 		if (HUD)
 		{
-			if(EquippedWeapon == nullptr) return;
 			FHUDPackage HUDPackage ;
+			if(EquippedWeapon == nullptr)
+			{
+				HUD->SetHUDPackage(HUDPackage);
+				return;
+			}
 			HUDPackage.CrosshairsCenter = EquippedWeapon->CrosshairsCenter;
 			HUDPackage.CrosshairsLeft = EquippedWeapon->CrosshairsLeft;
 			HUDPackage.CrosshairsRight = EquippedWeapon->CrosshairsRight;

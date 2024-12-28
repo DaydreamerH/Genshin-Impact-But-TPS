@@ -29,6 +29,19 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void PostInitializeComponents() override;
+
+	void Elim(); // 只在服务器上
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastElim();
+
+	FTimerHandle ElimTimer;
+	FTimerHandle HealthRecoveryTimerHandle;
+
+	UPROPERTY(EditDefaultsOnly)
+	float ElimDelay = 2.5f;
+	
+	void ElimTimerFinished();
 protected:
 	virtual void BeginPlay() override;
 
@@ -60,6 +73,15 @@ protected:
 	void UpdateMPC();
 
 	virtual void Jump() override;
+
+	UFUNCTION()
+	void ReceiveDamage
+	(AActor* DamageActor, float Damage,
+		const UDamageType* DamageType,
+		class AController* InstigatorController,
+		AActor* DamageCauser);
+
+	
 private:
 	
 	// 相机模块
@@ -124,6 +146,8 @@ private:
 	class UAnimMontage* FireWeaponMontage;
 	UPROPERTY(EditAnywhere, Category=Combat)
 	UAnimMontage* HitReactMontage;
+	UPROPERTY(EditAnywhere, Category=Combat)
+	UAnimMontage* ElimMontage;
 
 	float CurrentRadius;
 
@@ -131,6 +155,26 @@ private:
 	UPROPERTY(EditAnywhere)
 	float CameraThreshold = 200.f;
 
+	UPROPERTY(EditAnywhere, Category= "Player Stats")
+	float MaxHealth = 100.f;
+
+	UPROPERTY(ReplicatedUsing=OnRep_Health, VisibleAnywhere, Category="Player Stats")
+	float Health = 100.f;
+
+	UFUNCTION()
+	void OnRep_Health();
+
+	class AMyPlayerController* PlayerController;
+
+	void UpdateHUDHealth();
+
+	bool bElimmed = false;
+
+	void StartHealthRecovery();
+
+	UFUNCTION()
+	void RecoverHealthTick();
+	
 public:	
 	void SetOverlappingWeapon(AWeapon* Weapon);
 
@@ -146,6 +190,7 @@ public:
 
 	void PlayFireMontage(bool bAiming) const;
 	void PlayHitReactMontage() const;
+	void PlayElimMontage() const;
 	
 	FVector GetHitTarget() const;
 
@@ -153,6 +198,6 @@ public:
 
 	void SetCrosshairShootingFactor() const;
 
-	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastHit();
+	FORCEINLINE bool IsElimmed() const { return bElimmed; }
+	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 };

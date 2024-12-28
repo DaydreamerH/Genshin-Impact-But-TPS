@@ -15,6 +15,7 @@
 #include "Materials/MaterialParameterCollection.h"
 #include "Materials/MaterialParameterCollectionInstance.h"
 #include "Net/UnrealNetwork.h"
+#include "PlayerController/MyPlayerController.h"
 #include "ShootGame/ShootGame.h"
 #include "Weapon/Weapon.h"
 
@@ -65,6 +66,7 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(APlayerCharacter, PlayerIndex);
 	DOREPLIFETIME_CONDITION(APlayerCharacter, OverlappingWeapon, COND_OwnerOnly);
+	DOREPLIFETIME(APlayerCharacter, Health);
 }
 
 void APlayerCharacter::PostInitializeComponents()
@@ -75,6 +77,33 @@ void APlayerCharacter::PostInitializeComponents()
 	{
 		Combat->Character = this;
 	}
+}
+
+void APlayerCharacter::Elim()
+{
+	MulticastElim();
+	StartHealthRecovery();
+	GetWorldTimerManager().SetTimer(
+		ElimTimer,
+		this,
+		&ThisClass::ElimTimerFinished,
+		ElimDelay
+	);
+}
+
+void APlayerCharacter::MulticastElim_Implementation()
+{
+	bElimmed = true;
+	PlayElimMontage();
+}
+
+void APlayerCharacter::ElimTimerFinished()
+{
+	if(AShootGameMode* ShootGameMode = GetWorld()->GetAuthGameMode<AShootGameMode>())
+	{
+		ShootGameMode->RequestRespawn(this, PlayerController);
+	}
+	
 }
 
 void APlayerCharacter::BeginPlay()
@@ -91,7 +120,11 @@ void APlayerCharacter::BeginPlay()
 		{
 			PlayerIndex = sGM->GetPlayerIndex();
 		}
+
+		OnTakeAnyDamage.AddDynamic(this, &ThisClass::ReceiveDamage);
 	}
+	
+	UpdateHUDHealth();
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
@@ -304,11 +337,33 @@ void APlayerCharacter::Jump()
 	}
 }
 
+void APlayerCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UDamageType* DamageType,
+	AController* InstigatorController, AActor* DamageCauser)
+{
+	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
+	UpdateHUDHealth();
+	PlayHitReactMontage();
+
+	if(Health<=0.f)
+	{
+		if(AShootGameMode* ShootGameMode = GetWorld()->GetAuthGameMode<AShootGameMode>())
+		{
+			if((PlayerController = PlayerController == nullptr ? Cast<AMyPlayerController>(GetController()):PlayerController))
+			{
+				AMyPlayerController* AttackerController =
+					Cast<AMyPlayerController>(InstigatorController);
+				
+				ShootGameMode->PlayerEliminated
+				(this, PlayerController, AttackerController);
+			}
+		}	
+	}
+}
+
 void APlayerCharacter::PlayFireMontage(bool bAiming) const
 {
 	if(Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if(AnimInstance && FireWeaponMontage && !AnimInstance->Montage_IsPlaying(FireWeaponMontage))
+	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && FireWeaponMontage && !AnimInstance->Montage_IsPlaying(FireWeaponMontage))
 	{
 		AnimInstance->Montage_Play(FireWeaponMontage);
 		const FName SectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
@@ -319,12 +374,19 @@ void APlayerCharacter::PlayFireMontage(bool bAiming) const
 void APlayerCharacter::PlayHitReactMontage() const
 {
 	if(Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if(AnimInstance && HitReactMontage)
+	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && HitReactMontage)
 	{
 		AnimInstance->Montage_Play(HitReactMontage);
 		const FName SectionName ("FromFront");
 		AnimInstance->Montage_JumpToSection(SectionName);
+	}
+}
+
+void APlayerCharacter::PlayElimMontage() const
+{
+	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && ElimMontage)
+	{
+		AnimInstance->Montage_Play(ElimMontage);
 	}
 }
 
@@ -397,9 +459,20 @@ void APlayerCharacter::HideCamera()
 	}
 }
 
-void APlayerCharacter::MulticastHit_Implementation()
+void APlayerCharacter::OnRep_Health()
 {
+	UpdateHUDHealth();
 	PlayHitReactMontage();
+}
+
+void APlayerCharacter::UpdateHUDHealth()
+{
+	if(!IsLocallyControlled())return;
+	PlayerController = PlayerController == nullptr?Cast<AMyPlayerController>(Controller):PlayerController;
+	if(PlayerController)
+	{
+		PlayerController->SetHUDHealth(Health, MaxHealth);
+	}
 }
 
 void APlayerCharacter::SetOverlappingWeapon(AWeapon* Weapon)
@@ -500,4 +573,24 @@ AWeapon* APlayerCharacter::GetEuippedWeapon() const
 	return Combat->EquippedWeapon;
 }
 
+void APlayerCharacter::StartHealthRecovery()
+{
+	GetWorld()->GetTimerManager().SetTimer(HealthRecoveryTimerHandle, this, &APlayerCharacter::RecoverHealthTick, GetWorld()->GetDeltaSeconds(), true);
+}
 
+void APlayerCharacter::RecoverHealthTick()
+{
+	if (Health < MaxHealth)
+	{
+		float HealthIncreasePerTick = MaxHealth / ((ElimDelay-0.1f) / GetWorld()->GetDeltaSeconds());
+		Health += HealthIncreasePerTick;
+		
+		Health = FMath::Min(Health, MaxHealth);
+
+		UpdateHUDHealth();
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().ClearTimer(HealthRecoveryTimerHandle);
+	}
+}
