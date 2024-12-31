@@ -12,6 +12,7 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 	if(FireAnimation && !WeaponMesh->IsPlaying())
 	{
 		WeaponMesh->PlayAnimation(FireAnimation, false);
+		SpendRounnd();
 		if(!HasAuthority()) return;
 		APawn* InstigatorPawn = Cast<APawn>(GetOwner());
 

@@ -58,6 +58,9 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	AO_Yaw = PlayerCharacter->GetAO_Yaw();
 	AO_Pitch = PlayerCharacter->GetAO_Pitch();
 
+	bUseFABRIK = PlayerCharacter->GetCombatState() != ECombatState::ECS_Reloading;
+
+	
 	if(bWeaponEquipped && EquippedWeapon && EquippedWeapon->GetWeaponMesh() && PlayerCharacter->GetMesh())
 	{
 		LeftHandTransform = EquippedWeapon->GetWeaponMesh()
@@ -69,7 +72,8 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		LeftHandTransform.SetLocation(OutPosition);
 		LeftHandTransform.SetRotation(FQuat(OutRotation));
 
-		if (PlayerCharacter && PlayerCharacter->IsLocallyControlled())
+		if (PlayerCharacter && PlayerCharacter->IsLocallyControlled()
+			&& bUseFABRIK)
 		{
 			FTransform RightHandTransform = PlayerCharacter->GetMesh()->GetSocketTransform(FName("RightHandSocket"), RTS_World);
 
@@ -90,5 +94,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		}
 
 	}
+
+	
 }
 

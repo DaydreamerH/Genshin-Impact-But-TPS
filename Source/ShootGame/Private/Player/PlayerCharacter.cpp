@@ -1,5 +1,6 @@
 #include "ShootGame/Public/Player/PlayerCharacter.h"
 
+#include "AsyncTreeDifferences.h"
 #include "EnhancedInputSubsystemInterface.h"
 #include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
@@ -15,6 +16,7 @@
 #include "Materials/MaterialParameterCollection.h"
 #include "Materials/MaterialParameterCollectionInstance.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/MyPlayerState.h"
 #include "PlayerController/MyPlayerController.h"
 #include "ShootGame/ShootGame.h"
 #include "Weapon/Weapon.h"
@@ -81,6 +83,11 @@ void APlayerCharacter::PostInitializeComponents()
 
 void APlayerCharacter::Elim()
 {
+	if(Combat && Combat->EquippedWeapon)
+	{
+		Combat->EquippedWeapon->Dropped();
+	}
+	
 	MulticastElim();
 	StartHealthRecovery();
 	GetWorldTimerManager().SetTimer(
@@ -93,8 +100,20 @@ void APlayerCharacter::Elim()
 
 void APlayerCharacter::MulticastElim_Implementation()
 {
+	if(PlayerController)
+	{
+		PlayerController->SetHUDWeaponAmmo(0);
+	}
+	
 	bElimmed = true;
 	PlayElimMontage();
+	
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	if(IsLocallyControlled() && PlayerController)
+	{
+		DisableInput(PlayerController);
+	}
 }
 
 void APlayerCharacter::ElimTimerFinished()
@@ -134,6 +153,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	this->UpdateMPC();
 	AimOffset(DeltaTime);
 	HideCamera();
+	PollInit();
 }
 
 void APlayerCharacter::OnActionMoveForward(const FInputActionValue& InputActionValue)
@@ -236,6 +256,14 @@ void APlayerCharacter::OnActionFireReleased(const FInputActionValue& InputAction
 	if(Combat)
 	{
 		Combat->FireButtonPressed(false);
+	}
+}
+
+void APlayerCharacter::OnActionReload(const FInputActionValue& InputActionValue)
+{
+	if(Combat)
+	{
+		Combat->Reload();
 	}
 }
 
@@ -360,6 +388,20 @@ void APlayerCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UD
 	}
 }
 
+void APlayerCharacter::PollInit()
+{
+	if(MyPlayerState==nullptr)
+	{
+		MyPlayerState = GetPlayerState<AMyPlayerState>();
+		if(MyPlayerState)
+		{
+			MyPlayerState->AddToScore(0.f);
+			MyPlayerState->AddToDefeats(0);
+		}
+		
+	}
+}
+
 void APlayerCharacter::PlayFireMontage(bool bAiming) const
 {
 	if(Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
@@ -390,6 +432,27 @@ void APlayerCharacter::PlayElimMontage() const
 	}
 }
 
+void APlayerCharacter::PlayReloadMontage() const
+{
+	if(Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
+	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && ReloadMontage && !AnimInstance->Montage_IsPlaying(ReloadMontage))
+	{
+		AnimInstance->Montage_Play(ReloadMontage);
+		FName SectionName;
+
+		switch (Combat->EquippedWeapon->GetWeaponType())
+		{
+		case EWeaponType::EWT_AssultRifle:
+			SectionName = FName("Rifle");
+			break;
+		default:
+			break;
+		}
+		
+		AnimInstance->Montage_JumpToSection(SectionName);
+	}
+}
+
 FVector APlayerCharacter::GetHitTarget() const
 {
 	if(Combat == nullptr)return  FVector();
@@ -402,6 +465,15 @@ void APlayerCharacter::SetCrosshairShootingFactor() const
 	{
 		Combat->SetCrosshairShootingFactor(Combat->EquippedWeapon->GetDeltaCrosshairShootingFactor());
 	}
+}
+
+ECombatState APlayerCharacter::GetCombatState() const
+{
+	if(Combat)
+	{
+		return Combat->CombatState;
+	}
+	return ECombatState::ECS_MAX;
 }
 
 void APlayerCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon) const
@@ -552,6 +624,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		{
 			inputComponent->BindAction(IA_Fire, ETriggerEvent::Triggered, this, &ThisClass::OnActionFirePressed);
 			inputComponent->BindAction(IA_Fire, ETriggerEvent::Completed, this, &ThisClass::OnActionFireReleased);
+		}
+
+		if(IA_Reload)
+		{
+			inputComponent->BindAction(IA_Reload, ETriggerEvent::Triggered, this, &ThisClass::OnActionReload);
 		}
 	}
 	

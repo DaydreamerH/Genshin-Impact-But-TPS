@@ -4,6 +4,7 @@
 #include "HUD/PlayerHUD.h"
 
 #include "Blueprint/UserWidget.h"
+#include "HUD/Announcement.h"
 #include "HUD/CharacterOverlay.h"
 
 void APlayerHUD::DrawHUD()
@@ -50,8 +51,6 @@ void APlayerHUD::DrawHUD()
 void APlayerHUD::BeginPlay()
 {
 	Super::BeginPlay();
-
-	AddCharacterOverlay();
 }
 
 void APlayerHUD::AddCharacterOverlay()
@@ -61,6 +60,16 @@ void APlayerHUD::AddCharacterOverlay()
 	{
 		CharacterOverlay = CreateWidget<UCharacterOverlay>(PlayerController, CharacterOverlayClass);
 		CharacterOverlay->AddToViewport();
+	}
+}
+
+void APlayerHUD::AddAnnouncement()
+{
+	APlayerController* PlayerController = GetOwningPlayerController();
+	if(PlayerController && AnnouncementClass)
+	{
+		Announcement = CreateWidget<UAnnouncement>(PlayerController, AnnouncementClass);
+		Announcement->AddToViewport();
 	}
 }
 

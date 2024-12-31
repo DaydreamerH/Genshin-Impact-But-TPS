@@ -2,7 +2,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CombatStates.h"
 #include "Components/ActorComponent.h"
+#include "Weapon/WeaponTypes.h"
 #include "CombatComponent.generated.h"
 
 #define TRACE_LENGTH 8000
@@ -19,6 +21,7 @@ public:
 	friend class APlayerCharacter;
 
 	void EquipWeapon(class AWeapon* WeaponToEquip);
+	void Reload();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 protected:
@@ -41,11 +44,19 @@ protected:
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 
 	void SetHUDCrosshairs(float DeltaTime);
-private:
-	class APlayerCharacter* Character;
 
+	UFUNCTION(Server, Reliable)
+	void ServerReload();
+
+	void HandleReload();
+
+	int32 AmountToReload();
+private:
+	UPROPERTY()
+	APlayerCharacter* Character;
+	UPROPERTY()
 	class AMyPlayerController* Controller;
-	
+	UPROPERTY()
 	class APlayerHUD* HUD;
 
 	float CrosshairVelocityFactor;
@@ -78,7 +89,35 @@ private:
 	float ZoomInterpSpeed = 20.f;
 
 	void InterpFOV(float DeltaTime);
+
+	bool CanFire();
+
+	UPROPERTY(ReplicatedUsing=OnRep_CarriedAmmo)
+	int32 CarriedAmmo;
+
+	UFUNCTION()
+	void OnRep_CarriedAmmo();
+
+	TMap<EWeaponType, int32> CarriedAmmoMap;
+
+	UPROPERTY(EditAnywhere)
+	int32 StartingARAmmo = 30;
+	
+	void InitializeCarriedAmmo();
+
+	UPROPERTY(ReplicatedUsing=OnRep_CombatState)
+	ECombatState CombatState;
+
+	UFUNCTION()
+	void OnRep_CombatState();
+
+	void UpdateAmmoValue();
+
+	bool bPlayNoAmmoSound = true;
 public:	
 	
 	void SetCrosshairShootingFactor(float f);
+
+	UFUNCTION(BlueprintCallable)
+	void FinishReloading();
 };

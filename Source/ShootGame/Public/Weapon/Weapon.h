@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WeaponTypes.h"
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
@@ -26,6 +27,16 @@ public:
 	void ShowPickupWidget(bool bShowWidget);
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Fire(const FVector& HitTarget);
+	void Dropped();
+	virtual void OnRep_Owner() override;
+	void SetHUDAmmo();
+	void AddAmmo(int32 AmmoToAdd);
+
+	UPROPERTY(EditAnywhere)
+	class USoundCue* EquipSound;
+
+	UPROPERTY(EditAnywhere)
+	USoundCue* NoAmmoSound;
 protected:
 	virtual void BeginPlay() override;
 	
@@ -51,6 +62,17 @@ protected:
 	USkeletalMeshComponent* WeaponMesh;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ABulletShell> BulletShellClass;
+
+	UPROPERTY(EditAnywhere, ReplicatedUsing=OnRep_Ammo)
+	int32 Ammo;
+
+	UFUNCTION()
+	void OnRep_Ammo();
+
+	void SpendRounnd();
+	
+	UPROPERTY(EditAnywhere)
+	int32 MagCapcitiy = 30;
 private:
 
 	UPROPERTY(VisibleAnywhere, Category="WeaponProperties")
@@ -62,7 +84,7 @@ private:
 	UFUNCTION()
 	void OnRep_WeaponState();
 	
-	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
+	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties", meta=(AllowPrivateAccess="true"))
 	class UWidgetComponent* PickupWidget;
 
 	UPROPERTY(EditAnywhere)
@@ -73,6 +95,14 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float DeltaCrosshairShootingFactor = .2f;
+	
+	UPROPERTY()
+	class APlayerCharacter* OwnerPlayerCharacter;
+	UPROPERTY()
+	class AMyPlayerController* OwnerPlayerController;
+
+	UPROPERTY(EditAnywhere)
+	EWeaponType WeaponType;
 public:
 	FORCEINLINE void SetWeaponState(EWeaponState State);
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
@@ -92,4 +122,9 @@ public:
 	FORCEINLINE float GetZoomedFOV() const {return ZoomedFOV;}
 	FORCEINLINE float GetZoomInterpSpeed() const {return ZoomInterpSpeed;}
 	FORCEINLINE float GetDeltaCrosshairShootingFactor() const {return DeltaCrosshairShootingFactor;}
+	FORCEINLINE bool AmmoEqualsZero() const { return Ammo <= 0; }
+	FORCEINLINE EWeaponType GetWeaponType() const {return WeaponType;}
+
+	FORCEINLINE int32 GetAmmo() const {return Ammo; }
+	FORCEINLINE int32 GetMagCapcity() const {return MagCapcitiy;}
 };

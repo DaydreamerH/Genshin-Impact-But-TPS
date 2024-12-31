@@ -2,11 +2,13 @@
 
 #include "ShootGame/Public/Weapon/Weapon.h"
 
+#include "AudioDevice.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/PlayerCharacter.h"
+#include "PlayerController/MyPlayerController.h"
 #include "Weapon/BulletShell.h"
 
 AWeapon::AWeapon()
@@ -74,12 +76,29 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	}
 }
 
+void AWeapon::OnRep_Ammo()
+{
+	SetHUDAmmo();
+}
+
+void AWeapon::SpendRounnd()
+{
+	Ammo = FMath::Clamp(Ammo - 1, 0, MagCapcitiy);
+	SetHUDAmmo();
+}
+
 void AWeapon::OnRep_WeaponState()
 {
 	switch (WeaponState)
 	{
 	case EWeaponState::EWS_Equipped:
 		ShowPickupWidget(false);
+		WeaponMesh->SetSimulatePhysics(false);
+		WeaponMesh->SetEnableGravity(false);
+		break;
+	case EWeaponState::EWS_Dropped:
+		WeaponMesh->SetSimulatePhysics(true);
+		WeaponMesh->SetEnableGravity(true);
 		break;
 	}
 }
@@ -92,6 +111,16 @@ void AWeapon::SetWeaponState(EWeaponState State)
 	case EWeaponState::EWS_Equipped:
 		ShowPickupWidget(false);
 		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		WeaponMesh->SetSimulatePhysics(false);
+		WeaponMesh->SetEnableGravity(false);
+		break;
+	case EWeaponState::EWS_Dropped:
+		if(HasAuthority())
+		{
+			AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		}
+		WeaponMesh->SetSimulatePhysics(true);
+		WeaponMesh->SetEnableGravity(true);
 		break;
 	}
 }
@@ -109,6 +138,7 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AWeapon, WeaponState);
+	DOREPLIFETIME(AWeapon, Ammo);
 }
 
 void AWeapon::Fire(const FVector& HitTarget)
@@ -116,23 +146,71 @@ void AWeapon::Fire(const FVector& HitTarget)
 	if(FireAnimation && !WeaponMesh->IsPlaying())
 	{
 		WeaponMesh->PlayAnimation(FireAnimation, false);
-	}
-	if(BulletShellClass)
-	{
-		if(const USkeletalMeshSocket* AmmoEjectSocket = 
-			WeaponMesh->GetSocketByName(FName("AmmoEject")))
+		if(BulletShellClass)
 		{
-			FTransform SocketTransform = AmmoEjectSocket->GetSocketTransform(WeaponMesh);
-			if(UWorld* World = GetWorld())
+			if(const USkeletalMeshSocket* AmmoEjectSocket = 
+				WeaponMesh->GetSocketByName(FName("AmmoEject")))
 			{
-				World->SpawnActor<ABulletShell>(
-					BulletShellClass,
-					SocketTransform.GetLocation(),
-					SocketTransform.GetRotation().Rotator()
-					);
-			}
+				FTransform SocketTransform = AmmoEjectSocket->GetSocketTransform(WeaponMesh);
+				if(UWorld* World = GetWorld())
+				{
+					World->SpawnActor<ABulletShell>(
+						BulletShellClass,
+						SocketTransform.GetLocation(),
+						SocketTransform.GetRotation().Rotator()
+						);
+				}
 			
+			}
+		}
+		SpendRounnd();
+	}
+	
+}
+
+void AWeapon::Dropped()
+{
+	SetWeaponState(EWeaponState::EWS_Dropped);
+	FDetachmentTransformRules DetachmentTransformRules(EDetachmentRule::KeepWorld, true);
+	WeaponMesh->DetachFromComponent(DetachmentTransformRules);
+	OwnerPlayerCharacter=nullptr;
+	OwnerPlayerController=nullptr;
+	SetOwner(nullptr);
+}
+
+void AWeapon::OnRep_Owner()
+{
+	Super::OnRep_Owner();
+	if(Owner == nullptr)
+	{
+		OwnerPlayerCharacter = nullptr;
+		OwnerPlayerController = nullptr;
+	}
+	else
+	{
+		SetHUDAmmo();
+	}
+}
+
+void AWeapon::SetHUDAmmo()
+{
+	OwnerPlayerCharacter = OwnerPlayerCharacter==nullptr?Cast<APlayerCharacter>(GetOwner()):OwnerPlayerCharacter;
+	if(OwnerPlayerCharacter)
+	{
+		OwnerPlayerController =
+			OwnerPlayerController==nullptr?
+				Cast<AMyPlayerController>(OwnerPlayerCharacter->GetController()):OwnerPlayerController;
+
+		if(OwnerPlayerController)
+		{
+			OwnerPlayerController->SetHUDWeaponAmmo(Ammo);
 		}
 	}
+}
+
+void AWeapon::AddAmmo(int32 AmmoToAdd)
+{
+	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapcitiy);
+	SetHUDAmmo();
 }
 

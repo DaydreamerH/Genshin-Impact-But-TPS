@@ -39,7 +39,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	bool bElimmed = false;
-	
+
+	UPROPERTY()
 	class AWeapon* EquippedWeapon;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
@@ -70,5 +71,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category=Movement)
 	ETurningInPlace TurningInPlace;
+
+	UPROPERTY(BlueprintReadOnly, Category=Movement)
+	bool bUseFABRIK;
 private:
+	
 };

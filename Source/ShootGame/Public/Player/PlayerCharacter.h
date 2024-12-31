@@ -6,6 +6,7 @@
 #include "TurningPlace.h"
 #include "GameFramework/Character.h"
 #include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/inputActionValue.h"
+#include "Components/CombatStates.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -67,6 +68,8 @@ protected:
 	void OnActionFirePressed(const FInputActionValue& InputActionValue);
 	UFUNCTION()
 	void OnActionFireReleased(const FInputActionValue& InputActionValue);
+	UFUNCTION()
+	void OnActionReload(const FInputActionValue& InputActionValue);
 
 	void AimOffset(float DeltaTime);
 	
@@ -81,7 +84,7 @@ protected:
 		class AController* InstigatorController,
 		AActor* DamageCauser);
 
-	
+	void PollInit();
 private:
 	
 	// 相机模块
@@ -110,7 +113,8 @@ private:
 	class UInputAction* IA_Aim;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* IA_Fire;
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* IA_Reload;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* InputMappingContext;
 
@@ -127,7 +131,7 @@ private:
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* LastWeapon) const;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
 	class UCombatComponent* Combat;
 
 	UFUNCTION(Server, Reliable)
@@ -148,6 +152,8 @@ private:
 	UAnimMontage* HitReactMontage;
 	UPROPERTY(EditAnywhere, Category=Combat)
 	UAnimMontage* ElimMontage;
+	UPROPERTY(EditAnywhere, Category=Combat)
+	UAnimMontage* ReloadMontage;
 
 	float CurrentRadius;
 
@@ -164,6 +170,7 @@ private:
 	UFUNCTION()
 	void OnRep_Health();
 
+	UPROPERTY()
 	class AMyPlayerController* PlayerController;
 
 	void UpdateHUDHealth();
@@ -174,7 +181,9 @@ private:
 
 	UFUNCTION()
 	void RecoverHealthTick();
-	
+
+	UPROPERTY()
+	class AMyPlayerState* MyPlayerState;
 public:	
 	void SetOverlappingWeapon(AWeapon* Weapon);
 
@@ -191,6 +200,7 @@ public:
 	void PlayFireMontage(bool bAiming) const;
 	void PlayHitReactMontage() const;
 	void PlayElimMontage() const;
+	void PlayReloadMontage() const;
 	
 	FVector GetHitTarget() const;
 
@@ -200,4 +210,6 @@ public:
 
 	FORCEINLINE bool IsElimmed() const { return bElimmed; }
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
+
+	ECombatState GetCombatState() const;
 };
