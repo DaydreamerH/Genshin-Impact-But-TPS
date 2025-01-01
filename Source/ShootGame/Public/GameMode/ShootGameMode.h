@@ -6,6 +6,11 @@
 #include "GameFramework/GameMode.h"
 #include "ShootGameMode.generated.h"
 
+namespace MatchState
+{
+	extern SHOOTGAME_API const FName Cooldown; // 有人赢了，游戏结束，休息
+}
+
 /**
  * 
  */
@@ -31,8 +36,15 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	float WarmUpTime = 10.f;
-
+	UPROPERTY(EditDefaultsOnly)
+	float MatchTime = 120.f;
 	float LevelStartingTime = 0.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float CooldownTime = 10.f;
+
+	FORCEINLINE float GetCountdownTime() const {return CountDownTime;}
 private:
 	float CountDownTime = 0.f;
+	
 };

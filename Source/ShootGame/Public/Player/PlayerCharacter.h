@@ -212,4 +212,9 @@ public:
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 
 	ECombatState GetCombatState() const;
+
+	UPROPERTY(Replicated)
+	bool bDisableGameplay = false;
+
+	void CancelCombatComponentFireButtonPressed() const;
 };

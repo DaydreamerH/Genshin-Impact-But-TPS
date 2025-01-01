@@ -1,6 +1,5 @@
 #include "ShootGame/Public/Player/PlayerCharacter.h"
 
-#include "AsyncTreeDifferences.h"
 #include "EnhancedInputSubsystemInterface.h"
 #include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
@@ -69,6 +68,7 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(APlayerCharacter, PlayerIndex);
 	DOREPLIFETIME_CONDITION(APlayerCharacter, OverlappingWeapon, COND_OwnerOnly);
 	DOREPLIFETIME(APlayerCharacter, Health);
+	DOREPLIFETIME(APlayerCharacter, bDisableGameplay);
 }
 
 void APlayerCharacter::PostInitializeComponents()
@@ -110,10 +110,7 @@ void APlayerCharacter::MulticastElim_Implementation()
 	
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	if(IsLocallyControlled() && PlayerController)
-	{
-		DisableInput(PlayerController);
-	}
+	bDisableGameplay = true;
 }
 
 void APlayerCharacter::ElimTimerFinished()
@@ -158,6 +155,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 void APlayerCharacter::OnActionMoveForward(const FInputActionValue& InputActionValue)
 {
+	if(bDisableGameplay)return;
+	
 	float inputValue = InputActionValue.Get<float>();
 	if(Controller&&inputValue!=0)
 	{
@@ -171,6 +170,7 @@ void APlayerCharacter::OnActionMoveForward(const FInputActionValue& InputActionV
 
 void APlayerCharacter::OnActionMoveRight(const FInputActionValue& InputActionValue)
 {
+	if(bDisableGameplay)return;
 	float inputValue = InputActionValue.Get<float>();
 	if(Controller&&inputValue!=0)
 	{
@@ -184,23 +184,27 @@ void APlayerCharacter::OnActionMoveRight(const FInputActionValue& InputActionVal
 
 void APlayerCharacter::OnActionLookUp(const FInputActionValue& InputActionValue)
 {
+	if(bDisableGameplay)return;
 	float inputValue = InputActionValue.Get<float>();
 	AddControllerPitchInput(inputValue);
 }
 
 void APlayerCharacter::OnActionLookRight(const FInputActionValue& InputActionValue)
 {
+	if(bDisableGameplay)return;
 	float inputValue = InputActionValue.Get<float>();
 	AddControllerYawInput(inputValue);
 }
 
 void APlayerCharacter::OnActionJump(const FInputActionValue& InputActionValue)
 {
+	if(bDisableGameplay)return;
 	Jump();
 }
 
 void APlayerCharacter::OnActionEquip(const FInputActionValue& InputActionValue)
 {
+	if(bDisableGameplay)return;
 	if(HasAuthority())
 	{
 		if(Combat)
@@ -216,6 +220,7 @@ void APlayerCharacter::OnActionEquip(const FInputActionValue& InputActionValue)
 
 void APlayerCharacter::OnActionCrouch(const FInputActionValue& InputActionValue)
 {
+	if(bDisableGameplay)return;
 	if(bIsCrouched)
 	{
 		UnCrouch();
@@ -229,6 +234,7 @@ void APlayerCharacter::OnActionCrouch(const FInputActionValue& InputActionValue)
 
 void APlayerCharacter::OnActionAimPressed(const FInputActionValue& InputActionValue)
 {
+	if(bDisableGameplay)return;
 	if (Combat)
 	{
 		Combat->SetAiming(true);
@@ -237,6 +243,7 @@ void APlayerCharacter::OnActionAimPressed(const FInputActionValue& InputActionVa
 
 void APlayerCharacter::OnActionAimReleased(const FInputActionValue& InputActionValue)
 {
+	if(bDisableGameplay)return;
 	if (Combat)
 	{
 		Combat->SetAiming(false);
@@ -245,6 +252,7 @@ void APlayerCharacter::OnActionAimReleased(const FInputActionValue& InputActionV
 
 void APlayerCharacter::OnActionFirePressed(const FInputActionValue& InputActionValue)
 {
+	if(bDisableGameplay)return;
 	if(Combat)
 	{
 		Combat->FireButtonPressed(true);
@@ -253,6 +261,7 @@ void APlayerCharacter::OnActionFirePressed(const FInputActionValue& InputActionV
 
 void APlayerCharacter::OnActionFireReleased(const FInputActionValue& InputActionValue)
 {
+	if(bDisableGameplay)return;
 	if(Combat)
 	{
 		Combat->FireButtonPressed(false);
@@ -261,6 +270,7 @@ void APlayerCharacter::OnActionFireReleased(const FInputActionValue& InputAction
 
 void APlayerCharacter::OnActionReload(const FInputActionValue& InputActionValue)
 {
+	if(bDisableGameplay)return;
 	if(Combat)
 	{
 		Combat->Reload();
@@ -474,6 +484,14 @@ ECombatState APlayerCharacter::GetCombatState() const
 		return Combat->CombatState;
 	}
 	return ECombatState::ECS_MAX;
+}
+
+void APlayerCharacter::CancelCombatComponentFireButtonPressed() const
+{
+	if(Combat)
+	{
+		Combat->FireButtonPressed(false);
+	}
 }
 
 void APlayerCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon) const

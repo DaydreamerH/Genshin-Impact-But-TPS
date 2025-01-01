@@ -6,9 +6,13 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "GameFramework/GameMode.h"
+#include "GameFramework/PlayerState.h"
+#include "GameMode/ShootGameMode.h"
+#include "GameState/ShootGameState.h"
 #include "HUD/Announcement.h"
 #include "HUD/CharacterOverlay.h"
 #include "HUD/PlayerHUD.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/PlayerCharacter.h"
 
@@ -102,13 +106,38 @@ void AMyPlayerController::SetHUDMatchCountdown(float CountdownTime)
 	if(PlayerHUD && PlayerHUD->CharacterOverlay &&
 		PlayerHUD->CharacterOverlay->MatchCountdownText)
 	{
-		FString AmmoText;
-
+		if(CountdownTime<1.f)
+		{
+			PlayerHUD->CharacterOverlay->MatchCountdownText->SetText(FText());
+			return;
+		}
+		
 		const int32 Minutes = FMath::FloorToInt(CountdownTime/60.f);
 		const int32 Seconds = CountdownTime - Minutes*60;
 
-		const FString CountdownText = FString::Printf(TEXT("%2d:%02d"), Minutes, Seconds);
+		const FString CountdownText = FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds);
 		PlayerHUD->CharacterOverlay->MatchCountdownText->SetText(FText::FromString(CountdownText));
+	}
+}
+
+void AMyPlayerController::SetHUDAnnouncementCountdown(float CountdownTime)
+{
+	PlayerHUD = PlayerHUD ==nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+	if(PlayerHUD && PlayerHUD->Announcement &&
+		PlayerHUD->Announcement->WarmupTime)
+	{
+
+		if(CountdownTime<1.f)
+		{
+			PlayerHUD->Announcement->WarmupTime->SetText(FText());
+			return;
+		}
+		
+		const int32 Minutes = FMath::FloorToInt(CountdownTime/60.f);
+		const int32 Seconds = CountdownTime - Minutes*60;
+
+		const FString CountdownText = FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds);
+		PlayerHUD->Announcement->WarmupTime->SetText(FText::FromString(CountdownText));
 	}
 }
 
@@ -158,6 +187,10 @@ void AMyPlayerController::OnMatchStateSet(FName State)
 	{
 		HandleMatchHasStarted();
 	}
+	else if(MatchState == MatchState::Cooldown)
+	{
+		HandleCooldown();
+	}
 }
 
 void AMyPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -180,23 +213,111 @@ void AMyPlayerController::HandleMatchHasStarted()
 	}
 }
 
+void AMyPlayerController::HandleCooldown()
+{
+	PlayerHUD = PlayerHUD ==nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+
+	if(APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	{
+		PlayerCharacter->bDisableGameplay = true;
+		PlayerCharacter->CancelCombatComponentFireButtonPressed();
+	}
+	
+	if(PlayerHUD)
+	{
+		PlayerHUD->CharacterOverlay->RemoveFromParent();
+		if(PlayerHUD->Announcement)
+		{
+			PlayerHUD->Announcement->SetVisibility(ESlateVisibility::Visible);
+			if(PlayerHUD->Announcement->AnnouncementText)
+			{
+				FString AnnouncementText(TEXT("新的一轮即将开始"));
+				PlayerHUD->Announcement->AnnouncementText->SetText(FText::FromString(AnnouncementText));
+			}
+
+			if(PlayerHUD->Announcement->InfoText)
+			{
+				AShootGameState* ShootGameState = Cast<AShootGameState>
+					(UGameplayStatics::GetGameState(this));
+				
+				if(ShootGameState)
+				{
+					TArray<APlayerState*> TopPlayers = ShootGameState->TopScoringPlayers;
+					FString InfoTextString;
+					if(TopPlayers.Num() == 0)
+					{
+						InfoTextString = FString(TEXT("无人得分，卡bug呢？"));
+					}
+					else
+					{
+						InfoTextString = FString::Printf(TEXT("胜利者是：\n"));
+						for(auto TiedPlayer:TopPlayers)
+						{
+							InfoTextString.Append(FString::Printf(TEXT("%s\n"), *TiedPlayer->GetPlayerName()));
+						}
+					}
+					PlayerHUD->Announcement->InfoText->SetText(FText::FromString(InfoTextString));
+				}
+			}
+		}
+	}
+}
+
+
 void AMyPlayerController::OnRep_MatchState()
 {
 	if(MatchState == MatchState::InProgress)
 	{
 		HandleMatchHasStarted();
 	}
+	else if(MatchState == MatchState::Cooldown)
+	{
+		HandleCooldown();
+	}
 }
 
 void AMyPlayerController::SetHUDTime()
 {
-	uint32 SecondsLeft = FMath::CeilToInt(MatchTime - GetServerTime());
-
+	uint32 SecondsLeft = 0.f;
+	float TimeLeft = 0.f;
+	if(MatchState == MatchState::WaitingToStart)
+	{
+		TimeLeft = WarmupTime - GetServerTime() + LevelStartingTime;
+	}
+	else if(MatchState == MatchState::InProgress)
+	{
+		TimeLeft = WarmupTime + MatchTime - GetServerTime() + LevelStartingTime;
+	}
+	else if(MatchState == MatchState::Cooldown)
+	{
+		TimeLeft = CooldownTime + WarmupTime + MatchTime - GetServerTime() + LevelStartingTime;
+	}
+	if(HasAuthority())
+	{
+		if((GameMode =
+			GameMode == nullptr?
+			Cast<AShootGameMode>(UGameplayStatics::GetGameMode(this)):GameMode))
+		{
+			SecondsLeft = FMath::CeilToInt(GameMode->GetCountdownTime() + LevelStartingTime);
+		}
+	}
+	else
+	{
+		SecondsLeft = FMath::CeilToInt(TimeLeft);
+	}
+	
 	if(CountdownInt!=SecondsLeft)
 	{
-		SetHUDMatchCountdown(MatchTime - GetServerTime());
+		if(MatchState == MatchState::WaitingToStart || MatchState == MatchState::Cooldown)
+		{
+			SetHUDAnnouncementCountdown(TimeLeft);
+		}
+		else if(MatchState == MatchState::InProgress)
+		{
+			SetHUDMatchCountdown(TimeLeft);
+		}
+		CountdownInt = SecondsLeft;
 	}
-	CountdownInt = SecondsLeft;
 }
 
 void AMyPlayerController::CheckTimeSync(float DeltaSeconds)
@@ -227,6 +348,21 @@ void AMyPlayerController::PollInit()
 	}
 }
 
+void AMyPlayerController::ClientJoinMidgame_Implementation
+	(FName StateOfMatch, float Warmup, float Match, float StartingTime, float Cooldown)
+{
+	WarmupTime = Warmup;
+	MatchTime = Match;
+	LevelStartingTime = StartingTime;
+	CooldownTime = Cooldown;
+	OnMatchStateSet(MatchState);
+	PlayerHUD = Cast<APlayerHUD>(GetHUD());
+	if(PlayerHUD && MatchState == MatchState::WaitingToStart)
+	{
+		PlayerHUD->AddAnnouncement();
+	}
+}
+
 void AMyPlayerController::ClientReportServerTime_Implementation(float TimeOfClientRequest,
                                                                 float TimeServerReceivedClientRequest)
 {
@@ -246,13 +382,22 @@ void AMyPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	PlayerHUD = Cast<APlayerHUD>(GetHUD());
-	if(PlayerHUD)
-	{
-		PlayerHUD->AddAnnouncement();
-	}
+	ServerCheckMatchState();
 }
 
 void AMyPlayerController::ServerCheckMatchState_Implementation()
 {
+	if((GameMode =
+			GameMode == nullptr?Cast<AShootGameMode>(UGameplayStatics::GetGameMode(this)):GameMode))
+	{
+		WarmupTime = GameMode->WarmUpTime;
+		MatchTime = GameMode->MatchTime;
+		LevelStartingTime = GameMode->LevelStartingTime;
+		MatchState = GameMode->GetMatchState();
+		CooldownTime = GameMode->CooldownTime;
+		ClientJoinMidgame(MatchState, WarmupTime, MatchTime, LevelStartingTime, CooldownTime);
+
+		
+	}
 	
 }
