@@ -41,6 +41,9 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void MuliticastFire(const FVector_NetQuantize& TraceHitTarget);
 
+	UFUNCTION(Server, Reliable)
+	void ServerCooldown();
+
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 
 	void SetHUDCrosshairs(float DeltaTime);
@@ -104,6 +107,8 @@ private:
 	int32 StartingARAmmo = 30;
 	UPROPERTY(EditAnywhere)
 	int32 StartingRLAmmo = 2;
+	UPROPERTY(EditAnywhere)
+	int32 StartingPistolAmmo = 10;
 	void InitializeCarriedAmmo();
 
 	UPROPERTY(ReplicatedUsing=OnRep_CombatState)

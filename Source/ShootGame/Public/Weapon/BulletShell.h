@@ -16,7 +16,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* BulletShellMesh;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	float ShellEjectionImpulse;
 
 	UPROPERTY(EditAnywhere)

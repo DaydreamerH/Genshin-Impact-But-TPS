@@ -107,6 +107,18 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 	else
 	{
 		bPlayNoAmmoSound = true;
+		if(EquippedWeapon && !EquippedWeapon->GetAutoFire())
+		{
+			ServerCooldown();
+		}
+	}
+}
+
+void UCombatComponent::ServerCooldown_Implementation()
+{
+	if(CombatState == ECombatState::ECS_Cooling)
+	{
+		CombatState = ECombatState::ECS_Unoccupied;
 	}
 }
 
@@ -274,6 +286,7 @@ void UCombatComponent::InitializeCarriedAmmo()
 {
 	CarriedAmmoMap.Emplace(EWeaponType::EWT_AssultRifle, StartingARAmmo);
 	CarriedAmmoMap.Emplace(EWeaponType::EWT_RocketLauncher, StartingRLAmmo);
+	CarriedAmmoMap.Emplace(EWeaponType::EWT_Pistol, StartingPistolAmmo);
 }
 
 void UCombatComponent::OnRep_CombatState()
@@ -337,6 +350,10 @@ void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& Trac
 {
 	if(Character&&CanFire())
 	{
+		if(EquippedWeapon && !EquippedWeapon->GetAutoFire())
+		{
+			CombatState = ECombatState::ECS_Cooling;
+		}
 		MuliticastFire(TraceHitTarget);
 	}
 }
