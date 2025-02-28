@@ -73,6 +73,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	int32 MagCapcitiy = 30;
+
+	UPROPERTY(EditAnywhere)
+	bool AutoFire = true;
 private:
 
 	UPROPERTY(VisibleAnywhere, Category="WeaponProperties")
@@ -128,4 +131,6 @@ public:
 
 	FORCEINLINE int32 GetAmmo() const {return Ammo; }
 	FORCEINLINE int32 GetMagCapcity() const {return MagCapcitiy;}
+
+	FORCEINLINE bool GetAutoFire() const {return AutoFire;}
 };
