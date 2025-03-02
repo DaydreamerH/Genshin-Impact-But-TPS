@@ -111,6 +111,13 @@ void APlayerCharacter::MulticastElim_Implementation()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	bDisableGameplay = true;
+	
+	if(IsLocallyControlled() && Combat
+		&& Combat->bAiming && Combat->EquippedWeapon
+		&& Combat->EquippedWeapon->GetWeaponType() == EWeaponType::EWT_SniperRifle)
+	{
+		ShowSniperScopeWidget(false);
+	}
 }
 
 void APlayerCharacter::ElimTimerFinished()
@@ -465,6 +472,9 @@ void APlayerCharacter::PlayReloadMontage() const
 			SectionName = FName("Rifle");
 			break;
 		case EWeaponType::EWT_ShotGun:
+			SectionName = FName("Rifle");
+			break;
+		case EWeaponType::EWT_SniperRifle:
 			SectionName = FName("Rifle");
 			break;
 		default:

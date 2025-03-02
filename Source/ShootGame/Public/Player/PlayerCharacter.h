@@ -184,6 +184,8 @@ private:
 
 	UPROPERTY()
 	class AMyPlayerState* MyPlayerState;
+
+	
 public:	
 	void SetOverlappingWeapon(AWeapon* Weapon);
 
@@ -217,4 +219,7 @@ public:
 	bool bDisableGameplay = false;
 
 	void CancelCombatComponentFireButtonPressed() const;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowSniperScopeWidget(bool bShowScope);
 };
