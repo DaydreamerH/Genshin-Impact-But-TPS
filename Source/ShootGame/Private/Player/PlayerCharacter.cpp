@@ -477,6 +477,9 @@ void APlayerCharacter::PlayReloadMontage() const
 		case EWeaponType::EWT_SniperRifle:
 			SectionName = FName("Rifle");
 			break;
+		case EWeaponType::EWT_GrenadeLauncher:
+			SectionName = FName("Rifle");
+			break;
 		default:
 			break;
 		}

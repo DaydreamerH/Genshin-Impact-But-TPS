@@ -37,22 +37,9 @@ protected:
 		UPrimitiveComponent* OtherComp,
 		FVector NormalImpulse,
 		const FHitResult& Hit) override;
-
-	UPROPERTY(EditAnywhere)
-	class UNiagaraSystem* TrailSystem;
-
-	void DestroyTimerFinished();
 	
 	
 private:
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* RocketMesh;
 
-	FTimerHandle DestroyTimer;
 
-	UPROPERTY(EditAnywhere)
-	float DestroyTime = 3.f;
-
-	UPROPERTY()
-	class UNiagaraComponent* TrailSystemComponent;
 };
