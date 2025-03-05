@@ -133,6 +133,16 @@ void UCombatComponent::ShotGunShellReload()
 	}
 }
 
+void UCombatComponent::PickupAmmo(EWeaponType WeaponType, int32 AmmoAmount)
+{
+	if(CarriedAmmoMap.Contains(WeaponType))
+	{
+		CarriedAmmoMap[WeaponType] = FMath::Clamp(CarriedAmmoMap[WeaponType] + AmmoAmount, 0, MaxCarriedAmmo);
+
+		UpdateCarriedAmmo();
+	}
+}
+
 void UCombatComponent::ServerCooldown_Implementation()
 {
 	if(CombatState == ECombatState::ECS_Cooling)

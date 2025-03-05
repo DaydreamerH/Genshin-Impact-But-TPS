@@ -30,6 +30,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ShotGunShellReload();
+
+	void PickupAmmo(EWeaponType WeaponType, int32 AmmoAmount);
 protected:
 	virtual void BeginPlay() override;
 	void SetAiming(bool bIsAiming);
@@ -138,6 +140,8 @@ private:
 	int32 StartingSniperRifleAmmo = 20;
 	UPROPERTY(EditAnywhere)
 	int32 StartingGLAmmo = 20;
+	UPROPERTY(EditAnywhere)
+	int32 MaxCarriedAmmo = 500;
 	
 	void InitializeCarriedAmmo();
 
