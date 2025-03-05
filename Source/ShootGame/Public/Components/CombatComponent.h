@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "CombatStates.h"
 #include "Components/ActorComponent.h"
+#include "Weapon/Projectile.h"
 #include "Weapon/WeaponTypes.h"
 #include "CombatComponent.generated.h"
 
@@ -57,6 +58,23 @@ protected:
 	void HandleReload();
 
 	int32 AmountToReload();
+
+	void TossGrenade();
+
+	UFUNCTION(Server, Reliable)
+	void ServerTossGrenade();
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AProjectile>GrenadeClass;
+	
+	void DropEquippedWeapon();
+	void AttachActorToRightHand(AActor* ActorToAttach);
+	void UpdateCarriedAmmo();
+	void PlayEquipWeaponSound();
+	void AttachActorToLeftHand(AActor* ActorToAttach);
+	void ShowGrenade(bool bShowGrenade);
+
+	void UpdateHUDGernades();
 private:
 	UPROPERTY()
 	APlayerCharacter* Character;
@@ -136,6 +154,13 @@ private:
 
 	float ShotGunReloadTimeSpace = 0.1f;
 	float ShotGunLastReloadTime = 0.f;
+
+	UPROPERTY(ReplicatedUsing=OnRep_Grenades)
+	int32 Grenades = 2;
+	UPROPERTY(EditAnywhere)
+	int32 MaxGrenades = 4;
+	UFUNCTION()
+	void OnRep_Grenades();
 public:	
 	
 	void SetCrosshairShootingFactor(float f);
@@ -144,4 +169,15 @@ public:
 	void FinishReloading();
 
 	void JumpToShotGunEnd();
+
+	UFUNCTION(BlueprintCallable)
+	void LaunchGrenade();
+	
+	UFUNCTION(Server, Reliable)
+	void ServerLaunchGrenade(const FVector_NetQuantize& Target);
+	
+	UFUNCTION(BlueprintCallable)
+	void TossGrenadeFinish();
+
+	FORCEINLINE int32 GetGrenades() const { return Grenades; }
 };

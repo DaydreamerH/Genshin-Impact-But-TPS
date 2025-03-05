@@ -19,7 +19,6 @@ AGrenadeProjectile::AGrenadeProjectile()
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
 	ProjectileMovementComponent->SetIsReplicated(true);
 	ProjectileMovementComponent->bShouldBounce = true;
-	
 }
 
 void AGrenadeProjectile::Destroyed()
@@ -27,7 +26,6 @@ void AGrenadeProjectile::Destroyed()
 	ExplodeDamage();
 	
 	Super::Destroyed();
-	
 }
 
 void AGrenadeProjectile::BeginPlay()

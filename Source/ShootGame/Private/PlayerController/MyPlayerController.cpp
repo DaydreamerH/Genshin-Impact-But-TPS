@@ -3,6 +3,7 @@
 
 #include "PlayerController/MyPlayerController.h"
 
+#include "Components/CombatComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "GameFramework/GameMode.h"
@@ -126,7 +127,6 @@ void AMyPlayerController::SetHUDAnnouncementCountdown(float CountdownTime)
 	if(PlayerHUD && PlayerHUD->Announcement &&
 		PlayerHUD->Announcement->WarmupTime)
 	{
-
 		if(CountdownTime<1.f)
 		{
 			PlayerHUD->Announcement->WarmupTime->SetText(FText());
@@ -138,6 +138,21 @@ void AMyPlayerController::SetHUDAnnouncementCountdown(float CountdownTime)
 
 		const FString CountdownText = FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds);
 		PlayerHUD->Announcement->WarmupTime->SetText(FText::FromString(CountdownText));
+	}
+}
+
+void AMyPlayerController::SetHUDGrenades(int32 Grenades)
+{
+	PlayerHUD = PlayerHUD ==nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+	if(PlayerHUD && PlayerHUD->CharacterOverlay &&
+		PlayerHUD->CharacterOverlay->MatchCountdownText)
+	{
+		FString GrenadesText = FString::Printf(TEXT("%d"), Grenades);
+		PlayerHUD->CharacterOverlay->GrenadesText->SetText(FText::FromString(GrenadesText));
+	}
+	else
+	{
+		HUDGrenades = Grenades;
 	}
 }
 
@@ -342,6 +357,11 @@ void AMyPlayerController::PollInit()
 				SetHUDHealth(HUDHealth, HUDMaxHealth);
 				SetHUDScore(HUDScore);
 				SetHUDDefeats(HUDDefeats);
+
+				if(APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()); PlayerCharacter && PlayerCharacter->GetCombat())
+				{
+					SetHUDGrenades(PlayerCharacter->GetCombat()->GetGrenades());
+				}
 				bInitializeCharacterOverlay = false;
 			}
 		}

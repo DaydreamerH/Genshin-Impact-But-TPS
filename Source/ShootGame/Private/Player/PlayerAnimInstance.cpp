@@ -23,9 +23,9 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if(PlayerCharacter == nullptr)return ;
 
-	FVector velocity = PlayerCharacter->GetVelocity();
-	velocity.Z = 0.f;
-	Speed = velocity.Size();
+	FVector Velocity = PlayerCharacter->GetVelocity();
+	Velocity.Z = 0.f;
+	Speed = Velocity.Size();
 
 	bIsFalling = PlayerCharacter->GetCharacterMovement()->IsFalling();
 	
@@ -58,8 +58,13 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	AO_Yaw = PlayerCharacter->GetAO_Yaw();
 	AO_Pitch = PlayerCharacter->GetAO_Pitch();
 
-	bUseFABRIK = PlayerCharacter->GetCombatState() != ECombatState::ECS_Reloading;
+	bUseFABRIK = PlayerCharacter->GetCombatState() != ECombatState::ECS_Reloading
+		&& PlayerCharacter->GetCombatState() != ECombatState::ECS_TossGrenade;
 
+	if(!bUseFABRIK)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Stop FABRIK"));
+	}
 	
 	if(bWeaponEquipped && EquippedWeapon && EquippedWeapon->GetWeaponMesh() && PlayerCharacter->GetMesh())
 	{
@@ -92,9 +97,6 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 			EquippedWeapon->GetWeaponMesh()->SetWorldRotation(SmoothedWeaponRotation);
 		}
-
 	}
-
-	
 }
 

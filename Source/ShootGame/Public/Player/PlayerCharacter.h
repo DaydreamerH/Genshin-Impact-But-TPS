@@ -70,6 +70,8 @@ protected:
 	void OnActionFireReleased(const FInputActionValue& InputActionValue);
 	UFUNCTION()
 	void OnActionReload(const FInputActionValue& InputActionValue);
+	UFUNCTION()
+	void OnActionTossGrenade(const FInputActionValue& InputActionValue);
 
 	void AimOffset(float DeltaTime);
 	
@@ -116,6 +118,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* IA_Reload;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* IA_TossGrenade;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* InputMappingContext;
 
 	// 获取MPC
@@ -154,7 +158,9 @@ private:
 	UAnimMontage* ElimMontage;
 	UPROPERTY(EditAnywhere, Category=Combat)
 	UAnimMontage* ReloadMontage;
-
+	UPROPERTY(EditAnywhere, Category=Combat)
+	UAnimMontage* TossGrenadeMontage;
+	
 	float CurrentRadius;
 
 	void HideCamera();
@@ -185,7 +191,8 @@ private:
 	UPROPERTY()
 	class AMyPlayerState* MyPlayerState;
 
-	
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* AttachGrenade;
 public:	
 	void SetOverlappingWeapon(AWeapon* Weapon);
 
@@ -203,6 +210,7 @@ public:
 	void PlayHitReactMontage() const;
 	void PlayElimMontage() const;
 	void PlayReloadMontage() const;
+	void PlayTossGrenadeMontage() const;
 	
 	FVector GetHitTarget() const;
 
@@ -224,4 +232,5 @@ public:
 	void ShowSniperScopeWidget(bool bShowScope);
 	FORCEINLINE UCombatComponent* GetCombat() const {return Combat;}
 	FORCEINLINE UAnimMontage* GetReloadMontage() const {return ReloadMontage;}
+	FORCEINLINE UStaticMeshComponent* GetGrenade() const {return AttachGrenade;}
 };

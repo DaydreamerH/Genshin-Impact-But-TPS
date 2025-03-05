@@ -19,6 +19,7 @@
 #include "PlayerController/MyPlayerController.h"
 #include "ShootGame/ShootGame.h"
 #include "Weapon/Weapon.h"
+#include "WorldPartition/ContentBundle/ContentBundleLog.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -54,6 +55,10 @@ APlayerCharacter::APlayerCharacter()
 	TurningInPlace = ETurningInPlace::ETIP_NotTurning;
 	NetUpdateFrequency = 66.f;
 	MinNetUpdateFrequency = 33.f;
+
+	AttachGrenade = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Attach Grenade"));
+	AttachGrenade->SetupAttachment(GetMesh(), FName("GrenadeSocket"));
+	AttachGrenade->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void APlayerCharacter::OnRep_PlayerIndex() 
@@ -145,6 +150,11 @@ void APlayerCharacter::BeginPlay()
 		}
 
 		OnTakeAnyDamage.AddDynamic(this, &ThisClass::ReceiveDamage);
+	}
+
+	if(AttachGrenade)
+	{
+		AttachGrenade->SetVisibility(false);
 	}
 	
 	UpdateHUDHealth();
@@ -284,6 +294,15 @@ void APlayerCharacter::OnActionReload(const FInputActionValue& InputActionValue)
 	}
 }
 
+void APlayerCharacter::OnActionTossGrenade(const FInputActionValue& InputActionValue)
+{
+	UE_LOG(LogTemp, Log, TEXT("Trigger G"));
+	if(Combat)
+	{
+		Combat->TossGrenade();
+	}
+}
+
 void APlayerCharacter::AimOffset(float DeltaTime)
 {
 	if(Combat && Combat->EquippedWeapon==nullptr)return;
@@ -385,6 +404,7 @@ void APlayerCharacter::Jump()
 void APlayerCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UDamageType* DamageType,
 	AController* InstigatorController, AActor* DamageCauser)
 {
+	if(bElimmed) return;
 	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
 	UpdateHUDHealth();
 	PlayHitReactMontage();
@@ -489,6 +509,16 @@ void APlayerCharacter::PlayReloadMontage() const
 		}
 		AnimInstance->Montage_Play(ReloadMontage);
 		AnimInstance->Montage_JumpToSection(SectionName, ReloadMontage);
+	}
+}
+
+void APlayerCharacter::PlayTossGrenadeMontage() const
+{
+	UE_LOG(LogTemp, Log, TEXT("Play Montage"));
+	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && TossGrenadeMontage)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Ready Play Montage"));
+		UE_LOG(LogTemp,Log,TEXT("%f"), AnimInstance->Montage_Play(TossGrenadeMontage));
 	}
 }
 
@@ -676,6 +706,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		if(IA_Reload)
 		{
 			inputComponent->BindAction(IA_Reload, ETriggerEvent::Started, this, &ThisClass::OnActionReload);
+		}
+
+		if(IA_TossGrenade)
+		{
+			inputComponent->BindAction(IA_TossGrenade, ETriggerEvent::Started, this, &ThisClass::OnActionTossGrenade);
 		}
 	}
 	

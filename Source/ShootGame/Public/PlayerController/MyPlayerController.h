@@ -22,6 +22,7 @@ public:
 	void ResetCrosshair() const;
 	void SetHUDMatchCountdown(float CountdownTime);
 	void SetHUDAnnouncementCountdown(float CountdownTime);
+	void SetHUDGrenades(int32 Grenades);
 	void ResetHUD();
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void ReceivedPlayer() override;
@@ -83,7 +84,8 @@ private:
 	float HUDMaxHealth;
 	float HUDScore;
 	int32 HUDDefeats;
-
+	int32 HUDGrenades;
+	
 	UPROPERTY()
 	class AShootGameMode* GameMode;
 };

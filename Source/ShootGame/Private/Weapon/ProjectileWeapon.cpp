@@ -14,7 +14,7 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 		WeaponMesh->PlayAnimation(FireAnimation, false);
 		SpendRounnd();
 		APawn* InstigatorPawn = Cast<APawn>(GetOwner());
-
+		if(!HasAuthority())return;
 		if(const USkeletalMeshSocket* MuzzleFlashSocket = 
 			GetWeaponMesh()->GetSocketByName(FName("MuzzleFlash")))
 		{
