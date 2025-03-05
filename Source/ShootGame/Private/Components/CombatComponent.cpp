@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GenericPlatform/GenericPlatformCrashContext.h"
 #include "HUD/PlayerHUD.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -119,6 +120,29 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 	}
 }
 
+void UCombatComponent::ShotGunShellReload()
+{
+	if(Character && Character->HasAuthority())
+	{
+		UE_LOG(LogTemp, Log, TEXT("BL Call On Server"));
+
+		if(UWorld* World = GetWorld())
+		{
+			float CurrentTime = World->GetTimeSeconds();
+			if(CurrentTime - ShotGunLastReloadTime < ShotGunReloadTimeSpace)
+			{
+				return;
+			}
+			else
+			{
+				ShotGunLastReloadTime = CurrentTime;
+			}
+		}
+		
+		UpdateShotGunAmmoValue();
+	}
+}
+
 void UCombatComponent::ServerCooldown_Implementation()
 {
 	if(CombatState == ECombatState::ECS_Cooling)
@@ -225,6 +249,10 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 
 void UCombatComponent::HandleReload()
 {
+	if(Character->HasAuthority())
+	{
+		UE_LOG(LogTemp, Log, TEXT("HandleReloadOnServer"));
+	}
 	if(Character)
 	{
 		Character->PlayReloadMontage();
@@ -275,6 +303,9 @@ bool UCombatComponent::CanFire()
 		);
 		bPlayNoAmmoSound = false;
 	}
+	if(EquippedWeapon->GetWeaponType() == EWeaponType::EWT_ShotGun
+		&& !EquippedWeapon->AmmoEqualsZero()
+		&& CombatState == ECombatState::ECS_Reloading)return true;
 	return !EquippedWeapon->AmmoEqualsZero() && CombatState == ECombatState::ECS_Unoccupied;
 }
 
@@ -284,6 +315,13 @@ void UCombatComponent::OnRep_CarriedAmmo()
 	if(Controller)
 	{
 		Controller->SetHUDCarriedAmmo(CarriedAmmo);
+	}
+	if(CombatState == ECombatState::ECS_Reloading
+		&& EquippedWeapon!=nullptr
+		&& EquippedWeapon->GetWeaponType()==EWeaponType::EWT_ShotGun
+		&& CarriedAmmo == 0)
+	{
+		JumpToShotGunEnd();
 	}
 }
 
@@ -303,7 +341,10 @@ void UCombatComponent::OnRep_CombatState()
 	switch(CombatState)
 	{
 	case ECombatState::ECS_Reloading:
-		HandleReload();
+		if(Character)
+		{
+			HandleReload();
+		}
 		break;
 
 	default:
@@ -313,6 +354,7 @@ void UCombatComponent::OnRep_CombatState()
 
 void UCombatComponent::UpdateAmmoValue()
 {
+	UE_LOG(LogTemp, Log, TEXT("Update Ammo"));
 	if(EquippedWeapon==nullptr || Character ==nullptr)return;
 	
 	int32 ReloadAmount = AmountToReload();
@@ -330,6 +372,30 @@ void UCombatComponent::UpdateAmmoValue()
 	}
 }
 
+void UCombatComponent::UpdateShotGunAmmoValue()
+{
+	if(EquippedWeapon==nullptr || Character ==nullptr)return;
+	if(CarriedAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
+	{
+		CarriedAmmoMap[EquippedWeapon->GetWeaponType()] -= 1;
+		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
+	}
+	EquippedWeapon->AddAmmo(1);
+	Controller = 
+		Controller ==nullptr?
+			Cast<AMyPlayerController>(Character->Controller):Controller;
+	
+	if(Controller)
+	{
+		Controller->SetHUDCarriedAmmo(CarriedAmmo);
+	}
+	
+	if(EquippedWeapon->IsFull() || CarriedAmmo == 0)
+	{
+		JumpToShotGunEnd();
+	}
+}
+
 void UCombatComponent::SetCrosshairShootingFactor(float f)
 {
 	if(CrosshairShootingFactor<2.f)
@@ -340,11 +406,23 @@ void UCombatComponent::SetCrosshairShootingFactor(float f)
 
 void UCombatComponent::FinishReloading()
 {
+	UE_LOG(LogTemp, Log, TEXT("Finish: %d"), Character->GetLocalRole());
+	
 	if(Character ==nullptr)return;
 	if(Character->HasAuthority())
 	{
+		UE_LOG(LogTemp, Log, TEXT("Finish Reloading OnServer"));
 		CombatState = ECombatState::ECS_Unoccupied;
 		UpdateAmmoValue();
+	}
+}
+
+void UCombatComponent::JumpToShotGunEnd()
+{
+	if(UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance();
+			AnimInstance && Character->GetReloadMontage())
+	{
+		AnimInstance->Montage_JumpToSection(FName("ShotGunEnd"));
 	}
 }
 
@@ -352,6 +430,11 @@ void UCombatComponent::MuliticastFire_Implementation(const FVector_NetQuantize& 
 {
 	Character->PlayFireMontage(bAiming);
 	Character->SetCrosshairShootingFactor();
+	if(EquippedWeapon->GetWeaponType() == EWeaponType::EWT_ShotGun
+		&& CombatState == ECombatState::ECS_Reloading)
+	{
+		CombatState = ECombatState::ECS_Unoccupied;
+	}
 	EquippedWeapon->Fire(TraceHitTarget);
 }
 
@@ -424,9 +507,9 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 
 void UCombatComponent::Reload()
 {
-	if(CarriedAmmo > 0 && CombatState!=ECombatState::ECS_Reloading
+	if(CarriedAmmo > 0 && CombatState == ECombatState::ECS_Unoccupied
 		&& EquippedWeapon
-		&& EquippedWeapon->GetAmmo()<EquippedWeapon->GetMagCapcity())
+		&& !EquippedWeapon->IsFull())
 	{
 		ServerReload();
 	}
@@ -434,13 +517,10 @@ void UCombatComponent::Reload()
 
 void UCombatComponent::ServerReload_Implementation()
 {
-	if(Character && EquippedWeapon)
-	{
-		HandleReload();
-		CombatState = ECombatState::ECS_Reloading;
-	}
-
+	if(Character == nullptr)return;
 	
+	HandleReload();
+	CombatState = ECombatState::ECS_Reloading;
 }
 
 void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

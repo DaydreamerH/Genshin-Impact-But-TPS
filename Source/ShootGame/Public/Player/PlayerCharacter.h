@@ -222,4 +222,6 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowSniperScopeWidget(bool bShowScope);
+	FORCEINLINE UCombatComponent* GetCombat() const {return Combat;}
+	FORCEINLINE UAnimMontage* GetReloadMontage() const {return ReloadMontage;}
 };

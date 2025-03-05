@@ -26,6 +26,9 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void FireButtonPressed(bool bPressed);
+
+	UFUNCTION(BlueprintCallable)
+	void ShotGunShellReload();
 protected:
 	virtual void BeginPlay() override;
 	void SetAiming(bool bIsAiming);
@@ -127,12 +130,18 @@ private:
 	void OnRep_CombatState();
 
 	void UpdateAmmoValue();
+	void UpdateShotGunAmmoValue();
 
 	bool bPlayNoAmmoSound = true;
+
+	float ShotGunReloadTimeSpace = 0.1f;
+	float ShotGunLastReloadTime = 0.f;
 public:	
 	
 	void SetCrosshairShootingFactor(float f);
 
 	UFUNCTION(BlueprintCallable)
 	void FinishReloading();
+
+	void JumpToShotGunEnd();
 };

@@ -106,6 +106,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	EWeaponType WeaponType;
+
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface* OverlayMaterial;
 public:
 	void SetWeaponState(EWeaponState State);
 	
@@ -133,4 +136,6 @@ public:
 	FORCEINLINE int32 GetMagCapcity() const {return MagCapcitiy;}
 
 	FORCEINLINE bool GetAutoFire() const {return AutoFire;}
+
+	FORCEINLINE bool IsFull(){return Ammo >= MagCapcitiy;}
 };

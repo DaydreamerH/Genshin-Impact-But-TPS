@@ -3,6 +3,7 @@
 #include "ShootGame/Public/Weapon/Weapon.h"
 
 #include "AudioDevice.h"
+#include "Components/CombatComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
@@ -48,6 +49,8 @@ void AWeapon::BeginPlay()
 		AreaSphere->OnComponentBeginOverlap.AddDynamic(this, &AWeapon::OnSphereOverlap);
 		AreaSphere->OnComponentEndOverlap.AddDynamic(this, &AWeapon::OnSphereEndOverlap);
 	}
+
+	WeaponMesh->SetOverlayMaterial(OverlayMaterial);
 }
 
 void AWeapon::Tick(float DeltaTime)
@@ -78,6 +81,11 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 
 void AWeapon::OnRep_Ammo()
 {
+	OwnerPlayerCharacter = OwnerPlayerCharacter == nullptr ? Cast<APlayerCharacter>(GetOwner()):OwnerPlayerCharacter;
+	if(WeaponType == EWeaponType::EWT_ShotGun && OwnerPlayerCharacter && OwnerPlayerCharacter->GetCombat() && IsFull())
+	{
+		OwnerPlayerCharacter->GetCombat()->JumpToShotGunEnd();
+	}
 	SetHUDAmmo();
 }
 
@@ -95,10 +103,12 @@ void AWeapon::OnRep_WeaponState()
 		ShowPickupWidget(false);
 		WeaponMesh->SetSimulatePhysics(false);
 		WeaponMesh->SetEnableGravity(false);
+		WeaponMesh->SetOverlayMaterial(nullptr);
 		break;
 	case EWeaponState::EWS_Dropped:
 		WeaponMesh->SetSimulatePhysics(true);
 		WeaponMesh->SetEnableGravity(true);
+		WeaponMesh->SetOverlayMaterial(OverlayMaterial);
 		break;
 	}
 }
@@ -113,6 +123,7 @@ void AWeapon::SetWeaponState(EWeaponState State)
 		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		WeaponMesh->SetSimulatePhysics(false);
 		WeaponMesh->SetEnableGravity(false);
+		WeaponMesh->SetOverlayMaterial(nullptr);
 		break;
 	case EWeaponState::EWS_Dropped:
 		if(HasAuthority())
@@ -121,6 +132,7 @@ void AWeapon::SetWeaponState(EWeaponState State)
 		}
 		WeaponMesh->SetSimulatePhysics(true);
 		WeaponMesh->SetEnableGravity(true);
+		WeaponMesh->SetOverlayMaterial(OverlayMaterial);
 		break;
 	}
 }

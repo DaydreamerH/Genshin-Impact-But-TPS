@@ -278,7 +278,7 @@ void APlayerCharacter::OnActionFireReleased(const FInputActionValue& InputAction
 void APlayerCharacter::OnActionReload(const FInputActionValue& InputActionValue)
 {
 	if(bDisableGameplay)return;
-	if(Combat)
+	if(Combat && IsLocallyControlled())
 	{
 		Combat->Reload();
 	}
@@ -452,9 +452,13 @@ void APlayerCharacter::PlayElimMontage() const
 void APlayerCharacter::PlayReloadMontage() const
 {
 	if(Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
-	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && ReloadMontage && !AnimInstance->Montage_IsPlaying(ReloadMontage))
+	if(HasAuthority())
 	{
-		AnimInstance->Montage_Play(ReloadMontage);
+		UE_LOG(LogTemp, Log, TEXT("PlayMontageOnServer"));
+	}
+	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance && ReloadMontage)
+	{
 		FName SectionName;
 
 		switch (Combat->EquippedWeapon->GetWeaponType())
@@ -466,16 +470,16 @@ void APlayerCharacter::PlayReloadMontage() const
 			SectionName = FName("Rifle");
 			break;
 		case EWeaponType::EWT_Pistol:
-			SectionName = FName("Rifle");
+			SectionName = FName("Pistol");
 			break;
 		case EWeaponType::EWT_SubmachineGun:
 			SectionName = FName("Rifle");
 			break;
 		case EWeaponType::EWT_ShotGun:
-			SectionName = FName("Rifle");
+			SectionName = FName("ShotGun");
 			break;
 		case EWeaponType::EWT_SniperRifle:
-			SectionName = FName("Rifle");
+			SectionName = FName("SniperRifle");
 			break;
 		case EWeaponType::EWT_GrenadeLauncher:
 			SectionName = FName("Rifle");
@@ -483,8 +487,8 @@ void APlayerCharacter::PlayReloadMontage() const
 		default:
 			break;
 		}
-		
-		AnimInstance->Montage_JumpToSection(SectionName);
+		AnimInstance->Montage_Play(ReloadMontage);
+		AnimInstance->Montage_JumpToSection(SectionName, ReloadMontage);
 	}
 }
 
@@ -671,7 +675,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		if(IA_Reload)
 		{
-			inputComponent->BindAction(IA_Reload, ETriggerEvent::Triggered, this, &ThisClass::OnActionReload);
+			inputComponent->BindAction(IA_Reload, ETriggerEvent::Started, this, &ThisClass::OnActionReload);
 		}
 	}
 	
