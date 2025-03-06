@@ -32,9 +32,30 @@ void AMyPlayerController::SetHUDHealth(float Health, float MaxHealth)
 	}
 	else
 	{
-		bInitializeCharacterOverlay = true;
+		bInitializeHealth = true;
 		HUDHealth = Health;
 		HUDMaxHealth = MaxHealth;
+	}
+}
+
+void AMyPlayerController::SetHUDShield(float Shield, float MaxShield)
+{
+	PlayerHUD = PlayerHUD==nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+	if(PlayerHUD && PlayerHUD->CharacterOverlay &&
+		PlayerHUD->CharacterOverlay->ShieldBar && PlayerHUD->CharacterOverlay->ShieldText)
+	{
+		const float ShieldPercent = Shield/MaxShield;
+		PlayerHUD->CharacterOverlay->ShieldBar->SetPercent(ShieldPercent);
+		FString ShieldText =
+			FString::Printf(TEXT("%d/%d"), FMath::CeilToInt(Shield), FMath::CeilToInt(MaxShield));
+
+		PlayerHUD->CharacterOverlay->ShieldText->SetText(FText::FromString(ShieldText));
+	}
+	else
+	{
+		bInitializeShield = true;
+		HUDShield = Shield;
+		HUDMaxShield = MaxShield;
 	}
 }
 
@@ -49,7 +70,7 @@ void AMyPlayerController::SetHUDScore(float Score)
 	}
 	else
 	{
-		bInitializeCharacterOverlay = true;
+		bInitializeScore= true;
 		HUDScore = Score;
 	}
 }
@@ -65,7 +86,7 @@ void AMyPlayerController::SetHUDDefeats(int32 Defeats)
 	}
 	else
 	{
-		bInitializeCharacterOverlay = true;
+		bInitializeDefeats = true;
 		HUDDefeats = Defeats;
 	}
 }
@@ -172,10 +193,7 @@ void AMyPlayerController::Tick(float DeltaSeconds)
 
 	SetHUDTime();
 	CheckTimeSync(DeltaSeconds);
-	if(bInitializeCharacterOverlay)
-	{
-		PollInit();
-	}
+	PollInit();
 }
 
 void AMyPlayerController::ReceivedPlayer()
@@ -354,15 +372,28 @@ void AMyPlayerController::PollInit()
 			CharacterOverlay = PlayerHUD->CharacterOverlay;
 			if(CharacterOverlay)
 			{
-				SetHUDHealth(HUDHealth, HUDMaxHealth);
-				SetHUDScore(HUDScore);
-				SetHUDDefeats(HUDDefeats);
-
-				if(APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()); PlayerCharacter && PlayerCharacter->GetCombat())
+				if(bInitializeHealth)
+				{
+					SetHUDHealth(HUDHealth, HUDMaxHealth);
+				}
+				if(bInitializeShield)
+				{
+					SetHUDShield(HUDShield, HUDMaxShield);
+				}
+				if(bInitializeScore)
+				{
+					SetHUDScore(HUDScore);
+				}
+				if(bInitializeDefeats)
+				{
+					SetHUDDefeats(HUDDefeats);
+				}
+				
+				if(APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn());
+					PlayerCharacter && PlayerCharacter->GetCombat() && !bInitializeGrenades)
 				{
 					SetHUDGrenades(PlayerCharacter->GetCombat()->GetGrenades());
 				}
-				bInitializeCharacterOverlay = false;
 			}
 		}
 	}

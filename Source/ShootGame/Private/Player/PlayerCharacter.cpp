@@ -4,6 +4,7 @@
 #include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/BuffComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/CombatComponent.h"
 #include "Components/WidgetComponent.h"
@@ -11,6 +12,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameMode/LobbyGameMode.h"
 #include "GameMode/ShootGameMode.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Materials/MaterialParameterCollection.h"
 #include "Materials/MaterialParameterCollectionInstance.h"
@@ -18,8 +20,8 @@
 #include "Player/MyPlayerState.h"
 #include "PlayerController/MyPlayerController.h"
 #include "ShootGame/ShootGame.h"
+#include "Sound/SoundCue.h"
 #include "Weapon/Weapon.h"
-#include "WorldPartition/ContentBundle/ContentBundleLog.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -44,7 +46,9 @@ APlayerCharacter::APlayerCharacter()
 
 	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	Combat->SetIsReplicated(true);
-	
+
+	Buff = CreateDefaultSubobject<UBuffComponent>(TEXT("BuffComponent"));
+	Buff->SetIsReplicated(true);
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
@@ -74,6 +78,7 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_CONDITION(APlayerCharacter, OverlappingWeapon, COND_OwnerOnly);
 	DOREPLIFETIME(APlayerCharacter, Health);
 	DOREPLIFETIME(APlayerCharacter, bDisableGameplay);
+	DOREPLIFETIME(APlayerCharacter, Shield);
 }
 
 void APlayerCharacter::PostInitializeComponents()
@@ -83,6 +88,14 @@ void APlayerCharacter::PostInitializeComponents()
 	if(Combat)
 	{
 		Combat->Character = this;
+	}
+	if(Buff)
+	{
+		Buff->Character = this;
+		Buff->SetInitialSpeed
+		(GetCharacterMovement()->MaxWalkSpeed,
+			GetCharacterMovement()->MaxWalkSpeedCrouched);
+		Buff->SetInitialJumpVelocity(GetCharacterMovement()->JumpZVelocity);
 	}
 }
 
@@ -158,6 +171,7 @@ void APlayerCharacter::BeginPlay()
 	}
 	
 	UpdateHUDHealth();
+	UpdateHUDShield();
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
@@ -168,6 +182,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 	AimOffset(DeltaTime);
 	HideCamera();
 	PollInit();
+
+	DropShield(DeltaTime);
 }
 
 void APlayerCharacter::OnActionMoveForward(const FInputActionValue& InputActionValue)
@@ -405,11 +421,30 @@ void APlayerCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UD
 	AController* InstigatorController, AActor* DamageCauser)
 {
 	if(bElimmed) return;
-	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
+
+	float DamageToHealth = Damage;
+	if(Shield > 0.f)
+	{
+		if(Shield>=Damage)
+		{
+			DamageToHealth = 0.f;
+			Shield = FMath::Clamp(Shield - Damage, 0.f, MaxShield);
+		}
+		else
+		{
+			DamageToHealth = FMath::Clamp(DamageToHealth - Shield, 0.f, Damage);
+			Shield = 0.f;
+		}
+	}
+	
+	Health = FMath::Clamp(Health - DamageToHealth, 0.f, MaxHealth);
+
+	
 	UpdateHUDHealth();
+	UpdateHUDShield();
 	PlayHitReactMontage();
 
-	if(Health<=0.f)
+	if(Health <= 0.f)
 	{
 		if(AShootGameMode* ShootGameMode = GetWorld()->GetAuthGameMode<AShootGameMode>())
 		{
@@ -553,6 +588,18 @@ void APlayerCharacter::CancelCombatComponentFireButtonPressed() const
 	}
 }
 
+void APlayerCharacter::PlayHealthSound() const
+{
+	if(HealSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+			this,
+			HealSound,
+			GetActorLocation()
+		);
+	}
+}
+
 void APlayerCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon) const
 {
 	if(OverlappingWeapon)
@@ -608,21 +655,52 @@ void APlayerCharacter::HideCamera()
 	}
 }
 
-void APlayerCharacter::OnRep_Health()
+void APlayerCharacter::OnRep_Health(float LastHealth)
 {
 	UpdateHUDHealth();
-	PlayHitReactMontage();
+	if(Health<LastHealth)
+	{
+		PlayHitReactMontage();
+	}
+}
+
+void APlayerCharacter::DropShield(float DeltaTime)
+{
+	if(Shield <= 0.f)return;
+	float AmountShieldToDrop = DeltaTime*ShieldDropEverySecond;
+	Shield = FMath::Clamp(Shield - AmountShieldToDrop, 0.f, MaxShield);
+	UpdateHUDShield();
+}
+
+void APlayerCharacter::OnRep_Shield(float LastShield)
+{
+	UpdateHUDShield();
+	if(Shield<LastShield)
+	{
+		PlayHitReactMontage();
+	}
 }
 
 void APlayerCharacter::UpdateHUDHealth()
 {
-	if(!IsLocallyControlled())return;
+	if(!IsLocallyControlled()) return;
 	PlayerController = PlayerController == nullptr?Cast<AMyPlayerController>(Controller):PlayerController;
 	if(PlayerController)
 	{
 		PlayerController->SetHUDHealth(Health, MaxHealth);
 	}
 }
+
+void APlayerCharacter::UpdateHUDShield()
+{
+	if(!IsLocallyControlled()) return;
+	PlayerController = PlayerController == nullptr?Cast<AMyPlayerController>(Controller):PlayerController;
+	if(PlayerController)
+	{
+		PlayerController->SetHUDShield(Shield, MaxShield);
+	}
+}
+
 
 void APlayerCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 {

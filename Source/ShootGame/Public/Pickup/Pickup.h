@@ -16,7 +16,7 @@ public:
 	virtual void Destroyed() override;
 protected:
 	virtual void BeginPlay() override;
-
+	UFUNCTION()
 	virtual void OnSphereOverlap(
 		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
@@ -38,6 +38,12 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* PickupMesh;
+
+	UPROPERTY(VisibleAnywhere)
+	class UNiagaraComponent* PickupEffectComponent;
+
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* PickupEffect;
 public:	
 	
 };

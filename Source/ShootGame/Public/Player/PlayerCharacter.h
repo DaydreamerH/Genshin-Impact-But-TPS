@@ -137,6 +137,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
 	class UCombatComponent* Combat;
+	UPROPERTY(VisibleAnywhere)
+	class UBuffComponent* Buff;
 
 	UFUNCTION(Server, Reliable)
 	void ServerOnActionEquip();
@@ -174,12 +176,23 @@ private:
 	float Health = 100.f;
 
 	UFUNCTION()
-	void OnRep_Health();
+	void OnRep_Health(float LastHealth);
 
+	UPROPERTY(EditAnywhere, Category= "Player Stats")
+	float MaxShield = 100.f;
+
+	UPROPERTY(ReplicatedUsing=OnRep_Shield, EditAnywhere, Category="Player Stats")
+	float Shield = 100.f;
+
+	UPROPERTY(EditAnywhere, Category = "PlayerStats")
+	float ShieldDropEverySecond = 5.f;
+	void DropShield(float DeltaTime);
+
+	UFUNCTION()
+	void OnRep_Shield(float LastShield);
+	
 	UPROPERTY()
 	class AMyPlayerController* PlayerController;
-
-	void UpdateHUDHealth();
 
 	bool bElimmed = false;
 
@@ -193,7 +206,13 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* AttachGrenade;
-public:	
+
+	UPROPERTY(EditAnywhere)
+	USoundCue* HealSound;
+public:
+	void UpdateHUDHealth();
+	void UpdateHUDShield();
+	
 	void SetOverlappingWeapon(AWeapon* Weapon);
 
 	bool IsWeaponEquipped() const;
@@ -220,7 +239,11 @@ public:
 
 	FORCEINLINE bool IsElimmed() const { return bElimmed; }
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
-
+	FORCEINLINE void SetHealth(float Amount){ Health = Amount; }
+	FORCEINLINE float GetHealth() const { return Health; }
+	FORCEINLINE void SetShield(float Amount) { Shield = Amount; }
+	FORCEINLINE float GetShield() const {return Shield;}
+	FORCEINLINE float GetMaxShield() const {return MaxShield;}
 	ECombatState GetCombatState() const;
 
 	UPROPERTY(Replicated)
@@ -233,4 +256,7 @@ public:
 	FORCEINLINE UCombatComponent* GetCombat() const {return Combat;}
 	FORCEINLINE UAnimMontage* GetReloadMontage() const {return ReloadMontage;}
 	FORCEINLINE UStaticMeshComponent* GetGrenade() const {return AttachGrenade;}
+	FORCEINLINE UBuffComponent* GetBuff() const { return Buff; }
+
+	void PlayHealthSound() const;
 };

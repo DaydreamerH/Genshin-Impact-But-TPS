@@ -15,6 +15,7 @@ class SHOOTGAME_API AMyPlayerController : public APlayerController
 	GENERATED_BODY()
 public:
 	void SetHUDHealth(float Health, float MaxHealth);
+	void SetHUDShield(float Sheild, float MaxSheild);
 	void SetHUDScore(float Score);
 	void SetHUDDefeats(int32 Defeats);
 	void SetHUDWeaponAmmo(int32 Ammo);
@@ -77,14 +78,19 @@ private:
 
 	UPROPERTY()
 	class UCharacterOverlay* CharacterOverlay;
-
-	bool bInitializeCharacterOverlay = false;
-
+	
 	float HUDHealth;
+	bool bInitializeHealth = false;
 	float HUDMaxHealth;
+	float HUDShield;
+	bool bInitializeShield = false;
+	float HUDMaxShield;
 	float HUDScore;
+	bool bInitializeScore = false;
 	int32 HUDDefeats;
-	int32 HUDGrenades;
+	bool bInitializeDefeats;
+	int32 HUDGrenades = false;
+	bool bInitializeGrenades = false;
 	
 	UPROPERTY()
 	class AShootGameMode* GameMode;
