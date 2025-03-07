@@ -72,6 +72,8 @@ protected:
 	void OnActionReload(const FInputActionValue& InputActionValue);
 	UFUNCTION()
 	void OnActionTossGrenade(const FInputActionValue& InputActionValue);
+	UFUNCTION()
+	void OnActionSwapWeapons(const FInputActionValue& InputActionValue);
 
 	void AimOffset(float DeltaTime);
 	
@@ -120,6 +122,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* IA_TossGrenade;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* IA_SwapWeapons;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* InputMappingContext;
 
 	// 获取MPC
@@ -142,6 +146,9 @@ private:
 
 	UFUNCTION(Server, Reliable)
 	void ServerOnActionEquip();
+
+	UFUNCTION(Server, Reliable)
+	void ServerOnActionSwapWeapons();
 
 	float AO_Yaw;
 	float AO_Pitch;

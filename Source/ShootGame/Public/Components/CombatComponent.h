@@ -24,6 +24,8 @@ public:
 	void EquipWeapon(class AWeapon* WeaponToEquip);
 	void Reload();
 
+	void SwapWeapons();
+
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void FireButtonPressed(bool bPressed);
@@ -40,6 +42,9 @@ protected:
 	
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
+
+	UFUNCTION()
+	void OnRep_SecondaryWeapon();
 
 	UFUNCTION(Server, Reliable)
 	void ServerFire(const FVector_NetQuantize& TraceHitTarget );
@@ -71,12 +76,16 @@ protected:
 	
 	void DropEquippedWeapon();
 	void AttachActorToRightHand(AActor* ActorToAttach);
+	void AttachActorToBackpack(AActor* ActorToAttach);
 	void UpdateCarriedAmmo();
-	void PlayEquipWeaponSound();
+	void PlayEquipWeaponSound(AWeapon* WeaponToEquip);
 	void AttachActorToLeftHand(AActor* ActorToAttach);
 	void ShowGrenade(bool bShowGrenade);
 
 	void UpdateHUDGernades();
+
+	void EquipPrimaryWeapon(AWeapon* WeaponToEquip);
+	void EquipSecondaryWeapon(AWeapon* WeaponToEquip);
 private:
 	UPROPERTY()
 	APlayerCharacter* Character;
@@ -91,6 +100,9 @@ private:
 	
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;
+
+	UPROPERTY(ReplicatedUsing = OnRep_SecondaryWeapon)
+	AWeapon* SecondaryWeapon;
 
 	UPROPERTY(Replicated)
 	bool bAiming;
@@ -184,4 +196,5 @@ public:
 	void TossGrenadeFinish();
 
 	FORCEINLINE int32 GetGrenades() const { return Grenades; }
+	bool CouldSwapWeapons() const;
 };

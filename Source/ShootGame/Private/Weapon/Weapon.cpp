@@ -97,44 +97,60 @@ void AWeapon::SpendRounnd()
 
 void AWeapon::OnRep_WeaponState()
 {
-	switch (WeaponState)
-	{
-	case EWeaponState::EWS_Equipped:
-		ShowPickupWidget(false);
-		WeaponMesh->SetSimulatePhysics(false);
-		WeaponMesh->SetEnableGravity(false);
-		WeaponMesh->SetOverlayMaterial(nullptr);
-		break;
-	case EWeaponState::EWS_Dropped:
-		WeaponMesh->SetSimulatePhysics(true);
-		WeaponMesh->SetEnableGravity(true);
-		WeaponMesh->SetOverlayMaterial(OverlayMaterial);
-		break;
-	}
+	OnWeaponStateSet();
 }
 
 void AWeapon::SetWeaponState(EWeaponState State)
 {
 	WeaponState = State;
-	switch (State)
+	OnWeaponStateSet();
+}
+
+void AWeapon::OnWeaponStateSet()
+{
+	switch (WeaponState)
 	{
 	case EWeaponState::EWS_Equipped:
-		ShowPickupWidget(false);
-		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		WeaponMesh->SetSimulatePhysics(false);
-		WeaponMesh->SetEnableGravity(false);
-		WeaponMesh->SetOverlayMaterial(nullptr);
+		OnEquipped();
 		break;
 	case EWeaponState::EWS_Dropped:
-		if(HasAuthority())
-		{
-			AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		}
-		WeaponMesh->SetSimulatePhysics(true);
-		WeaponMesh->SetEnableGravity(true);
-		WeaponMesh->SetOverlayMaterial(OverlayMaterial);
+		OnDropped();
+		break;
+	case EWeaponState::EWS_EquippedSecondary:
+		OnEquippeedSecondary();
+		break;
+	default:
 		break;
 	}
+}
+
+void AWeapon::OnEquipped()
+{
+	ShowPickupWidget(false);
+	AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	WeaponMesh->SetSimulatePhysics(false);
+	WeaponMesh->SetEnableGravity(false);
+	WeaponMesh->SetOverlayMaterial(nullptr);
+}
+
+void AWeapon::OnDropped()
+{
+	if(HasAuthority())
+	{
+		AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	}
+	WeaponMesh->SetSimulatePhysics(true);
+	WeaponMesh->SetEnableGravity(true);
+	WeaponMesh->SetOverlayMaterial(OverlayMaterial);
+}
+
+void AWeapon::OnEquippeedSecondary()
+{
+	ShowPickupWidget(false);
+	AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	WeaponMesh->SetSimulatePhysics(false);
+	WeaponMesh->SetEnableGravity(false);
+	WeaponMesh->SetOverlayMaterial(nullptr);
 }
 
 void AWeapon::ShowPickupWidget(bool bShowWidget)
@@ -182,6 +198,11 @@ void AWeapon::Fire(const FVector& HitTarget)
 
 void AWeapon::Dropped()
 {
+	if(WeaponType == EWeaponType::EWT_Pistol || WeaponType == EWeaponType::EWT_AssultRifle)
+	{
+		Destroy();
+	}
+	
 	SetWeaponState(EWeaponState::EWS_Dropped);
 	FDetachmentTransformRules DetachmentTransformRules(EDetachmentRule::KeepWorld, true);
 	WeaponMesh->DetachFromComponent(DetachmentTransformRules);

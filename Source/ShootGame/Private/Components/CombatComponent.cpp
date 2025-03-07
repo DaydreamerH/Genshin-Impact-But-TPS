@@ -86,7 +86,20 @@ void UCombatComponent::OnRep_EquippedWeapon()
 		AttachActorToRightHand(EquippedWeapon);
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;
-		PlayEquipWeaponSound();
+		PlayEquipWeaponSound(EquippedWeapon);
+		EquippedWeapon->SetHUDAmmo();
+	}
+}
+
+void UCombatComponent::OnRep_SecondaryWeapon()
+{
+	if(SecondaryWeapon && Character)
+	{
+		SecondaryWeapon->SetWeaponState(EWeaponState::EWS_EquippedSecondary);
+		AttachActorToBackpack(SecondaryWeapon);
+		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+		Character->bUseControllerRotationYaw = true;
+		PlayEquipWeaponSound(SecondaryWeapon);
 	}
 }
 
@@ -315,6 +328,18 @@ void UCombatComponent::AttachActorToRightHand(AActor* ActorToAttach)
 	}
 }
 
+void UCombatComponent::AttachActorToBackpack(AActor* ActorToAttach)
+{
+	if(ActorToAttach == nullptr
+		|| Character == nullptr
+		|| Character->GetMesh() == nullptr)return;
+	
+	if(const USkeletalMeshSocket* BackpackSocket = Character->GetMesh()->GetSocketByName(FName("BackpackSocket")))
+	{
+		BackpackSocket->AttachActor(ActorToAttach, Character->GetMesh());
+	}
+}
+
 void UCombatComponent::AttachActorToLeftHand(AActor* ActorToAttach)
 {
 	if(ActorToAttach == nullptr
@@ -360,15 +385,15 @@ void UCombatComponent::UpdateCarriedAmmo()
 	}
 }
 
-void UCombatComponent::PlayEquipWeaponSound()
+void UCombatComponent::PlayEquipWeaponSound(AWeapon* WeaponToEquip)
 {
-	if(Character == nullptr || EquippedWeapon == nullptr) return;
+	if(Character == nullptr || WeaponToEquip == nullptr) return;
 	
-	if(EquippedWeapon->EquipSound)
+	if(WeaponToEquip->EquipSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation
 		(this,
-			EquippedWeapon->EquipSound,
+			WeaponToEquip->EquipSound,
 			Character->GetActorLocation());
 	}
 }
@@ -589,6 +614,13 @@ void UCombatComponent::TossGrenadeFinish()
 	AttachActorToRightHand(EquippedWeapon);
 }
 
+bool UCombatComponent::CouldSwapWeapons() const
+{
+	return EquippedWeapon!=nullptr
+		&& SecondaryWeapon!=nullptr
+		&& CombatState == ECombatState::ECS_Unoccupied;
+}
+
 void UCombatComponent::MuliticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
 	Character->PlayFireMontage(bAiming);
@@ -626,7 +658,21 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 {
 	if(Character == nullptr || WeaponToEquip == nullptr)return;
 	if(CombatState != ECombatState::ECS_Unoccupied) return;
-	
+
+	if(EquippedWeapon != nullptr && SecondaryWeapon == nullptr)
+	{
+		EquipSecondaryWeapon(WeaponToEquip);
+	}
+	else
+	{
+		EquipPrimaryWeapon(WeaponToEquip);
+	}
+	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+	Character->bUseControllerRotationYaw = true;
+}
+
+void UCombatComponent::EquipPrimaryWeapon(AWeapon* WeaponToEquip)
+{
 	DropEquippedWeapon();
 	
 	EquippedWeapon = WeaponToEquip;
@@ -638,13 +684,18 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 
 	UpdateCarriedAmmo();
 	
-	PlayEquipWeaponSound();
-	
-	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
-	Character->bUseControllerRotationYaw = true;
-
+	PlayEquipWeaponSound(WeaponToEquip);
 	ZoomedFOV = WeaponToEquip->GetZoomedFOV();
 	ZoomInterpSpeed = WeaponToEquip->GetZoomInterpSpeed();
+}
+
+void UCombatComponent::EquipSecondaryWeapon(AWeapon* WeaponToEquip)
+{
+	SecondaryWeapon = WeaponToEquip;
+	SecondaryWeapon->SetWeaponState(EWeaponState::EWS_EquippedSecondary);
+	AttachActorToBackpack(WeaponToEquip);
+	SecondaryWeapon->SetOwner(Character);
+	PlayEquipWeaponSound(WeaponToEquip);
 }
 
 void UCombatComponent::Reload()
@@ -655,6 +706,24 @@ void UCombatComponent::Reload()
 	{
 		ServerReload();
 	}
+}
+
+void UCombatComponent::SwapWeapons()
+{
+	AWeapon* LastEquippedWeapon = EquippedWeapon;
+	EquippedWeapon = SecondaryWeapon;
+	SecondaryWeapon = LastEquippedWeapon;
+
+	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+	AttachActorToRightHand(EquippedWeapon);
+	EquippedWeapon->SetHUDAmmo();
+	UpdateCarriedAmmo();
+	PlayEquipWeaponSound(EquippedWeapon);
+	ZoomedFOV = EquippedWeapon->GetZoomedFOV();
+	ZoomInterpSpeed = EquippedWeapon->GetZoomInterpSpeed();
+	
+	SecondaryWeapon->SetWeaponState(EWeaponState::EWS_EquippedSecondary);
+	AttachActorToBackpack(SecondaryWeapon);
 }
 
 void UCombatComponent::ServerReload_Implementation()
@@ -670,6 +739,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(UCombatComponent, EquippedWeapon);
+	DOREPLIFETIME(UCombatComponent, SecondaryWeapon);
 	DOREPLIFETIME(UCombatComponent, bAiming);
 	DOREPLIFETIME_CONDITION(UCombatComponent, CarriedAmmo, COND_OwnerOnly);
 	DOREPLIFETIME(UCombatComponent, CombatState);

@@ -104,6 +104,10 @@ void APlayerCharacter::Elim()
 	if(Combat && Combat->EquippedWeapon)
 	{
 		Combat->EquippedWeapon->Dropped();
+		if(Combat->SecondaryWeapon)
+		{
+			Combat->SecondaryWeapon->Dropped();
+		}
 	}
 	
 	MulticastElim();
@@ -238,17 +242,7 @@ void APlayerCharacter::OnActionJump(const FInputActionValue& InputActionValue)
 void APlayerCharacter::OnActionEquip(const FInputActionValue& InputActionValue)
 {
 	if(bDisableGameplay)return;
-	if(HasAuthority())
-	{
-		if(Combat)
-		{
-			Combat->EquipWeapon(OverlappingWeapon);
-		}
-	}
-	else
-	{
-		ServerOnActionEquip();
-	}
+	ServerOnActionEquip();
 }
 
 void APlayerCharacter::OnActionCrouch(const FInputActionValue& InputActionValue)
@@ -312,11 +306,16 @@ void APlayerCharacter::OnActionReload(const FInputActionValue& InputActionValue)
 
 void APlayerCharacter::OnActionTossGrenade(const FInputActionValue& InputActionValue)
 {
-	UE_LOG(LogTemp, Log, TEXT("Trigger G"));
 	if(Combat)
 	{
 		Combat->TossGrenade();
 	}
+}
+
+void APlayerCharacter::OnActionSwapWeapons(const FInputActionValue& InputActionValue)
+{
+	if(bDisableGameplay || !Combat->CouldSwapWeapons())return;
+	ServerOnActionSwapWeapons_Implementation();
 }
 
 void APlayerCharacter::AimOffset(float DeltaTime)
@@ -363,6 +362,15 @@ void APlayerCharacter::ServerOnActionEquip_Implementation()
 		Combat->EquipWeapon(OverlappingWeapon);
 	}
 }
+
+void APlayerCharacter::ServerOnActionSwapWeapons_Implementation()
+{
+	if(Combat)
+	{
+		Combat->SwapWeapons();
+	}
+}
+
 
 void APlayerCharacter::UpdateMPC()
 {
@@ -789,6 +797,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		if(IA_TossGrenade)
 		{
 			inputComponent->BindAction(IA_TossGrenade, ETriggerEvent::Started, this, &ThisClass::OnActionTossGrenade);
+		}
+		if(IA_SwapWeapons)
+		{
+			inputComponent->BindAction(IA_SwapWeapons, ETriggerEvent::Started, this, &ThisClass::OnActionSwapWeapons);
 		}
 	}
 	

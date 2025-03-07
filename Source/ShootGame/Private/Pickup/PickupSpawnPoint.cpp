@@ -24,13 +24,11 @@ void APickupSpawnPoint::SpawnPickup()
 {
 	if(const int32 NumPickupClasses = PickupClasses.Num(); NumPickupClasses>0)
 	{
-		UE_LOG(LogTemp, Log, TEXT("StartSpawn"));
 		const int32 Selection = FMath::RandRange(0, NumPickupClasses - 1);
 		SpawnedPickup = GetWorld()->SpawnActor<APickup>
 			(PickupClasses[Selection], GetActorTransform());
 		if(HasAuthority() && SpawnedPickup)
 		{
-			UE_LOG(LogTemp, Log, TEXT("Finish"));
 			SpawnedPickup->OnDestroyed.AddDynamic(this, &ThisClass::StartSpawnPickupTimer);
 		}
 	}
@@ -53,5 +51,4 @@ void APickupSpawnPoint::StartSpawnPickupTimer(AActor* DestroyedActor)
 		&ThisClass::SpawnPickupTimerFinished,
 		SpawnTime
 	);
-	UE_LOG(LogTemp, Log, TEXT("%f"), SpawnTime);
 }
