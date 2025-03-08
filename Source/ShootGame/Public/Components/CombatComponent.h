@@ -8,7 +8,7 @@
 #include "Weapon/WeaponTypes.h"
 #include "CombatComponent.generated.h"
 
-#define TRACE_LENGTH 8000
+#define TRACE_LENGTH 15000
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SHOOTGAME_API UCombatComponent : public UActorComponent

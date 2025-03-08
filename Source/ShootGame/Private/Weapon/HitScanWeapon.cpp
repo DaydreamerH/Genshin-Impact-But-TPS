@@ -111,7 +111,7 @@ FVector AHitScanWeapon::TraceEndWithScatter(const FVector& TraceStart, const FVe
 	FVector EndLoc = SphereCenter + RandVec;
 	FVector ToEndLoc = EndLoc - TraceStart;
 
-	return FVector(TraceStart + ToEndLoc * TRACE_LENGTH/ToEndLoc.Size());
+	return FVector(TraceStart + ToEndLoc * TRACE_LENGTH);
 	
 }
 
