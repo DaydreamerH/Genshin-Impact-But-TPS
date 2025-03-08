@@ -187,12 +187,20 @@ void UCombatComponent::LocalFire(const FVector_NetQuantize& TraceHitTarget)
 {
 	Character->PlayFireMontage(bAiming);
 	Character->SetCrosshairShootingFactor();
-	if(EquippedWeapon->GetWeaponType() == EWeaponType::EWT_ShotGun
-		&& CombatState == ECombatState::ECS_Reloading)
+	EquippedWeapon->Fire(TraceHitTarget);
+}
+
+void UCombatComponent::ShotGunLocalFire(const TArray<FVector_NetQuantize>& TraceHitTarget)
+{
+	AShotGunWeapon* ShotGunWeapon = Cast<AShotGunWeapon>(EquippedWeapon);
+	if(ShotGunWeapon == nullptr || Character == nullptr)return;
+	if(CombatState == ECombatState::ECS_Reloading
+		|| CombatState == ECombatState::ECS_Unoccupied)
 	{
+		Character->PlayFireMontage(bAiming);
+		ShotGunWeapon->FireShotGun(TraceHitTarget);
 		CombatState = ECombatState::ECS_Unoccupied;
 	}
-	EquippedWeapon->Fire(TraceHitTarget);
 }
 
 void UCombatComponent::FireProjectileWeapon()
@@ -200,11 +208,14 @@ void UCombatComponent::FireProjectileWeapon()
 	// 我曾经在开火前再次更新射线检测的目标，不知道去掉会怎么样
 	// FHitResult HitResult;
 	// TraceUnderCrosshairs(HitResult);
-	if(EquippedWeapon)
+	if(EquippedWeapon && Character)
 	{
 		HitTarget = EquippedWeapon->bUseScatter?
 			EquippedWeapon->TraceEndWithScatter(HitTarget) : HitTarget;
-		LocalFire(HitTarget);
+		if(!Character->HasAuthority())
+		{
+			LocalFire(HitTarget);
+		}
 		ServerFire(HitTarget);	
 	}
 	
@@ -212,25 +223,48 @@ void UCombatComponent::FireProjectileWeapon()
 
 void UCombatComponent::FireHitScanWeapon()
 {
-	if(EquippedWeapon)
+	if(EquippedWeapon && Character)
 	{
 		HitTarget = EquippedWeapon->bUseScatter?
 			EquippedWeapon->TraceEndWithScatter(HitTarget) : HitTarget;
-		LocalFire(HitTarget);
+		if(!Character->HasAuthority())
+		{
+			LocalFire(HitTarget);
+		}
 		ServerFire(HitTarget);	
 	}
 }
 
 void UCombatComponent::FireShotGun()
 {
-	if(EquippedWeapon)
+	if(AShotGunWeapon* ShotGunWeapon = Cast<AShotGunWeapon>(EquippedWeapon);
+		ShotGunWeapon && Character)
 	{
-		if(AShotGunWeapon* ShotGunWeapon = Cast<AShotGunWeapon>(EquippedWeapon))
+		TArray<FVector_NetQuantize>HitTargets;
+		ShotGunWeapon->ShotGunTraceEndWithScatter(HitTarget, HitTargets);
+		if(!Character->HasAuthority())
 		{
-			TArray<FVector>HitTargets;
-			ShotGunWeapon->ShotGunTraceEndWithScatter(HitTarget, HitTargets);
+			ShotGunLocalFire(HitTargets);
 		}
+		ServerShotGunFire(HitTargets);
 	}
+}
+
+void UCombatComponent::ServerShotGunFire_Implementation(const TArray<FVector_NetQuantize>& TraceHitTargets)
+{
+	MulticastShotGunFire_Implementation(TraceHitTargets);
+}
+
+void UCombatComponent::MulticastShotGunFire_Implementation(const TArray<FVector_NetQuantize>& TraceHitTargets)
+{
+	// TODO: 这里是bug，服务器会开两次枪
+	
+	if(Character == nullptr || (Character->IsLocallyControlled() && !Character->HasAuthority()))
+	{
+		return;
+	}
+
+	ShotGunLocalFire(TraceHitTargets);
 }
 
 void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
