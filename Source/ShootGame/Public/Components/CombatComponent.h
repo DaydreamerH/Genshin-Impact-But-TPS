@@ -50,8 +50,10 @@ protected:
 	void ServerFire(const FVector_NetQuantize& TraceHitTarget );
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MuliticastFire(const FVector_NetQuantize& TraceHitTarget);
+	void MulticastFire(const FVector_NetQuantize& TraceHitTarget);
 
+	void LocalFire(const FVector_NetQuantize& TraceHitTarget);
+	
 	UFUNCTION(Server, Reliable)
 	void ServerCooldown();
 

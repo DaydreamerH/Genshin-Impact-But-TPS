@@ -106,13 +106,14 @@ void UCombatComponent::OnRep_SecondaryWeapon()
 void UCombatComponent::FireButtonPressed(bool bPressed)
 {
 	bFireButtonPressed = bPressed;
-
+	if(Character==nullptr)return;
 	if(bFireButtonPressed)
 	{
 		if(CanFire())
 		{
 			FHitResult HitResult;
 			TraceUnderCrosshairs(HitResult);
+			LocalFire(HitTarget);
 			ServerFire(HitResult.ImpactPoint);	
 		}
 		else if(bPlayNoAmmoSound && CombatState == ECombatState::ECS_Unoccupied)
@@ -169,6 +170,18 @@ void UCombatComponent::ServerCooldown_Implementation()
 	{
 		CombatState = ECombatState::ECS_Unoccupied;
 	}
+}
+
+void UCombatComponent::LocalFire(const FVector_NetQuantize& TraceHitTarget)
+{
+	Character->PlayFireMontage(bAiming);
+	Character->SetCrosshairShootingFactor();
+	if(EquippedWeapon->GetWeaponType() == EWeaponType::EWT_ShotGun
+		&& CombatState == ECombatState::ECS_Reloading)
+	{
+		CombatState = ECombatState::ECS_Unoccupied;
+	}
+	EquippedWeapon->Fire(TraceHitTarget);
 }
 
 void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
@@ -619,8 +632,14 @@ bool UCombatComponent::CouldSwapWeapons() const
 		&& CombatState == ECombatState::ECS_Unoccupied;
 }
 
-void UCombatComponent::MuliticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
+void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
+	// TODO: 这里是bug，服务器会开两次枪
+	
+	if(Character == nullptr || (Character->IsLocallyControlled() && !Character->HasAuthority()))
+	{
+		return;
+	}
 	Character->PlayFireMontage(bAiming);
 	Character->SetCrosshairShootingFactor();
 	if(EquippedWeapon->GetWeaponType() == EWeaponType::EWT_ShotGun
@@ -633,14 +652,12 @@ void UCombatComponent::MuliticastFire_Implementation(const FVector_NetQuantize& 
 
 void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
-	if(Character)
+	if(EquippedWeapon && !EquippedWeapon->GetAutoFire())
 	{
-		if(EquippedWeapon && !EquippedWeapon->GetAutoFire())
-		{
-			CombatState = ECombatState::ECS_Cooling;
-		}
-		MuliticastFire(TraceHitTarget);
+		CombatState = ECombatState::ECS_Cooling;
 	}
+	MulticastFire(TraceHitTarget);
+
 }
 
 void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
