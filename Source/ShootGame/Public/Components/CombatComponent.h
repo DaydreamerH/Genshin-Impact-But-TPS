@@ -86,6 +86,8 @@ protected:
 
 	void EquipPrimaryWeapon(AWeapon* WeaponToEquip);
 	void EquipSecondaryWeapon(AWeapon* WeaponToEquip);
+
+	void PlayNoAmmoSound();
 private:
 	UPROPERTY()
 	APlayerCharacter* Character;

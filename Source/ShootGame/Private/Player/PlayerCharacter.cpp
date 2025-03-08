@@ -187,7 +187,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	HideCamera();
 	PollInit();
 
-	DropShield(DeltaTime);
+	// DropShield(DeltaTime);
 }
 
 void APlayerCharacter::OnActionMoveForward(const FInputActionValue& InputActionValue)
@@ -485,6 +485,10 @@ void APlayerCharacter::PollInit()
 void APlayerCharacter::PlayFireMontage(bool bAiming) const
 {
 	if(Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
+	if(IsLocallyControlled())
+	{
+		UE_LOG(LogTemp, Log, TEXT("Play On Local"));
+	}
 	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && FireWeaponMontage && !AnimInstance->Montage_IsPlaying(FireWeaponMontage))
 	{
 		AnimInstance->Montage_Play(FireWeaponMontage);

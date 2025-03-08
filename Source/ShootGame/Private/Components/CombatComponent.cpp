@@ -109,9 +109,16 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 
 	if(bFireButtonPressed)
 	{
-		FHitResult HitResult;
-		TraceUnderCrosshairs(HitResult);
-		ServerFire(HitResult.ImpactPoint);
+		if(CanFire())
+		{
+			FHitResult HitResult;
+			TraceUnderCrosshairs(HitResult);
+			ServerFire(HitResult.ImpactPoint);	
+		}
+		else if(bPlayNoAmmoSound && CombatState == ECombatState::ECS_Unoccupied)
+		{
+			PlayNoAmmoSound();
+		}
 	}
 	else
 	{
@@ -433,16 +440,7 @@ void UCombatComponent::InterpFOV(float DeltaTime)
 bool UCombatComponent::CanFire()
 {
 	if(EquippedWeapon == nullptr)return false;
-	if(bPlayNoAmmoSound && EquippedWeapon->AmmoEqualsZero()
-		&& CombatState == ECombatState::ECS_Unoccupied)
-	{
-		UGameplayStatics::PlaySoundAtLocation(
-			this,
-			EquippedWeapon->NoAmmoSound,
-			Character->GetActorLocation()
-		);
-		bPlayNoAmmoSound = false;
-	}
+	
 	if(EquippedWeapon->GetWeaponType() == EWeaponType::EWT_ShotGun
 		&& !EquippedWeapon->AmmoEqualsZero()
 		&& CombatState == ECombatState::ECS_Reloading)return true;
@@ -635,7 +633,7 @@ void UCombatComponent::MuliticastFire_Implementation(const FVector_NetQuantize& 
 
 void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
-	if(Character&&CanFire())
+	if(Character)
 	{
 		if(EquippedWeapon && !EquippedWeapon->GetAutoFire())
 		{
@@ -696,6 +694,16 @@ void UCombatComponent::EquipSecondaryWeapon(AWeapon* WeaponToEquip)
 	AttachActorToBackpack(WeaponToEquip);
 	SecondaryWeapon->SetOwner(Character);
 	PlayEquipWeaponSound(WeaponToEquip);
+}
+
+void UCombatComponent::PlayNoAmmoSound()
+{
+	UGameplayStatics::PlaySoundAtLocation(
+		this,
+		EquippedWeapon->NoAmmoSound,
+		Character->GetActorLocation()
+		);
+	bPlayNoAmmoSound = false;
 }
 
 void UCombatComponent::Reload()
