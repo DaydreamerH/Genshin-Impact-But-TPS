@@ -4,6 +4,7 @@
 #include "PlayerController/MyPlayerController.h"
 
 #include "Components/CombatComponent.h"
+#include "Components/Image.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "GameFramework/GameMode.h"
@@ -194,6 +195,8 @@ void AMyPlayerController::Tick(float DeltaSeconds)
 	SetHUDTime();
 	CheckTimeSync(DeltaSeconds);
 	PollInit();
+
+	CheckPing(DeltaSeconds);
 }
 
 void AMyPlayerController::ReceivedPlayer()
@@ -395,6 +398,66 @@ void AMyPlayerController::PollInit()
 					SetHUDGrenades(PlayerCharacter->GetCombat()->GetGrenades());
 				}
 			}
+		}
+	}
+}
+
+void AMyPlayerController::HighPingWarning()
+{
+	PlayerHUD = PlayerHUD==nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+	if(PlayerHUD && PlayerHUD->CharacterOverlay &&
+		PlayerHUD->CharacterOverlay->HighPingImage
+		&&PlayerHUD->CharacterOverlay->HighPingAnimation)
+	{
+		PlayerHUD->CharacterOverlay->HighPingImage->SetOpacity(1.f);
+		PlayerHUD->CharacterOverlay->PlayAnimation(PlayerHUD->CharacterOverlay->HighPingAnimation);
+	}
+}
+
+void AMyPlayerController::StopHighPingWarning()
+{
+	PlayerHUD = PlayerHUD==nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+	if(PlayerHUD && PlayerHUD->CharacterOverlay &&
+		PlayerHUD->CharacterOverlay->HighPingImage
+		&&PlayerHUD->CharacterOverlay->HighPingAnimation)
+	{
+		PlayerHUD->CharacterOverlay->HighPingImage->SetOpacity(0.f);
+		if(PlayerHUD->CharacterOverlay->
+			IsAnimationPlaying(PlayerHUD->CharacterOverlay->HighPingAnimation))
+		{
+			PlayerHUD->CharacterOverlay->
+				StopAnimation(PlayerHUD->CharacterOverlay->HighPingAnimation);
+		}
+	}
+}
+
+void AMyPlayerController::CheckPing(const float DeltaSeconds)
+{
+	HighPingRunningTime += DeltaSeconds;
+	if(HighPingRunningTime>CheckPingFrequency)
+	{
+		PlayerState = PlayerState == nullptr ?
+			TObjectPtr<APlayerState>(GetPlayerState<APlayerState>()) : PlayerState;
+		if(PlayerState)
+		{
+			if(PlayerState->GetPingInMilliseconds()>HighPingThreshold)
+			{
+				PingAnimationRunningTime = 0.f;
+				HighPingWarning();
+			}
+		}
+		HighPingRunningTime = 0.f;
+	}
+	if(PlayerHUD
+		&& PlayerHUD->CharacterOverlay
+		&& PlayerHUD->CharacterOverlay->HighPingAnimation
+		&& PlayerHUD->CharacterOverlay->
+			IsAnimationPlaying(PlayerHUD->CharacterOverlay->HighPingAnimation))
+	{
+		PingAnimationRunningTime += DeltaSeconds;
+		if(PingAnimationRunningTime>HighPingDuration)
+		{
+			StopHighPingWarning();
 		}
 	}
 }
