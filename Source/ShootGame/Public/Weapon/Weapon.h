@@ -100,6 +100,11 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	bool AutoFire = true;
+
+	UPROPERTY(EditAnywhere, Category="Weapon Scatter")
+	float DistanceToSphere = 800.f;
+	UPROPERTY(EditAnywhere, Category="Weapon Scatter")
+	float SphereRadius = 75.f;
 private:
 
 	UPROPERTY(VisibleAnywhere, Category="WeaponProperties")
@@ -133,11 +138,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	UMaterialInterface* OverlayMaterial;
-
-	UPROPERTY(EditAnywhere, Category="Weapon Scatter")
-	float DistanceToSphere = 800.f;
-	UPROPERTY(EditAnywhere, Category="Weapon Scatter")
-	float SphereRadius = 75.f;
 	
 public:
 	void SetWeaponState(EWeaponState State);

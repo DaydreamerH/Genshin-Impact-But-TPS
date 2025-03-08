@@ -15,6 +15,8 @@ class SHOOTGAME_API AShotGunWeapon : public AHitScanWeapon
 	GENERATED_BODY()
 public:
 	virtual void Fire(const FVector& HitTarget) override;
+
+	void ShotGunTraceEndWithScatter(const FVector& HitTarget, TArray<FVector>& HitTargets);
 private:
 	UPROPERTY(EditAnywhere, Category="Weapon Scatter")
 	uint32 NumberOfPellets = 10;

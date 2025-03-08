@@ -11,6 +11,7 @@
 #include "Player/PlayerCharacter.h"
 #include "PlayerController/MyPlayerController.h"
 #include "Sound/SoundCue.h"
+#include "Weapon/ShotGunWeapon.h"
 #include "Weapon/Weapon.h"
 
 UCombatComponent::UCombatComponent()
@@ -222,6 +223,14 @@ void UCombatComponent::FireHitScanWeapon()
 
 void UCombatComponent::FireShotGun()
 {
+	if(EquippedWeapon)
+	{
+		if(AShotGunWeapon* ShotGunWeapon = Cast<AShotGunWeapon>(EquippedWeapon))
+		{
+			TArray<FVector>HitTargets;
+			ShotGunWeapon->ShotGunTraceEndWithScatter(HitTarget, HitTargets);
+		}
+	}
 }
 
 void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
