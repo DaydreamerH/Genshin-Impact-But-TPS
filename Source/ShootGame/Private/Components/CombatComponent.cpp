@@ -199,8 +199,14 @@ void UCombatComponent::FireProjectileWeapon()
 	// 我曾经在开火前再次更新射线检测的目标，不知道去掉会怎么样
 	// FHitResult HitResult;
 	// TraceUnderCrosshairs(HitResult);
-	LocalFire(HitTarget);
-	ServerFire(HitTarget);	
+	if(EquippedWeapon)
+	{
+		HitTarget = EquippedWeapon->bUseScatter?
+			EquippedWeapon->TraceEndWithScatter(HitTarget) : HitTarget;
+		LocalFire(HitTarget);
+		ServerFire(HitTarget);	
+	}
+	
 }
 
 void UCombatComponent::FireHitScanWeapon()
