@@ -7,6 +7,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/PlayerCharacter.h"
 #include "PlayerController/MyPlayerController.h"
@@ -242,5 +243,26 @@ void AWeapon::AddAmmo(int32 AmmoToAdd)
 {
 	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapcitiy);
 	SetHUDAmmo();
+}
+
+FVector AWeapon::TraceEndWithScatter(const FVector& HitTarget) const
+{
+	const USkeletalMeshSocket*
+			MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName("MuzzleFlash");
+	if(MuzzleFlashSocket == nullptr)
+	{
+		return FVector();
+	}
+	FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform((GetWeaponMesh()));
+	FVector TraceStart = SocketTransform.GetLocation();
+	
+	FVector ToTargetNormalized = (HitTarget - TraceStart).GetSafeNormal();
+	FVector SphereCenter = TraceStart + ToTargetNormalized*DistanceToSphere;
+
+	FVector RandVec = UKismetMathLibrary::RandomUnitVector() * FMath::FRandRange(0.f, SphereRadius);
+	FVector EndLoc = SphereCenter + RandVec;
+	FVector ToEndLoc = EndLoc - TraceStart;
+
+	return FVector(TraceStart + ToEndLoc * TRACE_LENGTH);
 }
 

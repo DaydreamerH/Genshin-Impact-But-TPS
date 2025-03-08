@@ -17,6 +17,16 @@ enum class EWeaponState : uint8
 	EWS_MAX UMETA(DisplayName = "DefaultMax")
 };
 
+UENUM(BlueprintType)
+enum class EFireType: uint8
+{
+	EFT_HitScan UMETA(DisplayName = "Hit Scan Weapon"),
+	EFT_Projectile UMETA(DisplayName = "Projectile Weapon"),
+	EFT_ShotGun UMETA(DisplayName = "Shot Gun Weapon"),
+	
+	EFT_MAX UMETA(DisplayName = "DefaultMax")
+};
+
 UCLASS()
 class SHOOTGAME_API AWeapon : public AActor
 {
@@ -38,6 +48,15 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	USoundCue* NoAmmoSound;
+
+	UPROPERTY(EditAnywhere)
+	EFireType FireType;
+
+	UPROPERTY(EditAnywhere, Category="Weapon Scatter")
+	bool bUseScatter = false;
+
+	UFUNCTION()
+	FVector TraceEndWithScatter(const FVector& HitTarget) const;
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnWeaponStateSet();
@@ -114,6 +133,12 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	UMaterialInterface* OverlayMaterial;
+
+	UPROPERTY(EditAnywhere, Category="Weapon Scatter")
+	float DistanceToSphere = 800.f;
+	UPROPERTY(EditAnywhere, Category="Weapon Scatter")
+	float SphereRadius = 75.f;
+	
 public:
 	void SetWeaponState(EWeaponState State);
 	

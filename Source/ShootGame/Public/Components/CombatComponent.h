@@ -53,6 +53,10 @@ protected:
 	void MulticastFire(const FVector_NetQuantize& TraceHitTarget);
 
 	void LocalFire(const FVector_NetQuantize& TraceHitTarget);
+
+	void FireProjectileWeapon();
+	void FireHitScanWeapon();
+	void FireShotGun();
 	
 	UFUNCTION(Server, Reliable)
 	void ServerCooldown();

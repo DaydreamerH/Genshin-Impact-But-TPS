@@ -111,10 +111,20 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 	{
 		if(CanFire())
 		{
-			FHitResult HitResult;
-			TraceUnderCrosshairs(HitResult);
-			LocalFire(HitTarget);
-			ServerFire(HitResult.ImpactPoint);	
+			switch (EquippedWeapon->FireType)
+			{
+				case EFireType::EFT_Projectile:
+					FireProjectileWeapon();
+					break;
+				case EFireType::EFT_HitScan:
+					FireHitScanWeapon();
+					break;
+				case EFireType::EFT_ShotGun:
+					FireShotGun();
+					break;
+				default:
+						break;
+			}
 		}
 		else if(bPlayNoAmmoSound && CombatState == ECombatState::ECS_Unoccupied)
 		{
@@ -182,6 +192,30 @@ void UCombatComponent::LocalFire(const FVector_NetQuantize& TraceHitTarget)
 		CombatState = ECombatState::ECS_Unoccupied;
 	}
 	EquippedWeapon->Fire(TraceHitTarget);
+}
+
+void UCombatComponent::FireProjectileWeapon()
+{
+	// 我曾经在开火前再次更新射线检测的目标，不知道去掉会怎么样
+	// FHitResult HitResult;
+	// TraceUnderCrosshairs(HitResult);
+	LocalFire(HitTarget);
+	ServerFire(HitTarget);	
+}
+
+void UCombatComponent::FireHitScanWeapon()
+{
+	if(EquippedWeapon)
+	{
+		HitTarget = EquippedWeapon->bUseScatter?
+			EquippedWeapon->TraceEndWithScatter(HitTarget) : HitTarget;
+		LocalFire(HitTarget);
+		ServerFire(HitTarget);	
+	}
+}
+
+void UCombatComponent::FireShotGun()
+{
 }
 
 void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
