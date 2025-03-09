@@ -48,6 +48,12 @@ protected:
 	
 	void SaveFramePackage(FFramePackage& Package);
 	void ShowFramePackage(FFramePackage& Package, const FColor& Color) const;
+
+	void ServerSideRewind(
+		APlayerCharacter* HitCharacter,
+		const FVector_NetQuantize& TraceStart,
+		const FVector_NetQuantize& HitLocation,
+		float HitTime);
 private:
 	UPROPERTY()
 	APlayerCharacter* Character;

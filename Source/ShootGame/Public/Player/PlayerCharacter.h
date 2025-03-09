@@ -295,4 +295,6 @@ public:
 
 	void PlayHealthSound() const;
 	bool IsLocallyReloading();
+
+	FORCEINLINE ULagCompensationComponent* GetLagCompensation() const { return LagCompensation; }
 };
