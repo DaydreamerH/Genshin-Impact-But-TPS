@@ -18,9 +18,6 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere)
-	float Damage = 20.f;
-
-	UPROPERTY(EditAnywhere)
 	class UParticleSystem* ImpactParticles;
 
 	UPROPERTY(EditAnywhere)
@@ -34,8 +31,6 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	USoundCue* HitSound;
-
-
 
 	void WeaponTraceHit(const FVector & TraceStart, const FVector & HitTarget, FHitResult& OutHit);
 };

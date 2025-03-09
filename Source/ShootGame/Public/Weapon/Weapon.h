@@ -113,6 +113,19 @@ protected:
 	float DistanceToSphere = 800.f;
 	UPROPERTY(EditAnywhere, Category="Weapon Scatter")
 	float SphereRadius = 75.f;
+
+	// 射线武器没有子弹
+	UPROPERTY(EditAnywhere)
+	float Damage = 20.f;
+
+	UPROPERTY(EditAnywhere)
+	bool bUseServerSideRewind = false;
+	
+	UPROPERTY()
+	class APlayerCharacter* OwnerPlayerCharacter;
+	UPROPERTY()
+	class AMyPlayerController* OwnerPlayerController;
+	
 private:
 
 	UPROPERTY(VisibleAnywhere, Category="WeaponProperties")
@@ -136,10 +149,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	float DeltaCrosshairShootingFactor = .2f;
 	
-	UPROPERTY()
-	class APlayerCharacter* OwnerPlayerCharacter;
-	UPROPERTY()
-	class AMyPlayerController* OwnerPlayerController;
+
 
 	UPROPERTY(EditAnywhere)
 	EWeaponType WeaponType;
@@ -175,5 +185,7 @@ public:
 
 	FORCEINLINE bool GetAutoFire() const {return AutoFire;}
 
-	FORCEINLINE bool IsFull(){return Ammo >= MagCapcitiy;}
+	FORCEINLINE bool IsFull() const {return Ammo >= MagCapcitiy;}
+
+	FORCEINLINE float GetDamage() const { return Damage; }
 };

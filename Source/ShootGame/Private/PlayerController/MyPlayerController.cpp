@@ -480,8 +480,9 @@ void AMyPlayerController::ClientJoinMidgame_Implementation
 void AMyPlayerController::ClientReportServerTime_Implementation(float TimeOfClientRequest,
                                                                 float TimeServerReceivedClientRequest)
 {
-	float RoundTripTime = GetWorld()->GetTimeSeconds() - TimeOfClientRequest;
-	float CurrentServerTime = TimeServerReceivedClientRequest + (0.5f*RoundTripTime);
+	const float RoundTripTime = GetWorld()->GetTimeSeconds() - TimeOfClientRequest;
+	SingleTripTime = RoundTripTime * 0.5f;
+	const float CurrentServerTime = TimeServerReceivedClientRequest + SingleTripTime;
 	ClientServerDelta = CurrentServerTime - GetWorld()->GetTimeSeconds();
 }
 

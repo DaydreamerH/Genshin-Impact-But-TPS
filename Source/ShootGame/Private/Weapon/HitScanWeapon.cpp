@@ -3,12 +3,12 @@
 
 #include "Weapon/HitScanWeapon.h"
 
-#include "Components/CombatComponent.h"
+#include "Components/LagCompensationComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Player/PlayerCharacter.h"
+#include "PlayerController/MyPlayerController.h"
 #include "Sound/SoundCue.h"
 #include "Weapon/BulletShell.h"
 
@@ -35,9 +35,9 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 			}
 		}
 		SpendRounnd();
-		const APawn* OnwerPawn = Cast<APawn>(GetOwner());
-		if(OnwerPawn==nullptr)return;
-		AController* InstigatorController = OnwerPawn->GetController();
+		APawn* OwnerPawn = Cast<APawn>(GetOwner());
+		if(OwnerPawn==nullptr)return;
+		AController* InstigatorController = OwnerPawn->GetController();
 
 		const USkeletalMeshSocket*
 			MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName("MuzzleFlash");
@@ -52,15 +52,38 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 			
 			if(APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(FireHit.GetActor()))
 			{
-				if(HasAuthority() && InstigatorController)
+				if(InstigatorController)
 				{
-					UGameplayStatics::ApplyDamage(
-						PlayerCharacter,
-						Damage,
-						InstigatorController,
-						this,
-						UDamageType::StaticClass()
-					);
+					if(HasAuthority())
+					{
+						UGameplayStatics::ApplyDamage(
+							PlayerCharacter,
+							Damage,
+							InstigatorController,
+							this,
+							UDamageType::StaticClass()
+						);
+					}
+					else if(bUseServerSideRewind)
+					{
+						OwnerPlayerCharacter = OwnerPlayerCharacter == nullptr ?
+							Cast<APlayerCharacter>(OwnerPawn) : OwnerPlayerCharacter;
+						OwnerPlayerController = OwnerPlayerController == nullptr ?
+							Cast<AMyPlayerController>(InstigatorController) : OwnerPlayerController;
+
+						if(OwnerPlayerCharacter
+							&& OwnerPlayerController
+							&& OwnerPlayerCharacter->GetLagCompensation())
+						{
+							OwnerPlayerCharacter->GetLagCompensation()->ServerScoreRequest(
+								PlayerCharacter,
+								Start,
+								HitTarget,
+								OwnerPlayerController->GetServerTime()-OwnerPlayerController->SingleTripTime,
+								this
+							);
+						}
+					}
 				}
 				if(ImpactParticles)
 				{
