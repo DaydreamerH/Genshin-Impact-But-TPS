@@ -54,6 +54,11 @@ protected:
 		const FVector_NetQuantize& TraceStart,
 		const FVector_NetQuantize& HitLocation,
 		float HitTime);
+
+	FFramePackage InterpBetweenFrames(
+		const FFramePackage& OlderFrame,
+		const FFramePackage& YoungerFrame,
+		float HitTime);
 private:
 	UPROPERTY()
 	APlayerCharacter* Character;
