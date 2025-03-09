@@ -369,10 +369,6 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 
 void UCombatComponent::HandleReload()
 {
-	if(Character->HasAuthority())
-	{
-		UE_LOG(LogTemp, Log, TEXT("HandleReloadOnServer"));
-	}
 	if(Character)
 	{
 		Character->PlayReloadMontage();
@@ -548,7 +544,7 @@ void UCombatComponent::InterpFOV(float DeltaTime)
 bool UCombatComponent::CanFire()
 {
 	if(EquippedWeapon == nullptr)return false;
-	
+	if(bLocallyReloading) return false;
 	if(EquippedWeapon->GetWeaponType() == EWeaponType::EWT_ShotGun
 		&& !EquippedWeapon->AmmoEqualsZero()
 		&& CombatState == ECombatState::ECS_Reloading)return true;
@@ -587,7 +583,7 @@ void UCombatComponent::OnRep_CombatState()
 	switch(CombatState)
 	{
 	case ECombatState::ECS_Reloading:
-		if(Character)
+		if(Character && !Character->IsLocallyControlled())
 		{
 			HandleReload();
 		}
@@ -664,12 +660,10 @@ void UCombatComponent::SetCrosshairShootingFactor(float f)
 
 void UCombatComponent::FinishReloading()
 {
-	UE_LOG(LogTemp, Log, TEXT("Finish: %d"), Character->GetLocalRole());
-	
 	if(Character ==nullptr)return;
+	bLocallyReloading = false;
 	if(Character->HasAuthority())
 	{
-		UE_LOG(LogTemp, Log, TEXT("Finish Reloading OnServer"));
 		CombatState = ECombatState::ECS_Unoccupied;
 		UpdateAmmoValue();
 	}
@@ -812,6 +806,12 @@ void UCombatComponent::EquipSecondaryWeapon(AWeapon* WeaponToEquip)
 
 void UCombatComponent::PlayNoAmmoSound()
 {
+	if(EquippedWeapon == nullptr ||
+		EquippedWeapon->NoAmmoSound == nullptr ||
+		Character == nullptr)
+	{
+		return;
+	}
 	UGameplayStatics::PlaySoundAtLocation(
 		this,
 		EquippedWeapon->NoAmmoSound,
@@ -824,9 +824,12 @@ void UCombatComponent::Reload()
 {
 	if(CarriedAmmo > 0 && CombatState == ECombatState::ECS_Unoccupied
 		&& EquippedWeapon
-		&& !EquippedWeapon->IsFull())
+		&& !EquippedWeapon->IsFull()
+		&& !bLocallyReloading)
 	{
 		ServerReload();
+		HandleReload();
+		bLocallyReloading = true;
 	}
 }
 
@@ -851,8 +854,10 @@ void UCombatComponent::SwapWeapons()
 void UCombatComponent::ServerReload_Implementation()
 {
 	if(Character == nullptr)return;
-	
-	HandleReload();
+	if(!Character->IsLocallyControlled())
+	{
+		HandleReload();
+	}
 	CombatState = ECombatState::ECS_Reloading;
 }
 

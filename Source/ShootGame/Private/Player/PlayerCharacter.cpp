@@ -612,6 +612,12 @@ void APlayerCharacter::PlayHealthSound() const
 	}
 }
 
+bool APlayerCharacter::IsLocallyReloading()
+{
+	if(Combat == nullptr)return false;
+	return Combat->bLocallyReloading;
+}
+
 void APlayerCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon) const
 {
 	if(OverlappingWeapon)

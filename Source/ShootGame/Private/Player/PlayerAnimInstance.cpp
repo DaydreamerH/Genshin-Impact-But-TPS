@@ -61,9 +61,10 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bUseFABRIK = PlayerCharacter->GetCombatState() != ECombatState::ECS_Reloading
 		&& PlayerCharacter->GetCombatState() != ECombatState::ECS_TossGrenade;
 
-	if(!bUseFABRIK)
+	if(!bUseFABRIK && PlayerCharacter->IsLocallyControlled()
+		&& PlayerCharacter->GetCombatState() == ECombatState::ECS_Reloading)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Stop FABRIK"));
+		bUseFABRIK = !PlayerCharacter->IsLocallyReloading();
 	}
 	
 	if(bWeaponEquipped && EquippedWeapon && EquippedWeapon->GetWeaponMesh() && PlayerCharacter->GetMesh())

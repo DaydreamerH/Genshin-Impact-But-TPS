@@ -197,6 +197,8 @@ private:
 	int32 MaxGrenades = 4;
 	UFUNCTION()
 	void OnRep_Grenades();
+
+	bool bLocallyReloading = false;
 public:	
 	
 	void SetCrosshairShootingFactor(float f);

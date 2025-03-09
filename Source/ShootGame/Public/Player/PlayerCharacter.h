@@ -266,4 +266,5 @@ public:
 	FORCEINLINE UBuffComponent* GetBuff() const { return Buff; }
 
 	void PlayHealthSound() const;
+	bool IsLocallyReloading();
 };
