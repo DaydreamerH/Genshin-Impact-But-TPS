@@ -53,7 +53,7 @@ void ULagCompensationComponent::ShowFramePackage(FFramePackage& Package, const F
 	}
 }
 
-void ULagCompensationComponent::ServerSideRewind(APlayerCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
+FServerSideRewindResult ULagCompensationComponent::ServerSideRewind(APlayerCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
 	const FVector_NetQuantize& HitLocation, float HitTime)
 {
 	if(HitCharacter == nullptr
@@ -61,7 +61,7 @@ void ULagCompensationComponent::ServerSideRewind(APlayerCharacter* HitCharacter,
 		|| HitCharacter->GetLagCompensation()->FrameHistory.GetHead() == nullptr
 		|| HitCharacter->GetLagCompensation()->FrameHistory.GetTail() == nullptr)
 	{
-		return;
+		return FServerSideRewindResult();
 	}
 	
 	const TDoubleLinkedList<FFramePackage>& History
@@ -70,7 +70,7 @@ void ULagCompensationComponent::ServerSideRewind(APlayerCharacter* HitCharacter,
 	
 	if(OldestHistoryTime>HitTime)
 	{
-		return;
+		return FServerSideRewindResult();
 	}
 	FFramePackage FrameToCheck;
 	bool bShouldInterpelate = true;
@@ -108,8 +108,12 @@ void ULagCompensationComponent::ServerSideRewind(APlayerCharacter* HitCharacter,
 	}
 	if(bShouldInterpelate)
 	{
-		
+		FrameToCheck = InterpBetweenFrames(
+			Older->GetValue(),
+			Younger->GetValue(),
+			HitTime);
 	}
+	return ConfirmHit(FrameToCheck, HitCharacter, TraceStart, HitLocation);
 }
 
 FFramePackage ULagCompensationComponent::InterpBetweenFrames(const FFramePackage& OlderFrame,
@@ -147,6 +151,123 @@ FFramePackage ULagCompensationComponent::InterpBetweenFrames(const FFramePackage
 	return InterFramePackage;
 }
 
+FServerSideRewindResult ULagCompensationComponent::ConfirmHit(const FFramePackage& FramePackage,
+	APlayerCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation)
+{
+	if(HitCharacter == nullptr)return FServerSideRewindResult();
+
+	FFramePackage CurrentFrame;
+	CacheBoxPosition(HitCharacter, CurrentFrame);
+	MoveBoxes(HitCharacter, FramePackage);
+	EnableCharacterMeshCollision(HitCharacter, ECollisionEnabled::NoCollision);
+
+
+	if(const UWorld* World = GetWorld())
+	{
+		// 头部检测
+		UBoxComponent* HeadBox = HitCharacter->HitCollisionBoxes[FName("Head")];
+		HeadBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		HeadBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+		FHitResult ConfirmHitResult;
+		const FVector TraceEnd = TraceStart + (HitLocation - TraceStart) * 1.25f;
+		World->LineTraceSingleByChannel(
+			ConfirmHitResult,
+			TraceStart,
+			TraceEnd,
+			ECC_Visibility
+		);
+		if(ConfirmHitResult.bBlockingHit)
+		{
+			ResetHitBoxes(HitCharacter, CurrentFrame);
+			EnableCharacterMeshCollision(HitCharacter, ECollisionEnabled::QueryAndPhysics);
+			return FServerSideRewindResult{true, true};
+		}
+		else
+		{
+			// 身体检测
+			for(auto& HitBoxPair:HitCharacter->HitCollisionBoxes)
+			{
+				if(HitBoxPair.Value != nullptr)
+				{
+					HitBoxPair.Value->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+					HitBoxPair.Value->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+				}
+			}
+			World->LineTraceSingleByChannel(
+				ConfirmHitResult,
+				TraceStart,
+				TraceEnd,
+				ECC_Visibility
+			);
+			if(ConfirmHitResult.bBlockingHit)
+			{
+				ResetHitBoxes(HitCharacter, CurrentFrame);
+				EnableCharacterMeshCollision(HitCharacter, ECollisionEnabled::QueryAndPhysics);
+				return FServerSideRewindResult{true, false};
+			}
+		}
+	}
+
+	ResetHitBoxes(HitCharacter, CurrentFrame);
+	EnableCharacterMeshCollision(HitCharacter, ECollisionEnabled::QueryAndPhysics);
+	return FServerSideRewindResult{false, false};
+}
+
+void ULagCompensationComponent::CacheBoxPosition(APlayerCharacter* HitCharacter, FFramePackage& OutFramePackage)
+{
+	if(HitCharacter == nullptr)return;
+	for(auto& HitBoxPair : HitCharacter->HitCollisionBoxes)
+	{
+		if(HitBoxPair.Value != nullptr)
+		{
+			FBoxInformation BoxInfo;
+			BoxInfo.Location = HitBoxPair.Value->GetComponentLocation();
+			BoxInfo.Rotation = HitBoxPair.Value->GetComponentRotation();
+			BoxInfo.BoxExtent = HitBoxPair.Value->GetScaledBoxExtent();
+			OutFramePackage.HitBoxInfo.Add(HitBoxPair.Key, BoxInfo);
+		}
+	}
+}
+
+
+void ULagCompensationComponent::MoveBoxes(APlayerCharacter* HitCharacter, const FFramePackage& Package)
+{
+	if(HitCharacter == nullptr)return;
+	for(auto& HitBoxPair : HitCharacter->HitCollisionBoxes)
+	{
+		if(HitBoxPair.Value != nullptr)
+		{
+			HitBoxPair.Value->SetWorldLocation(Package.HitBoxInfo[HitBoxPair.Key].Location);
+			HitBoxPair.Value->SetWorldRotation(Package.HitBoxInfo[HitBoxPair.Key].Rotation);
+			HitBoxPair.Value->SetBoxExtent(Package.HitBoxInfo[HitBoxPair.Key].BoxExtent);
+			
+		}
+	}
+}
+
+void ULagCompensationComponent::ResetHitBoxes(APlayerCharacter* HitCharacter, const FFramePackage& Package)
+{
+	if(HitCharacter == nullptr)return;
+	for(auto& HitBoxPair : HitCharacter->HitCollisionBoxes)
+	{
+		if(HitBoxPair.Value != nullptr)
+		{
+			HitBoxPair.Value->SetWorldLocation(Package.HitBoxInfo[HitBoxPair.Key].Location);
+			HitBoxPair.Value->SetWorldRotation(Package.HitBoxInfo[HitBoxPair.Key].Rotation);
+			HitBoxPair.Value->SetBoxExtent(Package.HitBoxInfo[HitBoxPair.Key].BoxExtent);
+			HitBoxPair.Value->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+	}
+}
+
+void ULagCompensationComponent::EnableCharacterMeshCollision(APlayerCharacter* HitCharacter,
+	ECollisionEnabled::Type CollisionEnabled)
+{
+	if(HitCharacter && HitCharacter->GetMesh())
+	{
+		HitCharacter->GetMesh()->SetCollisionEnabled(CollisionEnabled);
+	}
+}
 
 void ULagCompensationComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {

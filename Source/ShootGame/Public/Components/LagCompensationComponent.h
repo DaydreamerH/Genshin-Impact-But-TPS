@@ -33,6 +33,18 @@ struct FFramePackage
 	TMap<FName, FBoxInformation>HitBoxInfo;
 };
 
+USTRUCT()
+struct FServerSideRewindResult
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	bool bHitConfirmed;
+
+	UPROPERTY()
+	bool bHeadShot;
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SHOOTGAME_API ULagCompensationComponent : public UActorComponent
 {
@@ -49,7 +61,7 @@ protected:
 	void SaveFramePackage(FFramePackage& Package);
 	void ShowFramePackage(FFramePackage& Package, const FColor& Color) const;
 
-	void ServerSideRewind(
+	FServerSideRewindResult ServerSideRewind(
 		APlayerCharacter* HitCharacter,
 		const FVector_NetQuantize& TraceStart,
 		const FVector_NetQuantize& HitLocation,
@@ -59,6 +71,20 @@ protected:
 		const FFramePackage& OlderFrame,
 		const FFramePackage& YoungerFrame,
 		float HitTime);
+
+	FServerSideRewindResult ConfirmHit(
+		const FFramePackage& FramePackage,
+		APlayerCharacter* HitCharacter,
+		const FVector_NetQuantize& TraceStart,
+		const FVector_NetQuantize& HitLocation);
+
+	void CacheBoxPosition(APlayerCharacter* HitCharacter, FFramePackage& OutFramePackage);
+
+	void MoveBoxes(APlayerCharacter* HitCharacter, const FFramePackage& Package);
+
+	void ResetHitBoxes(APlayerCharacter* HitCharacter, const FFramePackage& Package);
+
+	void EnableCharacterMeshCollision(APlayerCharacter* HitCharacter, ECollisionEnabled::Type CollisionEnabled);
 private:
 	UPROPERTY()
 	APlayerCharacter* Character;
@@ -76,3 +102,4 @@ public:
 	
 		
 };
+
