@@ -77,10 +77,33 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	}
 }
 
-void AWeapon::OnRep_Ammo()
+/* void AWeapon::OnRep_Ammo()
 {
 	OwnerPlayerCharacter = OwnerPlayerCharacter == nullptr ? Cast<APlayerCharacter>(GetOwner()):OwnerPlayerCharacter;
 	if(WeaponType == EWeaponType::EWT_ShotGun && OwnerPlayerCharacter && OwnerPlayerCharacter->GetCombat() && IsFull())
+	{
+		OwnerPlayerCharacter->GetCombat()->JumpToShotGunEnd();
+	}
+	SetHUDAmmo();
+}*/
+
+void AWeapon::ClientUpdateAmmo_Implementation(int32 ServerAmmo)
+{
+	if(HasAuthority())return;
+	Ammo = ServerAmmo;
+	--Sequence;
+	Ammo -= Sequence;
+	SetHUDAmmo();
+}
+
+void AWeapon::ClientAddAmmo_Implementation(int32 AmmoToAdd)
+{
+	if(HasAuthority())return;
+	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapcitiy);
+	OwnerPlayerCharacter = OwnerPlayerCharacter == nullptr ?
+		Cast<APlayerCharacter>(GetOwner()):OwnerPlayerCharacter;
+
+	if(OwnerPlayerCharacter && OwnerPlayerCharacter->GetCombat() && IsFull())
 	{
 		OwnerPlayerCharacter->GetCombat()->JumpToShotGunEnd();
 	}
@@ -91,6 +114,21 @@ void AWeapon::SpendRounnd()
 {
 	Ammo = FMath::Clamp(Ammo - 1, 0, MagCapcitiy);
 	SetHUDAmmo();
+	if(HasAuthority())
+	{
+		ClientUpdateAmmo(Ammo);
+	}
+	else
+	{
+		++Sequence;
+	}
+}
+
+void AWeapon::AddAmmo(int32 AmmoToAdd)
+{
+	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapcitiy);
+	SetHUDAmmo();
+	ClientAddAmmo(AmmoToAdd);
 }
 
 void AWeapon::OnRep_WeaponState()
@@ -164,7 +202,7 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AWeapon, WeaponState);
-	DOREPLIFETIME(AWeapon, Ammo);
+	// DOREPLIFETIME(AWeapon, Ammo);
 }
 
 void AWeapon::Fire(const FVector& HitTarget)
@@ -239,11 +277,6 @@ void AWeapon::SetHUDAmmo()
 	}
 }
 
-void AWeapon::AddAmmo(int32 AmmoToAdd)
-{
-	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapcitiy);
-	SetHUDAmmo();
-}
 
 FVector AWeapon::TraceEndWithScatter(const FVector& HitTarget) const
 {

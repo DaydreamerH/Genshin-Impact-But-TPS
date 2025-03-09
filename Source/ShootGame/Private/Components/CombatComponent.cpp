@@ -666,7 +666,9 @@ void UCombatComponent::FinishReloading()
 void UCombatComponent::JumpToShotGunEnd()
 {
 	if(UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance();
-			AnimInstance && Character->GetReloadMontage())
+			AnimInstance && Character->GetReloadMontage() &&
+			EquippedWeapon
+			&& EquippedWeapon->GetWeaponType() == EWeaponType::EWT_ShotGun)
 	{
 		AnimInstance->Montage_JumpToSection(FName("ShotGunEnd"));
 	}

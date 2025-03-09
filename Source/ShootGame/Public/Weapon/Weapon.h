@@ -87,12 +87,20 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ABulletShell> BulletShellClass;
 
-	UPROPERTY(EditAnywhere, ReplicatedUsing=OnRep_Ammo)
+	UPROPERTY(EditAnywhere)
 	int32 Ammo;
 
-	UFUNCTION()
-	void OnRep_Ammo();
+	UFUNCTION(Client, Reliable)
+	void ClientUpdateAmmo(int32 ServerAmmo);
 
+	UFUNCTION(Client, Reliable)
+	void ClientAddAmmo(int32 AmmoToAdd);
+	// UFUNCTION()
+	// void OnRep_Ammo();
+
+	// 未被处理的服务器请求
+	int32 Sequence = 0;
+	
 	void SpendRounnd();
 	
 	UPROPERTY(EditAnywhere)
