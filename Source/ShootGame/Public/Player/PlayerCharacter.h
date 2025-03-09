@@ -43,6 +43,9 @@ public:
 	float ElimDelay = 2.5f;
 	
 	void ElimTimerFinished();
+
+	UPROPERTY()
+	TMap<FName, class UBoxComponent*> HitCollisionBoxes;
 protected:
 	virtual void BeginPlay() override;
 

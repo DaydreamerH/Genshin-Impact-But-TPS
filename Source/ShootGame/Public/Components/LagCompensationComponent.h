@@ -45,12 +45,22 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	
+	void SaveFramePackage(FFramePackage& Package);
+	void ShowFramePackage(FFramePackage& Package, const FColor& Color) const;
 private:
 	UPROPERTY()
 	APlayerCharacter* Character;
 
 	UPROPERTY()
 	class AMyPlayerController* Controller;
+	
+	TDoubleLinkedList<FFramePackage> FrameHistory;
+
+	UPROPERTY(EditAnywhere)
+	float MaxRecordTime = 4.f;
+
+	
 public:	
 	
 		
