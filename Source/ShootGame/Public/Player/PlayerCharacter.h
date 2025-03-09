@@ -89,6 +89,29 @@ protected:
 		AActor* DamageCauser);
 
 	void PollInit();
+
+	// 服务器倒带延迟补偿用
+
+	UPROPERTY(EditAnywhere)
+	class UBoxComponent* Head;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Pelvis;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Body;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* LeftArm;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* RightArm;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* LeftLeg;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* RightLeg;
 private:
 	
 	// 相机模块

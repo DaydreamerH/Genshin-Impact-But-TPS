@@ -4,6 +4,7 @@
 #include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/BoxComponent.h"
 #include "Components/BuffComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/CombatComponent.h"
@@ -63,6 +64,28 @@ APlayerCharacter::APlayerCharacter()
 	AttachGrenade = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Attach Grenade"));
 	AttachGrenade->SetupAttachment(GetMesh(), FName("GrenadeSocket"));
 	AttachGrenade->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Head = CreateDefaultSubobject<UBoxComponent>(TEXT("Head"));
+	Head->SetupAttachment(GetMesh(), FName(TEXT("頭")));
+	Head->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Pelvis = CreateDefaultSubobject<UBoxComponent>(TEXT("Pelvis"));
+	Pelvis->SetupAttachment(GetMesh(), FName(TEXT("腰")));
+	Pelvis->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Body = CreateDefaultSubobject<UBoxComponent>(TEXT("Body"));
+	Body->SetupAttachment(GetMesh(), FName(TEXT("上半身")));
+	Body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	LeftArm = CreateDefaultSubobject<UBoxComponent>(TEXT("LeftArm"));
+	LeftArm->SetupAttachment(GetMesh(), FName(TEXT("左腕")));
+	LeftArm->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	RightArm = CreateDefaultSubobject<UBoxComponent>(TEXT("RightArm"));
+	RightArm->SetupAttachment(GetMesh(), FName(TEXT("右腕")));
+	RightArm->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	LeftLeg = CreateDefaultSubobject<UBoxComponent>(TEXT("LeftLeg"));
+	LeftLeg->SetupAttachment(GetMesh(), FName(TEXT("左ひざD")));
+	LeftLeg->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	RightLeg = CreateDefaultSubobject<UBoxComponent>(TEXT("RightLeg"));
+	RightLeg->SetupAttachment(GetMesh(), FName(TEXT("右ひざD")));
+	RightLeg->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void APlayerCharacter::OnRep_PlayerIndex() 
