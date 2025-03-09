@@ -74,30 +74,112 @@ APlayerCharacter::APlayerCharacter()
 	Head->SetupAttachment(GetMesh(), FName(TEXT("頭")));
 	Head->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	HitCollisionBoxes.Add(FName("Head"), Head);
+
+	Neck = CreateDefaultSubobject<UBoxComponent>(TEXT("Neck"));
+	Neck->SetupAttachment(GetMesh(), FName(TEXT("首")));
+	Neck->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("Neck"), Neck);
+
+	Spine_1 = CreateDefaultSubobject<UBoxComponent>(TEXT("Spine_1"));
+	Spine_1->SetupAttachment(GetMesh(), FName(TEXT("上半身2")));
+	Spine_1->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("Spine_1"), Spine_1);
+
 	Pelvis = CreateDefaultSubobject<UBoxComponent>(TEXT("Pelvis"));
-	Pelvis->SetupAttachment(GetMesh(), FName(TEXT("腰")));
+	Pelvis->SetupAttachment(GetMesh(), FName(TEXT("上半身")));
 	Pelvis->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	HitCollisionBoxes.Add(FName("Pelvis"), Pelvis);
-	Body = CreateDefaultSubobject<UBoxComponent>(TEXT("Body"));
-	Body->SetupAttachment(GetMesh(), FName(TEXT("上半身")));
-	Body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	HitCollisionBoxes.Add(FName("Body"), Body);
-	LeftArm = CreateDefaultSubobject<UBoxComponent>(TEXT("LeftArm"));
-	LeftArm->SetupAttachment(GetMesh(), FName(TEXT("左腕")));
-	LeftArm->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	HitCollisionBoxes.Add(FName("LeftArm"), LeftArm);
-	RightArm = CreateDefaultSubobject<UBoxComponent>(TEXT("RightArm"));
-	RightArm->SetupAttachment(GetMesh(), FName(TEXT("右腕")));
-	RightArm->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	HitCollisionBoxes.Add(FName("RightArm"), RightArm);
-	LeftLeg = CreateDefaultSubobject<UBoxComponent>(TEXT("LeftLeg"));
-	LeftLeg->SetupAttachment(GetMesh(), FName(TEXT("左ひざD")));
-	LeftLeg->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	HitCollisionBoxes.Add(FName("LeftLeg"), LeftLeg);
-	RightLeg = CreateDefaultSubobject<UBoxComponent>(TEXT("RightLeg"));
-	RightLeg->SetupAttachment(GetMesh(), FName(TEXT("右ひざD")));
-	RightLeg->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	HitCollisionBoxes.Add(FName("RightLeg"), RightLeg);
+
+	RightShoulder = CreateDefaultSubobject<UBoxComponent>(TEXT("RightShoulder"));
+	RightShoulder->SetupAttachment(GetMesh(), FName(TEXT("右肩C")));
+	RightShoulder->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("RightShoulder"), RightShoulder);
+
+	LeftShoulder = CreateDefaultSubobject<UBoxComponent>(TEXT("LeftShoulder"));
+	LeftShoulder->SetupAttachment(GetMesh(), FName(TEXT("左肩C")));
+	LeftShoulder->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("LeftShoulder"), LeftShoulder);
+
+	RightArmUpper = CreateDefaultSubobject<UBoxComponent>(TEXT("RightArmUpper"));
+	RightArmUpper->SetupAttachment(GetMesh(), FName(TEXT("右腕")));
+	RightArmUpper->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("RightArmUpper"), RightArmUpper);
+
+	LeftArmUpper = CreateDefaultSubobject<UBoxComponent>(TEXT("LeftArmUpper"));
+	LeftArmUpper->SetupAttachment(GetMesh(), FName(TEXT("左腕")));
+	LeftArmUpper->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("LeftArmUpper"), LeftArmUpper);
+
+	RightArmMid = CreateDefaultSubobject<UBoxComponent>(TEXT("RightArmMid"));
+	RightArmMid->SetupAttachment(GetMesh(), FName(TEXT("右腕捩")));
+	RightArmMid->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("RightArmMid"), RightArmMid);
+
+	LeftArmMid = CreateDefaultSubobject<UBoxComponent>(TEXT("LeftArmMid"));
+	LeftArmMid->SetupAttachment(GetMesh(), FName(TEXT("左腕捩")));
+	LeftArmMid->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("LeftArmMid"), LeftArmMid);
+
+	RightArmLower = CreateDefaultSubobject<UBoxComponent>(TEXT("RightArmLower"));
+	RightArmLower->SetupAttachment(GetMesh(), FName(TEXT("右手捩")));
+	RightArmLower->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("RightArmLower"), RightArmLower);
+
+	LeftArmLower = CreateDefaultSubobject<UBoxComponent>(TEXT("LeftArmLower"));
+	LeftArmLower->SetupAttachment(GetMesh(), FName(TEXT("左手捩")));
+	LeftArmLower->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("LeftArmLower"), LeftArmLower);
+
+	RightHand = CreateDefaultSubobject<UBoxComponent>(TEXT("RightHand"));
+	RightHand->SetupAttachment(GetMesh(), FName(TEXT("右手首")));
+	RightHand->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("RightHand"), RightHand);
+
+	LeftHand = CreateDefaultSubobject<UBoxComponent>(TEXT("LeftHand"));
+	LeftHand->SetupAttachment(GetMesh(), FName(TEXT("左手首")));
+	LeftHand->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("LeftHand"), LeftHand);
+
+	RightAss = CreateDefaultSubobject<UBoxComponent>(TEXT("RightAss"));
+	RightAss->SetupAttachment(GetMesh(), FName(TEXT("腰キャンセル右")));
+	RightAss->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("RightAss"), RightAss);
+
+	LeftAss = CreateDefaultSubobject<UBoxComponent>(TEXT("LeftAss"));
+	LeftAss->SetupAttachment(GetMesh(), FName(TEXT("腰キャンセル左")));
+	LeftAss->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("LeftAss"), LeftAss);
+
+	RightLegUpper = CreateDefaultSubobject<UBoxComponent>(TEXT("RightLegUpper"));
+	RightLegUpper->SetupAttachment(GetMesh(), FName(TEXT("右足D")));
+	RightLegUpper->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("RightLegUpper"), RightLegUpper);
+
+	LeftLegUpper = CreateDefaultSubobject<UBoxComponent>(TEXT("LeftLegUpper"));
+	LeftLegUpper->SetupAttachment(GetMesh(), FName(TEXT("左足D")));
+	LeftLegUpper->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("LeftLegUpper"), LeftLegUpper);
+
+	RightLegLower = CreateDefaultSubobject<UBoxComponent>(TEXT("RightLegLower"));
+	RightLegLower->SetupAttachment(GetMesh(), FName(TEXT("右ひざD")));
+	RightLegLower->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("RightLegLower"), RightLegLower);
+
+	LeftLegLower = CreateDefaultSubobject<UBoxComponent>(TEXT("LeftLegLower"));
+	LeftLegLower->SetupAttachment(GetMesh(), FName(TEXT("左ひざD")));
+	LeftLegLower->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("LeftLegLower"), LeftLegLower);
+
+	RightFoot = CreateDefaultSubobject<UBoxComponent>(TEXT("RightFoot"));
+	RightFoot->SetupAttachment(GetMesh(), FName(TEXT("右足先EX")));
+	RightFoot->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("RightFoot"), RightFoot);
+
+	LeftFoot = CreateDefaultSubobject<UBoxComponent>(TEXT("LeftFoot"));
+	LeftFoot->SetupAttachment(GetMesh(), FName(TEXT("左足先EX")));
+	LeftFoot->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitCollisionBoxes.Add(FName("LeftFoot"), LeftFoot);
+
 }
 
 void APlayerCharacter::OnRep_PlayerIndex() 

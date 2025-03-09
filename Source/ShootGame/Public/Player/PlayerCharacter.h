@@ -94,27 +94,71 @@ protected:
 	void PollInit();
 
 	// 服务器倒带延迟补偿用
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Head;
 
 	UPROPERTY(EditAnywhere)
-	class UBoxComponent* Head;
+	UBoxComponent* Neck;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Spine_1;
 
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* Pelvis;
 
 	UPROPERTY(EditAnywhere)
-	UBoxComponent* Body;
+	UBoxComponent* RightShoulder;
 
 	UPROPERTY(EditAnywhere)
-	UBoxComponent* LeftArm;
+	UBoxComponent* LeftShoulder;
 
 	UPROPERTY(EditAnywhere)
-	UBoxComponent* RightArm;
+	UBoxComponent* RightArmUpper;
+	
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* LeftArmUpper;
 
 	UPROPERTY(EditAnywhere)
-	UBoxComponent* LeftLeg;
+	UBoxComponent* RightArmMid;
+	
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* LeftArmMid;
 
 	UPROPERTY(EditAnywhere)
-	UBoxComponent* RightLeg;
+	UBoxComponent* RightArmLower;
+	
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* LeftArmLower;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* RightHand;
+	
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* LeftHand;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* RightAss;
+	
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* LeftAss;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* RightLegUpper;
+	
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* LeftLegUpper;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* RightLegLower;
+	
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* LeftLegLower;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* RightFoot;
+	
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* LeftFoot;
 private:
 	
 	// 相机模块
