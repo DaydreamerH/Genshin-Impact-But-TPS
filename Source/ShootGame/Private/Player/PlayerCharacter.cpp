@@ -8,6 +8,7 @@
 #include "Components/BuffComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/CombatComponent.h"
+#include "Components/LagCompensationComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -51,6 +52,10 @@ APlayerCharacter::APlayerCharacter()
 	Buff = CreateDefaultSubobject<UBuffComponent>(TEXT("BuffComponent"));
 	Buff->SetIsReplicated(true);
 
+	// 延迟补偿只在服务器上
+	LagCompensation =
+		CreateDefaultSubobject<ULagCompensationComponent>(TEXT("LagCompensation"));
+
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetMesh()->SetCollisionObjectType(ECC_SkeletalMesh);
@@ -86,6 +91,8 @@ APlayerCharacter::APlayerCharacter()
 	RightLeg = CreateDefaultSubobject<UBoxComponent>(TEXT("RightLeg"));
 	RightLeg->SetupAttachment(GetMesh(), FName(TEXT("右ひざD")));
 	RightLeg->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	
 }
 
 void APlayerCharacter::OnRep_PlayerIndex() 
@@ -119,6 +126,14 @@ void APlayerCharacter::PostInitializeComponents()
 		(GetCharacterMovement()->MaxWalkSpeed,
 			GetCharacterMovement()->MaxWalkSpeedCrouched);
 		Buff->SetInitialJumpVelocity(GetCharacterMovement()->JumpZVelocity);
+	}
+	if(LagCompensation)
+	{
+		LagCompensation->Character = this;
+		if(Controller)
+		{
+			LagCompensation->Controller = Cast<AMyPlayerController>(Controller);
+		}
 	}
 }
 
