@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Player/PlayerCharacter.h"
+#include "Weapon/Projectile.h"
 #include "LagCompensationComponent.generated.h"
 
 USTRUCT(BlueprintType)
@@ -86,6 +87,15 @@ public:
 		const TArray<FVector_NetQuantize>& HitLocations,
 		float HitTime,
 		AWeapon* DamageCauser
+	);
+
+	UFUNCTION(Server, Reliable)
+	void ServerProjectileScoreRequest(
+		APlayerCharacter* HitCharacter,
+		const FVector_NetQuantize& TraceStart,
+		const FVector_NetQuantize100& InitialVelocity,
+		float HitTime,
+		AProjectile* DamageCauser
 	);
 protected:
 	virtual void BeginPlay() override;

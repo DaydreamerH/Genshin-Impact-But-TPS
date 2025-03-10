@@ -54,7 +54,7 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 			{
 				if(InstigatorController)
 				{
-					if(HasAuthority())
+					if(HasAuthority() && (OwnerPawn->IsLocallyControlled()||bUseServerSideRewind))
 					{
 						UGameplayStatics::ApplyDamage(
 							PlayerCharacter,
@@ -64,7 +64,7 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 							UDamageType::StaticClass()
 						);
 					}
-					else if(bUseServerSideRewind)
+					else if(!HasAuthority() && bUseServerSideRewind)
 					{
 						OwnerPlayerCharacter = OwnerPlayerCharacter == nullptr ?
 							Cast<APlayerCharacter>(OwnerPawn) : OwnerPlayerCharacter;

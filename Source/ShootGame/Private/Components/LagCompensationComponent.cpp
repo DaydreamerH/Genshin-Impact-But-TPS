@@ -634,3 +634,20 @@ void ULagCompensationComponent::ServerShotGunScoreRequest_Implementation(const T
 		}
 	}
 }
+
+void ULagCompensationComponent::ServerProjectileScoreRequest_Implementation(APlayerCharacter* HitCharacter,
+	const FVector_NetQuantize& TraceStart, const FVector_NetQuantize100& InitialVelocity, float HitTime, AProjectile* DamageCauser)
+{
+	FServerSideRewindResult Confirm = ProjectileServerSideRewindResult(HitCharacter, TraceStart, InitialVelocity, HitTime);
+
+	if(HitCharacter && Character && Confirm.bHitConfirmed && DamageCauser)
+	{
+		UGameplayStatics::ApplyDamage(
+			HitCharacter,
+			DamageCauser->Damage,
+			Character->Controller,
+			DamageCauser,
+			UDamageType::StaticClass()
+		);
+	}
+}

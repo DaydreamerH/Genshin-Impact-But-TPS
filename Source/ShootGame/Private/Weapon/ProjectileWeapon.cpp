@@ -48,7 +48,7 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 							SocketTransform.GetLocation(),
 							TargetRotation,
 							SpawnParameters);
-						SpawnedProjectile->bUseServerSideRewind = false;
+						SpawnedProjectile->bUseServerSideRewind = true;
 					}
 				}
 				else

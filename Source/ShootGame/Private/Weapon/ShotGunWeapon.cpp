@@ -202,7 +202,7 @@ void AShotGunWeapon::FireShotGun(const TArray<FVector_NetQuantize>& HitTargets)
 			{
 				if(InstigatorController && HitPair.Key)
 				{
-					if(HasAuthority())
+					if(HasAuthority() && (OwnerPawn->IsLocallyControlled() || !bUseServerSideRewind))
 					{
 						UGameplayStatics::ApplyDamage(
 						   HitPair.Key,
