@@ -76,7 +76,16 @@ public:
 		const FVector_NetQuantize& TraceStart,
 		const FVector_NetQuantize& HitLocation,
 		float HitTime,
-		class AWeapon* DamageCauser
+		AWeapon* DamageCauser
+	);
+
+	UFUNCTION(Server, Reliable)
+	void ServerShotGunScoreRequest(
+		const TArray<APlayerCharacter*>& HitCharacters,
+		const FVector_NetQuantize& TraceStart,
+		const TArray<FVector_NetQuantize>& HitLocations,
+		float HitTime,
+		AWeapon* DamageCauser
 	);
 protected:
 	virtual void BeginPlay() override;

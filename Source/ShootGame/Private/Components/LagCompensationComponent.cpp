@@ -13,7 +13,6 @@ ULagCompensationComponent::ULagCompensationComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-
 void ULagCompensationComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -449,3 +448,34 @@ void ULagCompensationComponent::ServerScoreRequest_Implementation(APlayerCharact
 	}
 }
 
+void ULagCompensationComponent::ServerShotGunScoreRequest_Implementation(const TArray<APlayerCharacter*>& HitCharacters,
+	const FVector_NetQuantize& TraceStart, const TArray<FVector_NetQuantize>& HitLocations, float HitTime,
+	AWeapon* DamageCauser)
+{
+	FShotGunServerSideRewindResult Confirm
+		= ShotGunServerSideRewind(HitCharacters, TraceStart, HitLocations, HitTime);
+	
+	for(auto& HitCharacter : HitCharacters)
+	{
+		if(HitCharacter == nullptr)continue;
+		float TotalDamage = 0.f;
+		if(Confirm.HeadShots.Contains(HitCharacter))
+		{
+			TotalDamage += Confirm.HeadShots[HitCharacter]*DamageCauser->GetDamage();
+		}
+		if(Confirm.BodyShots.Contains(HitCharacter))
+		{
+			TotalDamage += Confirm.BodyShots[HitCharacter]*DamageCauser->GetDamage();	
+		}
+		if(HitCharacter && Character && Character->Controller)
+		{
+			UGameplayStatics::ApplyDamage(
+				Character,
+				TotalDamage,
+				Character->Controller,
+				DamageCauser,
+				UDamageType::StaticClass()
+			);
+		}
+	}
+}
