@@ -38,6 +38,7 @@ public:
 
 	FTimerHandle ElimTimer;
 	FTimerHandle HealthRecoveryTimerHandle;
+	FTimerHandle ShieldRecoveryTimerHandle;
 
 	UPROPERTY(EditDefaultsOnly)
 	float ElimDelay = 2.5f;
@@ -276,10 +277,12 @@ private:
 	bool bElimmed = false;
 
 	void StartHealthRecovery();
-
 	UFUNCTION()
 	void RecoverHealthTick();
-
+	void StartShieldRecovery();
+	UFUNCTION()
+	void RecoverShieldTick();
+	
 	UPROPERTY()
 	class AMyPlayerState* MyPlayerState;
 

@@ -225,6 +225,7 @@ void APlayerCharacter::Elim()
 	
 	MulticastElim();
 	StartHealthRecovery();
+	StartShieldRecovery();
 	GetWorldTimerManager().SetTimer(
 		ElimTimer,
 		this,
@@ -960,5 +961,27 @@ void APlayerCharacter::RecoverHealthTick()
 	else
 	{
 		GetWorld()->GetTimerManager().ClearTimer(HealthRecoveryTimerHandle);
+	}
+}
+
+void APlayerCharacter::StartShieldRecovery()
+{
+	GetWorld()->GetTimerManager().SetTimer(ShieldRecoveryTimerHandle, this, &APlayerCharacter::RecoverShieldTick, GetWorld()->GetDeltaSeconds(), true);
+}
+
+void APlayerCharacter::RecoverShieldTick()
+{
+	if (Shield < MaxShield)
+	{
+		float ShieldIncreasePerTick = MaxShield / ((ElimDelay- 0.1f) / GetWorld()->GetDeltaSeconds());
+		Shield += ShieldIncreasePerTick;
+
+		Shield = FMath::Min(Shield, MaxShield);
+
+		UpdateHUDShield();
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ShieldRecoveryTimerHandle);
 	}
 }
