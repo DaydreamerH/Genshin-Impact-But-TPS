@@ -31,7 +31,8 @@ void ULagCompensationComponent::SaveFramePackage(FFramePackage& Package)
 	Package.HitCharacter = Character;
 	for(auto& BoxPair : Character->HitCollisionBoxes)
 	{
-		FBoxInformation BoxInformation;
+		if(BoxPair.Value == nullptr)continue;
+		FBoxInformation BoxInformation = FBoxInformation();
 		BoxInformation.Location = BoxPair.Value->GetComponentLocation();
 		BoxInformation.Rotation = BoxPair.Value->GetComponentRotation();
 		BoxInformation.BoxExtent = BoxPair.Value->GetScaledBoxExtent();
@@ -60,7 +61,7 @@ void ULagCompensationComponent::SaveFramePackage()
 	if(Character == nullptr || !Character->HasAuthority())return;
 	if(FrameHistory.Num()<=1)
 	{
-		FFramePackage ThisFrame;
+		FFramePackage ThisFrame = FFramePackage();
 		SaveFramePackage(ThisFrame);
 		FrameHistory.AddHead(ThisFrame);
 	}
@@ -448,10 +449,10 @@ void ULagCompensationComponent::MoveBoxes(APlayerCharacter* HitCharacter, const 
 	{
 		if(HitBoxPair.Value != nullptr)
 		{
+			if(!Package.HitBoxInfo.Contains(HitBoxPair.Key))continue;
 			HitBoxPair.Value->SetWorldLocation(Package.HitBoxInfo[HitBoxPair.Key].Location);
 			HitBoxPair.Value->SetWorldRotation(Package.HitBoxInfo[HitBoxPair.Key].Rotation);
 			HitBoxPair.Value->SetBoxExtent(Package.HitBoxInfo[HitBoxPair.Key].BoxExtent);
-			
 		}
 	}
 }

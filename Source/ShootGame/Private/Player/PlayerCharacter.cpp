@@ -158,7 +158,7 @@ APlayerCharacter::APlayerCharacter()
 	LeftFoot->SetupAttachment(GetMesh(), FName(TEXT("左足先EX")));
 	HitCollisionBoxes.Add(FName("LeftFoot"), LeftFoot);
 
-	for(auto& Box:HitCollisionBoxes)
+	for(const auto& Box:HitCollisionBoxes)
 	{
 		if(Box.Value)
 		{
