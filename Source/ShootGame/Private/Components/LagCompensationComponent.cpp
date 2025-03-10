@@ -11,7 +11,6 @@
 ULagCompensationComponent::ULagCompensationComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
 }
 
 
@@ -99,10 +98,10 @@ FShotGunServerSideRewindResult ULagCompensationComponent::ShotGunServerSideRewin
 	{
 		FramesToCheck.Add(GetFrameToCheck(HitCharacter, HitTime));
 	}
-	
+	return ShotGunConfirmHit(FramesToCheck, TraceStart, HitLocations);
 }
 
-FFramePackage ULagCompensationComponent::GetFrameToCheck(APlayerCharacter* HitCharacter, float HitTime)
+FFramePackage ULagCompensationComponent::GetFrameToCheck(const APlayerCharacter* HitCharacter, float HitTime)
 {
 	if(HitCharacter == nullptr
 			|| HitCharacter->GetLagCompensation()
@@ -171,8 +170,8 @@ FFramePackage ULagCompensationComponent::InterpBetweenFrames(const FFramePackage
 	const float Distance = YoungerFrame.Time - OlderFrame.Time;
 	const float InterpFraction = FMath::Clamp((HitTime - OlderFrame.Time) / Distance, 0.f, 1.f);
 
-	FFramePackage InterFramePackage;
-	InterFramePackage.Time = HitTime;
+	FFramePackage InterpFramePackage = FFramePackage();
+	InterpFramePackage.Time = HitTime;
 
 	for(auto& YoungerPair : YoungerFrame.HitBoxInfo)
 	{
@@ -194,10 +193,10 @@ FFramePackage ULagCompensationComponent::InterpBetweenFrames(const FFramePackage
 			InterpFraction);
 		InterpBoxInfo.BoxExtent = YoungerBox.BoxExtent;
 
-		InterFramePackage.HitBoxInfo.Add(BoxInfoName, InterpBoxInfo);
+		InterpFramePackage.HitBoxInfo.Add(BoxInfoName, InterpBoxInfo);
 	}
 	
-	return InterFramePackage;
+	return InterpFramePackage;
 }
 
 FServerSideRewindResult ULagCompensationComponent::ConfirmHit(const FFramePackage& FramePackage,
@@ -265,7 +264,108 @@ FServerSideRewindResult ULagCompensationComponent::ConfirmHit(const FFramePackag
 FShotGunServerSideRewindResult ULagCompensationComponent::ShotGunConfirmHit(const TArray<FFramePackage>& FramePackages,
 	const FVector_NetQuantize& TraceStart, const TArray<FVector_NetQuantize>& HitLocations)
 {
+	for(auto& Frame : FramePackages)
+	{
+		if(Frame.HitCharacter == nullptr)
+		{
+			return FShotGunServerSideRewindResult();
+		}
+	}
 	
+	FShotGunServerSideRewindResult ShotGunResult = FShotGunServerSideRewindResult();
+	TArray<FFramePackage> CurrentFrames = TArray<FFramePackage>();
+
+	for(auto& Frame : FramePackages)
+	{
+		FFramePackage CurrentFrame;
+		CurrentFrame.HitCharacter = Frame.HitCharacter;
+		CacheBoxPosition(Frame.HitCharacter, CurrentFrame);
+		CurrentFrames.Add(CurrentFrame);
+		MoveBoxes(Frame.HitCharacter, Frame);
+		EnableCharacterMeshCollision(Frame.HitCharacter, ECollisionEnabled::NoCollision);
+	}
+	
+	for(auto& Frame: FramePackages)
+	{
+		UBoxComponent* HeadBox = Frame.HitCharacter->HitCollisionBoxes[FName("Head")];
+		HeadBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		HeadBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	}
+	const UWorld* World = GetWorld();
+
+	//头部检测
+	for(auto& HitLocation : HitLocations)
+	{
+		FHitResult ConfirmHitResult = FHitResult();
+		const FVector TraceEnd = TraceStart + (HitLocation - TraceStart) * 1.25f;
+		if(World)
+		{
+			World->LineTraceSingleByChannel(
+            		ConfirmHitResult,
+            		TraceStart,
+            		TraceEnd,
+            		ECC_Visibility);
+		}
+		if(APlayerCharacter* PlayerCharacter
+			= Cast<APlayerCharacter>(ConfirmHitResult.GetActor()))
+		{
+			if(ShotGunResult.HeadShots.Contains(PlayerCharacter))
+			{
+				ShotGunResult.HeadShots[PlayerCharacter]++;
+			}
+			else
+			{
+				ShotGunResult.HeadShots.Emplace(PlayerCharacter, 1);
+			}
+		}
+	}
+
+	// 头部关闭，身体打开
+	for(auto& Frame:FramePackages)
+	{
+		for(auto& HitBoxPair:Frame.HitCharacter->HitCollisionBoxes)
+		{
+			if(HitBoxPair.Value!=nullptr)
+			{
+				HitBoxPair.Value->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+				HitBoxPair.Value->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+			}
+		}
+		UBoxComponent* HeadBox = Frame.HitCharacter->HitCollisionBoxes[FName("Head")];
+		HeadBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
+	for(auto& HitLocation : HitLocations)
+	{
+		FHitResult ConfirmHitResult = FHitResult();
+		const FVector TraceEnd = TraceStart + (HitLocation - TraceStart) * 1.25f;
+		if(World)
+		{
+			World->LineTraceSingleByChannel(
+					ConfirmHitResult,
+					TraceStart,
+					TraceEnd,
+					ECC_Visibility);
+		}
+		if(APlayerCharacter* PlayerCharacter
+			= Cast<APlayerCharacter>(ConfirmHitResult.GetActor()))
+		{
+			if(ShotGunResult.BodyShots.Contains(PlayerCharacter))
+			{
+				ShotGunResult.BodyShots[PlayerCharacter]++;
+			}
+			else
+			{
+				ShotGunResult.BodyShots.Emplace(PlayerCharacter, 1);
+			}
+		}
+	}
+	for(auto& CurrentFrame:CurrentFrames)
+	{
+		ResetHitBoxes(CurrentFrame.HitCharacter, CurrentFrame);
+		EnableCharacterMeshCollision(CurrentFrame.HitCharacter, ECollisionEnabled::QueryAndPhysics);
+	}
+	return ShotGunResult;
 }
 
 void ULagCompensationComponent::CacheBoxPosition(APlayerCharacter* HitCharacter, FFramePackage& OutFramePackage)
