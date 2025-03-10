@@ -94,7 +94,7 @@ FServerSideRewindResult ULagCompensationComponent::ProjectileServerSideRewindRes
 	const FVector_NetQuantize& TraceStart, const FVector_NetQuantize100& InitialVelocity, float HitTime)
 {
 	const FFramePackage FrameToCheck = GetFrameToCheck(HitCharacter, HitTime);
-	return ProjectileConfirmHit(HitCharacter, TraceStart, InitialVelocity, HitTime);
+	return ProjectileConfirmHit(FrameToCheck, HitCharacter, TraceStart, InitialVelocity, HitTime);
 }
 
 FShotGunServerSideRewindResult ULagCompensationComponent::ShotGunServerSideRewind(
