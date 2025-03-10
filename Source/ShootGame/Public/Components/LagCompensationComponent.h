@@ -101,6 +101,14 @@ protected:
 		const FVector_NetQuantize& HitLocation,
 		float HitTime);
 
+	FServerSideRewindResult ProjectileServerSideRewindResult(
+		APlayerCharacter* HitCharacter,
+		const FVector_NetQuantize& TraceStart,
+		const FVector_NetQuantize100& InitialVelocity,
+		float HitTime
+	);
+	
+	
 	FFramePackage InterpBetweenFrames(
 		const FFramePackage& OlderFrame,
 		const FFramePackage& YoungerFrame,
@@ -133,7 +141,14 @@ protected:
 		const FVector_NetQuantize& TraceStart,
 		const TArray<FVector_NetQuantize>& HitLocations
 	);
-	
+
+	FServerSideRewindResult ProjectileConfirmHit(
+		const FFramePackage& FramePackage,
+		APlayerCharacter* HitCharacter,
+		const FVector_NetQuantize& TraceStart,
+		const FVector_NetQuantize& InitializeVelocity,
+		float HitTime
+	);
 private:
 	UPROPERTY()
 	APlayerCharacter* Character;

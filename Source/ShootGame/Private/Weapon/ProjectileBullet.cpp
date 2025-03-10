@@ -56,6 +56,7 @@ void AProjectileBullet::BeginPlay()
 {
 	Super::BeginPlay();
 
+	/*
 	FPredictProjectilePathParams Params;
 	Params.bTraceWithChannel = true;
 	Params.bTraceWithCollision = true;
@@ -69,6 +70,6 @@ void AProjectileBullet::BeginPlay()
 	Params.TraceChannel = ECC_Visibility;
 	Params.ActorsToIgnore.Add(this);
 	FPredictProjectilePathResult PathResult;
+	UGameplayStatics::PredictProjectilePath(this, Params, PathResult);*/
 	
-	UGameplayStatics::PredictProjectilePath(this, Params, PathResult);
 }
