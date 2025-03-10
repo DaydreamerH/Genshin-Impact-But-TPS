@@ -21,6 +21,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float InitialSpeed = 20000.f;
+	
+	float Damage = 10.f;
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -32,8 +35,7 @@ protected:
 		FVector NormalImpulse,
 		const FHitResult& Hit);
 
-	UPROPERTY(EditAnywhere)
-	float Damage = 10.f;
+
 
 	UPROPERTY(EditAnywhere)
 	UParticleSystem* ImpactParticles;

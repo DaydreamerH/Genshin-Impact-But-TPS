@@ -14,27 +14,80 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 		WeaponMesh->PlayAnimation(FireAnimation, false);
 		SpendRounnd();
 		APawn* InstigatorPawn = Cast<APawn>(GetOwner());
-		if(!HasAuthority())return;
+		UWorld* World = GetWorld();
 		if(const USkeletalMeshSocket* MuzzleFlashSocket = 
-			GetWeaponMesh()->GetSocketByName(FName("MuzzleFlash")))
+			GetWeaponMesh()->GetSocketByName(FName("MuzzleFlash"));
+			MuzzleFlashSocket && World)
 		{
 			FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(GetWeaponMesh());
 			FVector ToTarget = HitTarget - SocketTransform.GetLocation();
 			FRotator TargetRotation = ToTarget.Rotation();
-			if(ProjectileClass)
+			FActorSpawnParameters SpawnParameters;
+			SpawnParameters.Owner = GetOwner();
+			SpawnParameters.Instigator = InstigatorPawn;
+
+			AProjectile* SpawnedProjectile = nullptr;
+			if(bUseServerSideRewind)
 			{
-				FActorSpawnParameters SpawnParameters;
-				SpawnParameters.Owner = GetOwner();
-				SpawnParameters.Instigator = InstigatorPawn;
-				UWorld* World = GetWorld();
-				if(World)
+				if(InstigatorPawn->HasAuthority())
 				{
-					World->SpawnActor<AProjectile>(
-						ProjectileClass,
-						SocketTransform.GetLocation(),
-						TargetRotation,
-						SpawnParameters
-					);
+					if(InstigatorPawn->IsLocallyControlled())
+					{
+						SpawnedProjectile = World->SpawnActor<AProjectile>(
+							ProjectileClass,
+							SocketTransform.GetLocation(),
+							TargetRotation,
+							SpawnParameters);
+						SpawnedProjectile->bUseServerSideRewind = false;
+						SpawnedProjectile->Damage = Damage;
+					}
+					else
+					{	
+						SpawnedProjectile = World->SpawnActor<AProjectile>(
+							SeverSideRewindProjectileClass,
+							SocketTransform.GetLocation(),
+							TargetRotation,
+							SpawnParameters);
+						SpawnedProjectile->bUseServerSideRewind = false;
+					}
+				}
+				else
+				{
+					if(InstigatorPawn->IsLocallyControlled())
+					{
+						SpawnedProjectile = World->SpawnActor<AProjectile>(
+							SeverSideRewindProjectileClass,
+							SocketTransform.GetLocation(),
+							TargetRotation,
+							SpawnParameters);
+						SpawnedProjectile->bUseServerSideRewind = true;
+						SpawnedProjectile->TraceStart = SocketTransform.GetLocation();
+						SpawnedProjectile->InitialVelocity
+							= SpawnedProjectile->GetActorForwardVector() * SpawnedProjectile->InitialSpeed;
+						SpawnedProjectile->Damage = Damage;
+					}
+					else
+					{
+						SpawnedProjectile = World->SpawnActor<AProjectile>(
+							SeverSideRewindProjectileClass,
+							SocketTransform.GetLocation(),
+							TargetRotation,
+							SpawnParameters);
+						SpawnedProjectile->bUseServerSideRewind = false;
+					}
+				}
+			}
+			else
+			{
+				if(InstigatorPawn->HasAuthority())
+				{
+					SpawnedProjectile = World->SpawnActor<AProjectile>(
+							ProjectileClass,
+							SocketTransform.GetLocation(),
+							TargetRotation,
+							SpawnParameters);
+					SpawnedProjectile->bUseServerSideRewind = false;
+					SpawnedProjectile->Damage = Damage;
 				}
 			}
 			if(BulletShellClass)
@@ -44,15 +97,11 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 				if(AmmoEjectSocket)
 				{
 					FTransform AmmoSocketTransform = AmmoEjectSocket->GetSocketTransform(WeaponMesh);
-					if(UWorld* World = GetWorld())
-					{
-						World->SpawnActor<ABulletShell>(
-							BulletShellClass,
-							AmmoSocketTransform.GetLocation(),
-							AmmoSocketTransform.GetRotation().Rotator()
-							);
-					}
-			
+					World->SpawnActor<ABulletShell>(
+						BulletShellClass,
+						AmmoSocketTransform.GetLocation(),
+						AmmoSocketTransform.GetRotation().Rotator()
+					);
 				}
 			}
 		}
