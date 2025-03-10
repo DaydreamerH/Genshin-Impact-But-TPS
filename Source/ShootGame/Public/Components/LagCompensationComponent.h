@@ -120,7 +120,7 @@ protected:
 
 	void EnableCharacterMeshCollision(APlayerCharacter* HitCharacter, ECollisionEnabled::Type CollisionEnabled);
 
-	FFramePackage GetFrameToCheck(const APlayerCharacter* HitCharacter, float HitTime);
+	FFramePackage GetFrameToCheck(APlayerCharacter* HitCharacter, float HitTime);
 
 	FShotGunServerSideRewindResult ShotGunServerSideRewind(
 		const TArray<APlayerCharacter*>& HitCharacters,

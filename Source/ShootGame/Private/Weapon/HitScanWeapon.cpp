@@ -73,7 +73,8 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 
 						if(OwnerPlayerCharacter
 							&& OwnerPlayerController
-							&& OwnerPlayerCharacter->GetLagCompensation())
+							&& OwnerPlayerCharacter->GetLagCompensation()
+							&& OwnerPlayerCharacter->IsLocallyControlled())
 						{
 							OwnerPlayerCharacter->GetLagCompensation()->ServerScoreRequest(
 								PlayerCharacter,

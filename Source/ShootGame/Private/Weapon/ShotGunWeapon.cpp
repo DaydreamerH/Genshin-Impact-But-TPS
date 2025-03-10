@@ -4,11 +4,13 @@
 #include "Weapon/ShotGunWeapon.h"
 
 #include "Components/CombatComponent.h"
+#include "Components/LagCompensationComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Player/PlayerCharacter.h"
+#include "PlayerController/MyPlayerController.h"
 #include "Sound/SoundCue.h"
 #include "Weapon/BulletShell.h"
 /*
@@ -147,9 +149,9 @@ void AShotGunWeapon::FireShotGun(const TArray<FVector_NetQuantize>& HitTargets)
 		
 		SpendRounnd();
 		
-		const APawn* OnwerPawn = Cast<APawn>(GetOwner());
-		if(OnwerPawn==nullptr)return;
-		AController* InstigatorController = OnwerPawn->GetController();
+		APawn* OwnerPawn = Cast<APawn>(GetOwner());
+		if(OwnerPawn==nullptr)return;
+		AController* InstigatorController = OwnerPawn->GetController();
 
 		if(const USkeletalMeshSocket*
 			MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName("MuzzleFlash"))
@@ -194,36 +196,63 @@ void AShotGunWeapon::FireShotGun(const TArray<FVector_NetQuantize>& HitTargets)
 					);
 				}
 			}
-			
+
+			TArray<APlayerCharacter*>HitCharacters = TArray<APlayerCharacter*>();
 			for(auto HitPair:HitMap)
 			{
-				if(InstigatorController && HitPair.Key && HasAuthority())
+				if(InstigatorController && HitPair.Key)
 				{
-					UGameplayStatics::ApplyDamage(
-						HitPair.Key,
-						Damage * HitPair.Value,
-						InstigatorController,
-						this,
-						UDamageType::StaticClass()
-					);
+					if(HasAuthority())
+					{
+						UGameplayStatics::ApplyDamage(
+						   HitPair.Key,
+						   Damage * HitPair.Value,
+						   InstigatorController,
+						   this,
+						   UDamageType::StaticClass()
+					   );
+					}
+
+					HitCharacters.Add(HitPair.Key);
 				}
 			}
+			if(!HasAuthority() && HitCharacters.Num() > 0 && bUseServerSideRewind)
+			{
+				OwnerPlayerCharacter = OwnerPlayerCharacter == nullptr ?
+					Cast<APlayerCharacter>(OwnerPawn) : OwnerPlayerCharacter;
+				OwnerPlayerController = OwnerPlayerController == nullptr ?
+					Cast<AMyPlayerController>(InstigatorController) : OwnerPlayerController;
 
-			if(MuzzleFlash)
-			{
-				UGameplayStatics::SpawnEmitterAtLocation(
-					World,
-					MuzzleFlash,
-					SocketTransform.GetLocation()
-				);
-			}
-			if(FireSound)
-			{
-				UGameplayStatics::PlaySoundAtLocation(
-					this,
-					FireSound,
-					GetActorLocation()
-				);
+				if(OwnerPlayerCharacter
+					&& OwnerPlayerController
+					&& OwnerPlayerCharacter->GetLagCompensation()
+					&& OwnerPlayerCharacter->IsLocallyControlled())
+				{
+					OwnerPlayerCharacter->GetLagCompensation()->ServerShotGunScoreRequest(
+						HitCharacters,
+						Start,
+						HitTargets,
+						OwnerPlayerController->GetServerTime() - OwnerPlayerController->SingleTripTime,
+						this
+					);
+				}
+
+				if(MuzzleFlash)
+				{
+					UGameplayStatics::SpawnEmitterAtLocation(
+						World,
+						MuzzleFlash,
+						SocketTransform.GetLocation()
+					);
+				}
+				if(FireSound)
+				{
+					UGameplayStatics::PlaySoundAtLocation(
+						this,
+						FireSound,
+						GetActorLocation()
+					);
+				}
 			}
 		}
 	}

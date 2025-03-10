@@ -100,7 +100,7 @@ FShotGunServerSideRewindResult ULagCompensationComponent::ShotGunServerSideRewin
 	return ShotGunConfirmHit(FramesToCheck, TraceStart, HitLocations);
 }
 
-FFramePackage ULagCompensationComponent::GetFrameToCheck(const APlayerCharacter* HitCharacter, float HitTime)
+FFramePackage ULagCompensationComponent::GetFrameToCheck(APlayerCharacter* HitCharacter, float HitTime)
 {
 	if(HitCharacter == nullptr
 			|| HitCharacter->GetLagCompensation()
@@ -159,6 +159,7 @@ FFramePackage ULagCompensationComponent::GetFrameToCheck(const APlayerCharacter*
 			Younger->GetValue(),
 			HitTime);
 	}
+	FrameToCheck.HitCharacter = HitCharacter;
 	return FrameToCheck;
 }
 
