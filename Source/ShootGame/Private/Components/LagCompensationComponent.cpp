@@ -104,7 +104,9 @@ FShotGunServerSideRewindResult ULagCompensationComponent::ShotGunServerSideRewin
 	TArray<FFramePackage> FramesToCheck = TArray<FFramePackage>();
 	for(APlayerCharacter* HitCharacter : HitCharacters)
 	{
-		FramesToCheck.Add(GetFrameToCheck(HitCharacter, HitTime));
+		FFramePackage FrameToCheck = GetFrameToCheck(HitCharacter, HitTime);
+		FrameToCheck.HitCharacter = FrameToCheck.HitCharacter == nullptr ? HitCharacter : FrameToCheck.HitCharacter;
+		FramesToCheck.Add(FrameToCheck);
 	}
 	return ShotGunConfirmHit(FramesToCheck, TraceStart, HitLocations);
 }
@@ -168,6 +170,7 @@ FFramePackage ULagCompensationComponent::GetFrameToCheck(APlayerCharacter* HitCh
 			Younger->GetValue(),
 			HitTime);
 	}
+	
 	FrameToCheck.HitCharacter = HitCharacter;
 	return FrameToCheck;
 }
@@ -437,8 +440,7 @@ FShotGunServerSideRewindResult ULagCompensationComponent::ShotGunConfirmHit(cons
 		if(APlayerCharacter* PlayerCharacter
 			= Cast<APlayerCharacter>(ConfirmHitResult.GetActor()))
 		{
-			UBoxComponent* Box = Cast<UBoxComponent>(ConfirmHitResult.Component);
-			if(Box)
+			if(UBoxComponent* Box = Cast<UBoxComponent>(ConfirmHitResult.Component))
 			{
 				DrawDebugBox(
 					GetWorld(),
@@ -622,10 +624,11 @@ void ULagCompensationComponent::ServerShotGunScoreRequest_Implementation(const T
 		{
 			TotalDamage += Confirm.BodyShots[HitCharacter]*DamageCauser->GetDamage();	
 		}
+		UE_LOG(LogTemp, Log, TEXT("%f"),TotalDamage);
 		if(HitCharacter && Character && Character->Controller)
 		{
 			UGameplayStatics::ApplyDamage(
-				Character,
+				HitCharacter,
 				TotalDamage,
 				Character->Controller,
 				DamageCauser,
