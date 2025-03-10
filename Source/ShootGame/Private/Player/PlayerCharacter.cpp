@@ -428,7 +428,7 @@ void APlayerCharacter::OnActionTossGrenade(const FInputActionValue& InputActionV
 void APlayerCharacter::OnActionSwapWeapons(const FInputActionValue& InputActionValue)
 {
 	if(bDisableGameplay || !Combat->CouldSwapWeapons())return;
-	ServerOnActionSwapWeapons_Implementation();
+	ServerOnActionSwapWeapons();
 }
 
 void APlayerCharacter::AimOffset(float DeltaTime)
@@ -598,10 +598,6 @@ void APlayerCharacter::PollInit()
 void APlayerCharacter::PlayFireMontage(bool bAiming) const
 {
 	if(Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
-	if(IsLocallyControlled())
-	{
-		UE_LOG(LogTemp, Log, TEXT("Play On Local"));
-	}
 	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && FireWeaponMontage && !AnimInstance->Montage_IsPlaying(FireWeaponMontage))
 	{
 		AnimInstance->Montage_Play(FireWeaponMontage);

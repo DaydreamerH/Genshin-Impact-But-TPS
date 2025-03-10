@@ -255,10 +255,10 @@ void AWeapon::OnRep_Owner()
 		OwnerPlayerCharacter = nullptr;
 		OwnerPlayerController = nullptr;
 	}
-	else
-	{
-		SetHUDAmmo();
-	}
+	// else
+	// {
+	// 	SetHUDAmmo();
+	// }
 }
 
 void AWeapon::SetHUDAmmo()

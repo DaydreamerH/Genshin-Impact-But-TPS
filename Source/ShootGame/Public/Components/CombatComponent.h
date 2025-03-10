@@ -88,7 +88,7 @@ protected:
 	TSubclassOf<class AProjectile>GrenadeClass;
 	
 	void DropEquippedWeapon();
-	void AttachActorToRightHand(AActor* ActorToAttach);
+	void AttachActorToRightHand(AActor* ActorToAttach) const;
 	void AttachActorToBackpack(AActor* ActorToAttach);
 	void UpdateCarriedAmmo();
 	void PlayEquipWeaponSound(AWeapon* WeaponToEquip);

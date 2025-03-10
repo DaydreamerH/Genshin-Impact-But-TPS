@@ -419,7 +419,7 @@ void UCombatComponent::DropEquippedWeapon()
 	}
 }
 
-void UCombatComponent::AttachActorToRightHand(AActor* ActorToAttach)
+void UCombatComponent::AttachActorToRightHand(AActor* ActorToAttach) const
 {
 	if(ActorToAttach == nullptr
 		|| Character == nullptr
