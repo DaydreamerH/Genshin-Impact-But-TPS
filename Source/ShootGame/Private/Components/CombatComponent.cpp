@@ -87,12 +87,16 @@ void UCombatComponent::OnRep_EquippedWeapon()
 {
 	if(EquippedWeapon && Character)
 	{
+		UE_LOG(LogTemp, Log, TEXT("OnRep_Equip: %d"), EquippedWeapon->GetAmmo());
 		EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
 		AttachActorToRightHand(EquippedWeapon);
+		EquippedWeapon->SetOwner(Character);
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;
 		PlayEquipWeaponSound(EquippedWeapon);
+		UE_LOG(LogTemp, Log, TEXT("OnRep_Equip: %d"), EquippedWeapon->GetAmmo());
 		EquippedWeapon->SetHUDAmmo();
+		UE_LOG(LogTemp, Log, TEXT("OnRep_Equip: %d"), EquippedWeapon->GetAmmo());
 	}
 }
 
@@ -102,6 +106,7 @@ void UCombatComponent::OnRep_SecondaryWeapon()
 	{
 		SecondaryWeapon->SetWeaponState(EWeaponState::EWS_EquippedSecondary);
 		AttachActorToBackpack(SecondaryWeapon);
+		EquippedWeapon->SetOwner(Character);
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;
 		PlayEquipWeaponSound(SecondaryWeapon);
@@ -765,6 +770,7 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 	}
 	else
 	{
+		UE_LOG(LogTemp, Log, TEXT("Equip: %d"), WeaponToEquip->GetAmmo());
 		EquipPrimaryWeapon(WeaponToEquip);
 	}
 	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
@@ -780,6 +786,7 @@ void UCombatComponent::EquipPrimaryWeapon(AWeapon* WeaponToEquip)
 	AttachActorToRightHand(EquippedWeapon);
 	
 	EquippedWeapon->SetOwner(Character);
+	UE_LOG(LogTemp, Log, TEXT("EquipPri: %d"), WeaponToEquip->GetAmmo());
 	EquippedWeapon->SetHUDAmmo();
 
 	UpdateCarriedAmmo();

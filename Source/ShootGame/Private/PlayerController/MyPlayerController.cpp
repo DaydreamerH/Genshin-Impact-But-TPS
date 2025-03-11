@@ -100,6 +100,7 @@ void AMyPlayerController::SetHUDWeaponAmmo(int32 Ammo)
 	{
 		const FString AmmoText = FString::Printf(TEXT("%d"), Ammo);
 		PlayerHUD->CharacterOverlay->WeaponAmmoAmount->SetText(FText::FromString(AmmoText));
+		UE_LOG(LogTemp, Log, TEXT("SetHud: %s"), *AmmoText);
 	}
 }
 

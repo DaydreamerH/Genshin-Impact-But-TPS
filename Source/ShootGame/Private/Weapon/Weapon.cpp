@@ -238,13 +238,13 @@ void AWeapon::Dropped()
 	{
 		Destroy();
 	}
-	
 	SetWeaponState(EWeaponState::EWS_Dropped);
 	FDetachmentTransformRules DetachmentTransformRules(EDetachmentRule::KeepWorld, true);
 	WeaponMesh->DetachFromComponent(DetachmentTransformRules);
 	OwnerPlayerCharacter=nullptr;
 	OwnerPlayerController=nullptr;
 	SetOwner(nullptr);
+	UE_LOG(LogTemp, Log, TEXT("WhenDropped: %d"), Ammo);
 }
 
 void AWeapon::OnRep_Owner()
@@ -263,7 +263,9 @@ void AWeapon::OnRep_Owner()
 
 void AWeapon::SetHUDAmmo()
 {
-	OwnerPlayerCharacter = OwnerPlayerCharacter==nullptr?Cast<APlayerCharacter>(GetOwner()):OwnerPlayerCharacter;
+	UE_LOG(LogTemp, Log, TEXT("SetHud: %d"), Ammo);
+	OwnerPlayerCharacter = OwnerPlayerCharacter==nullptr?
+		Cast<APlayerCharacter>(GetOwner()):OwnerPlayerCharacter;
 	if(OwnerPlayerCharacter)
 	{
 		OwnerPlayerController =
@@ -273,6 +275,7 @@ void AWeapon::SetHUDAmmo()
 		if(OwnerPlayerController)
 		{
 			OwnerPlayerController->SetHUDWeaponAmmo(Ammo);
+			UE_LOG(LogTemp, Log, TEXT("SetHud: %d"), Ammo);
 		}
 	}
 }
