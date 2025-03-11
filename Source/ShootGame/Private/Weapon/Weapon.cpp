@@ -118,7 +118,7 @@ void AWeapon::SpendRounnd()
 	{
 		ClientUpdateAmmo(Ammo);
 	}
-	else
+	else if(OwnerPlayerCharacter && OwnerPlayerCharacter->IsLocallyControlled())
 	{
 		++Sequence;
 	}

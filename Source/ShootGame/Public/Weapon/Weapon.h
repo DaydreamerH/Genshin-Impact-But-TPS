@@ -185,7 +185,7 @@ public:
 
 	FORCEINLINE bool GetAutoFire() const {return AutoFire;}
 
-	FORCEINLINE bool IsFull() const {return Ammo >= MagCapcitiy;}
+	FORCEINLINE bool IsFull() const { return Ammo >= MagCapcitiy; }
 
 	FORCEINLINE float GetDamage() const { return Damage; }
 };
