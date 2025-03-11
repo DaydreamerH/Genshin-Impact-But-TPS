@@ -148,7 +148,7 @@ void AShotGunWeapon::FireShotGun(const TArray<FVector_NetQuantize>& HitTargets)
 			}
 		}
 		
-		SpendRounnd();
+		SpendRound();
 		
 		APawn* OwnerPawn = Cast<APawn>(GetOwner());
 		if(OwnerPawn==nullptr)return;

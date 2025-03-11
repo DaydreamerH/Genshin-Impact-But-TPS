@@ -113,7 +113,7 @@ void AWeapon::ClientAddAmmo_Implementation(int32 AmmoToAdd)
 	SetHUDAmmo();
 }
 
-void AWeapon::SpendRounnd()
+void AWeapon::SpendRound()
 {
 	Ammo = FMath::Clamp(Ammo - 1, 0, MagCapcitiy);
 	SetHUDAmmo();
@@ -121,7 +121,7 @@ void AWeapon::SpendRounnd()
 	{
 		ClientUpdateAmmo(Ammo);
 	}
-	else
+	else if(OwnerPlayerCharacter&&OwnerPlayerCharacter->IsLocallyControlled())
 	{
 		++Sequence;
 	}
@@ -230,7 +230,7 @@ void AWeapon::Fire(const FVector& HitTarget)
 			
 			}
 		}
-		SpendRounnd();
+		SpendRound();
 	}
 	
 }
@@ -273,7 +273,6 @@ void AWeapon::OnRep_Owner()
 
 void AWeapon::SetHUDAmmo()
 {
-	UE_LOG(LogTemp, Log, TEXT("SetHud: %d"), Ammo);
 	OwnerPlayerCharacter = OwnerPlayerCharacter==nullptr?
 		Cast<APlayerCharacter>(GetOwner()):OwnerPlayerCharacter;
 	if(OwnerPlayerCharacter)
@@ -285,7 +284,6 @@ void AWeapon::SetHUDAmmo()
 		if(OwnerPlayerController)
 		{
 			OwnerPlayerController->SetHUDWeaponAmmo(Ammo);
-			UE_LOG(LogTemp, Log, TEXT("SetHud: %d"), Ammo);
 		}
 	}
 }

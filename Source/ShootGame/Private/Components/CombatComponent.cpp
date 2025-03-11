@@ -87,15 +87,12 @@ void UCombatComponent::OnRep_EquippedWeapon()
 {
 	if(EquippedWeapon && Character)
 	{
-		UE_LOG(LogTemp, Log, TEXT("OnRep_Equip: %d"), EquippedWeapon->GetAmmo());
 		EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
 		AttachActorToRightHand(EquippedWeapon);
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;
 		PlayEquipWeaponSound(EquippedWeapon);
-		UE_LOG(LogTemp, Log, TEXT("OnRep_Equip: %d"), EquippedWeapon->GetAmmo());
 		EquippedWeapon->SetHUDAmmo();
-		UE_LOG(LogTemp, Log, TEXT("OnRep_Equip: %d"), EquippedWeapon->GetAmmo());
 	}
 }
 
@@ -255,18 +252,24 @@ void UCombatComponent::FireShotGun()
 
 void UCombatComponent::ServerShotGunFire_Implementation(const TArray<FVector_NetQuantize>& TraceHitTargets)
 {
-	MulticastShotGunFire_Implementation(TraceHitTargets);
+	if(Character->HasAuthority())
+	{
+		UE_LOG(LogTemp, Log, TEXT("ServerFire"));
+	}
+	MulticastShotGunFire(TraceHitTargets);
 }
 
 void UCombatComponent::MulticastShotGunFire_Implementation(const TArray<FVector_NetQuantize>& TraceHitTargets)
 {
-	// TODO: 这里是bug，服务器会开两次枪
-	
 	if(Character == nullptr || (Character->IsLocallyControlled() && !Character->HasAuthority()))
 	{
 		return;
 	}
 
+	if(!Character->HasAuthority())
+	{
+		UE_LOG(LogTemp, Log, TEXT("ServerOnClientFire"));
+	}
 	ShotGunLocalFire(TraceHitTargets);
 }
 
@@ -779,7 +782,6 @@ void UCombatComponent::EquipPrimaryWeapon(AWeapon* WeaponToEquip)
 	AttachActorToRightHand(EquippedWeapon);
 	
 	EquippedWeapon->SetOwner(Character);
-	UE_LOG(LogTemp, Log, TEXT("EquipPri: %d"), WeaponToEquip->GetAmmo());
 	EquippedWeapon->SetHUDAmmo();
 
 	UpdateCarriedAmmo();

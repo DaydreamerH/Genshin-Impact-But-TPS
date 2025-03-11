@@ -34,7 +34,7 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 			
 			}
 		}
-		SpendRounnd();
+		SpendRound();
 		APawn* OwnerPawn = Cast<APawn>(GetOwner());
 		if(OwnerPawn==nullptr)return;
 		AController* InstigatorController = OwnerPawn->GetController();

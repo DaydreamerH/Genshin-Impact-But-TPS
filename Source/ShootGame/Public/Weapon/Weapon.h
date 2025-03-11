@@ -101,7 +101,7 @@ protected:
 	// 未被处理的服务器请求
 	int32 Sequence = 0;
 	
-	void SpendRounnd();
+	void SpendRound();
 	
 	UPROPERTY(EditAnywhere)
 	int32 MagCapcitiy = 30;
