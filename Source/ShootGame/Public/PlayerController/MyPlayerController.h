@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "MyPlayerController.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHighPingDelegate, bool, bHighPing);
 /**
  * 
  */
@@ -34,6 +35,8 @@ public:
 	void HandleCooldown();
 
 	float SingleTripTime = 0.f;
+	
+	FHighPingDelegate HighPingDelegate;
 protected:
 	virtual void BeginPlay() override;
 	void SetHUDTime();
@@ -106,6 +109,10 @@ private:
 	float HighPingDuration = 5.f;
 	UPROPERTY(EditAnywhere)
 	float CheckPingFrequency = 20.f;
+	
+	UFUNCTION(Server, Reliable)
+	void ServerReportPingStatus(bool HighPing);
+	
 	UPROPERTY(EditAnywhere)
 	float HighPingThreshold = 100.f;
 	float PingAnimationRunningTime = 0.f;

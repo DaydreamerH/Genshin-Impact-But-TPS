@@ -313,6 +313,11 @@ void AMyPlayerController::OnRep_MatchState()
 	}
 }
 
+void AMyPlayerController::ServerReportPingStatus_Implementation(bool HighPing)
+{
+	HighPingDelegate.Broadcast(HighPing);
+}
+
 void AMyPlayerController::SetHUDTime()
 {
 	uint32 SecondsLeft = 0.f;
@@ -445,6 +450,11 @@ void AMyPlayerController::CheckPing(const float DeltaSeconds)
 			{
 				PingAnimationRunningTime = 0.f;
 				HighPingWarning();
+				ServerReportPingStatus(true);
+			}
+			else
+			{
+				ServerReportPingStatus(false);
 			}
 		}
 		HighPingRunningTime = 0.f;
