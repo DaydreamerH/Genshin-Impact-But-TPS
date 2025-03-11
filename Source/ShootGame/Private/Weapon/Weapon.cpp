@@ -89,7 +89,10 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 
 void AWeapon::ClientUpdateAmmo_Implementation(int32 ServerAmmo)
 {
-	if(HasAuthority())return;
+	if(HasAuthority())
+	{
+		return;
+	}
 	Ammo = ServerAmmo;
 	--Sequence;
 	Ammo -= Sequence;
@@ -118,7 +121,7 @@ void AWeapon::SpendRounnd()
 	{
 		ClientUpdateAmmo(Ammo);
 	}
-	else if(OwnerPlayerCharacter && OwnerPlayerCharacter->IsLocallyControlled())
+	else
 	{
 		++Sequence;
 	}

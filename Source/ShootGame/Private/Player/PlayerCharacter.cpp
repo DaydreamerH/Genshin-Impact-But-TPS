@@ -629,10 +629,6 @@ void APlayerCharacter::PlayElimMontage() const
 void APlayerCharacter::PlayReloadMontage() const
 {
 	if(Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
-	if(HasAuthority())
-	{
-		UE_LOG(LogTemp, Log, TEXT("PlayMontageOnServer"));
-	}
 	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		AnimInstance && ReloadMontage)
 	{

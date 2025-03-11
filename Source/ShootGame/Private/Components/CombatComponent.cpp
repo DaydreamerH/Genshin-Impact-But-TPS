@@ -155,8 +155,6 @@ void UCombatComponent::ShotGunShellReload()
 {
 	if(Character && Character->HasAuthority())
 	{
-		UE_LOG(LogTemp, Log, TEXT("BL Call On Server"));
-
 		if(UWorld* World = GetWorld())
 		{
 			float CurrentTime = World->GetTimeSeconds();
@@ -164,10 +162,7 @@ void UCombatComponent::ShotGunShellReload()
 			{
 				return;
 			}
-			else
-			{
-				ShotGunLastReloadTime = CurrentTime;
-			}
+			ShotGunLastReloadTime = CurrentTime;
 		}
 		
 		UpdateShotGunAmmoValue();
@@ -550,10 +545,10 @@ void UCombatComponent::InterpFOV(float DeltaTime)
 bool UCombatComponent::CanFire()
 {
 	if(EquippedWeapon == nullptr)return false;
-	if(bLocallyReloading) return false;
 	if(EquippedWeapon->GetWeaponType() == EWeaponType::EWT_ShotGun
 		&& !EquippedWeapon->AmmoEqualsZero()
 		&& CombatState == ECombatState::ECS_Reloading)return true;
+	if(bLocallyReloading) return false;
 	return !EquippedWeapon->AmmoEqualsZero() && CombatState == ECombatState::ECS_Unoccupied;
 }
 
