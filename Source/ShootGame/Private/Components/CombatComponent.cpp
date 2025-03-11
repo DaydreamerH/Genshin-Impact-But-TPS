@@ -189,12 +189,9 @@ void UCombatComponent::ServerCooldown_Implementation()
 
 void UCombatComponent::LocalFire(const FVector_NetQuantize& TraceHitTarget)
 {
-	if(EquippedWeapon && CombatState == ECombatState::ECS_Unoccupied)
-	{
-		Character->PlayFireMontage(bAiming);
-		Character->SetCrosshairShootingFactor();
-		EquippedWeapon->Fire(TraceHitTarget);
-	}
+	Character->PlayFireMontage(bAiming);
+	Character->SetCrosshairShootingFactor();
+	EquippedWeapon->Fire(TraceHitTarget);
 }
 
 void UCombatComponent::ShotGunLocalFire(const TArray<FVector_NetQuantize>& TraceHitTarget)
@@ -232,6 +229,7 @@ void UCombatComponent::FireHitScanWeapon()
 {
 	if(EquippedWeapon && Character)
 	{
+		UE_LOG(LogTemp, Log, TEXT("FireHitScan"));
 		HitTarget = EquippedWeapon->bUseScatter?
 			EquippedWeapon->TraceEndWithScatter(HitTarget) : HitTarget;
 		if(!Character->HasAuthority())
@@ -743,6 +741,7 @@ void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& Trac
 	{
 		CombatState = ECombatState::ECS_Cooling;
 	}
+	UE_LOG(LogTemp, Log, TEXT("FireHitScan"));
 	MulticastFire(TraceHitTarget);
 }
 
