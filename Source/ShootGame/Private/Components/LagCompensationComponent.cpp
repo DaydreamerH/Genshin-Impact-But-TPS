@@ -114,7 +114,7 @@ FShotGunServerSideRewindResult ULagCompensationComponent::ShotGunServerSideRewin
 FFramePackage ULagCompensationComponent::GetFrameToCheck(APlayerCharacter* HitCharacter, float HitTime)
 {
 	if(HitCharacter == nullptr
-			|| HitCharacter->GetLagCompensation()
+			|| HitCharacter->GetLagCompensation() == nullptr
 			|| HitCharacter->GetLagCompensation()->FrameHistory.GetHead() == nullptr
 			|| HitCharacter->GetLagCompensation()->FrameHistory.GetTail() == nullptr)
 	{
@@ -402,7 +402,6 @@ FShotGunServerSideRewindResult ULagCompensationComponent::ShotGunConfirmHit(cons
 			return FShotGunServerSideRewindResult();
 		}
 	}
-	
 	FShotGunServerSideRewindResult ShotGunResult = FShotGunServerSideRewindResult();
 	TArray<FFramePackage> CurrentFrames = TArray<FFramePackage>();
 
@@ -423,7 +422,7 @@ FShotGunServerSideRewindResult ULagCompensationComponent::ShotGunConfirmHit(cons
 		HeadBox->SetCollisionResponseToChannel(ECC_HitBox, ECR_Block);
 	}
 	const UWorld* World = GetWorld();
-
+	if(World==nullptr)return FShotGunServerSideRewindResult();
 	//头部检测
 	for(auto& HitLocation : HitLocations)
 	{
@@ -478,6 +477,7 @@ FShotGunServerSideRewindResult ULagCompensationComponent::ShotGunConfirmHit(cons
 		HeadBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
+	// 身体检测
 	for(auto& HitLocation : HitLocations)
 	{
 		FHitResult ConfirmHitResult = FHitResult();
@@ -493,8 +493,7 @@ FShotGunServerSideRewindResult ULagCompensationComponent::ShotGunConfirmHit(cons
 		if(APlayerCharacter* PlayerCharacter
 			= Cast<APlayerCharacter>(ConfirmHitResult.GetActor()))
 		{
-			UBoxComponent* Box = Cast<UBoxComponent>(ConfirmHitResult.Component);
-			if(Box)
+			if(UBoxComponent* Box = Cast<UBoxComponent>(ConfirmHitResult.Component))
 			{
 				DrawDebugBox(
 					GetWorld(),
@@ -548,7 +547,6 @@ void ULagCompensationComponent::MoveBoxes(APlayerCharacter* HitCharacter, const 
 	{
 		if(HitBoxPair.Value != nullptr)
 		{
-			if(!Package.HitBoxInfo.Contains(HitBoxPair.Key))continue;
 			HitBoxPair.Value->SetWorldLocation(Package.HitBoxInfo[HitBoxPair.Key].Location);
 			HitBoxPair.Value->SetWorldRotation(Package.HitBoxInfo[HitBoxPair.Key].Rotation);
 			HitBoxPair.Value->SetBoxExtent(Package.HitBoxInfo[HitBoxPair.Key].BoxExtent);

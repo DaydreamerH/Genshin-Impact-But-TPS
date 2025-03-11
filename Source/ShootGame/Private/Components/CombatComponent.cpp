@@ -731,14 +731,7 @@ void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& T
 	{
 		return;
 	}
-	Character->PlayFireMontage(bAiming);
-	Character->SetCrosshairShootingFactor();
-	if(EquippedWeapon->GetWeaponType() == EWeaponType::EWT_ShotGun
-		&& CombatState == ECombatState::ECS_Reloading)
-	{
-		CombatState = ECombatState::ECS_Unoccupied;
-	}
-	EquippedWeapon->Fire(TraceHitTarget);
+	LocalFire(HitTarget);
 }
 
 void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget)

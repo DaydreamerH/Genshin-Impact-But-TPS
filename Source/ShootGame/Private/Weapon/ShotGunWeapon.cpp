@@ -3,6 +3,7 @@
 
 #include "Weapon/ShotGunWeapon.h"
 
+#include "Components/BoxComponent.h"
 #include "Components/CombatComponent.h"
 #include "Components/LagCompensationComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
@@ -228,11 +229,16 @@ void AShotGunWeapon::FireShotGun(const TArray<FVector_NetQuantize>& HitTargets)
 					&& OwnerPlayerCharacter->GetLagCompensation()
 					&& OwnerPlayerCharacter->IsLocallyControlled())
 				{
+					UE_LOG(LogTemp, Log, TEXT("%f, %f, %f"),
+					HitCharacters[0]->HitCollisionBoxes["Head"]->GetScaledBoxExtent().X,
+			HitCharacters[0]->HitCollisionBoxes["Head"]->GetScaledBoxExtent().Y,
+			HitCharacters[0]->HitCollisionBoxes["Head"]->GetScaledBoxExtent().Z);
 					OwnerPlayerCharacter->GetLagCompensation()->ServerShotGunScoreRequest(
 						HitCharacters,
 						Start,
 						HitTargets,
-						OwnerPlayerController->GetServerTime() - OwnerPlayerController->SingleTripTime,
+						OwnerPlayerController->GetServerTime()
+							- OwnerPlayerController->SingleTripTime,
 						this
 					);
 				}
