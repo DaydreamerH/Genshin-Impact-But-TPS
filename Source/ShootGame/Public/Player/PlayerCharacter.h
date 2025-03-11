@@ -6,6 +6,7 @@
 #include "TurningPlace.h"
 #include "GameFramework/Character.h"
 #include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/inputActionValue.h"
+#include "Components/CombatComponent.h"
 #include "Components/CombatStates.h"
 #include "PlayerCharacter.generated.h"
 
@@ -344,4 +345,6 @@ public:
 	bool IsLocallyReloading();
 
 	FORCEINLINE ULagCompensationComponent* GetLagCompensation() const { return LagCompensation; }
+
+	FORCEINLINE AWeapon* GetEquippedWeapon() const { return Combat->EquippedWeapon; }
 };

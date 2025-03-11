@@ -258,10 +258,17 @@ void AWeapon::OnRep_Owner()
 		OwnerPlayerCharacter = nullptr;
 		OwnerPlayerController = nullptr;
 	}
-	// else
-	// {
-	// 	SetHUDAmmo();
-	// }
+	else
+	{
+		OwnerPlayerCharacter = OwnerPlayerCharacter == nullptr
+			? Cast<APlayerCharacter>(Owner) :OwnerPlayerCharacter;
+		if (OwnerPlayerCharacter
+			&& OwnerPlayerCharacter->GetEquippedWeapon()
+			&& OwnerPlayerCharacter->GetEquippedWeapon() == this)
+		{
+			SetHUDAmmo();
+		}
+	}
 }
 
 void AWeapon::SetHUDAmmo()

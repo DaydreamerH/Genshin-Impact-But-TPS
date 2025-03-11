@@ -90,7 +90,6 @@ void UCombatComponent::OnRep_EquippedWeapon()
 		UE_LOG(LogTemp, Log, TEXT("OnRep_Equip: %d"), EquippedWeapon->GetAmmo());
 		EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
 		AttachActorToRightHand(EquippedWeapon);
-		EquippedWeapon->SetOwner(Character);
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;
 		PlayEquipWeaponSound(EquippedWeapon);
@@ -106,7 +105,6 @@ void UCombatComponent::OnRep_SecondaryWeapon()
 	{
 		SecondaryWeapon->SetWeaponState(EWeaponState::EWS_EquippedSecondary);
 		AttachActorToBackpack(SecondaryWeapon);
-		EquippedWeapon->SetOwner(Character);
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;
 		PlayEquipWeaponSound(SecondaryWeapon);
