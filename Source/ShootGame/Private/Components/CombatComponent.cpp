@@ -548,7 +548,11 @@ bool UCombatComponent::CanFire()
 	if(EquippedWeapon == nullptr)return false;
 	if(EquippedWeapon->GetWeaponType() == EWeaponType::EWT_ShotGun
 		&& !EquippedWeapon->AmmoEqualsZero()
-		&& CombatState == ECombatState::ECS_Reloading)return true;
+		&& CombatState == ECombatState::ECS_Reloading)
+	{
+		bLocallyReloading = false;
+		return true;
+	}
 	if(bLocallyReloading) return false;
 	return !EquippedWeapon->AmmoEqualsZero() && CombatState == ECombatState::ECS_Unoccupied;
 }
