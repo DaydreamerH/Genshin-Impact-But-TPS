@@ -26,7 +26,7 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 			SpawnParameters.Owner = GetOwner();
 			SpawnParameters.Instigator = InstigatorPawn;
 
-			AProjectile* SpawnedProjectile = nullptr;
+			AProjectile* SpawnedProjectile;
 			if(bUseServerSideRewind)
 			{
 				if(InstigatorPawn->HasAuthority())

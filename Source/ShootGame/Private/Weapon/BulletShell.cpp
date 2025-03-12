@@ -9,10 +9,17 @@ ABulletShell::ABulletShell()
 
 	BulletShellMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BulletShellMesh"));
 	SetRootComponent(BulletShellMesh);
+
 	BulletShellMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	BulletShellMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	
+	BulletShellMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	BulletShellMesh->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
+	
 	BulletShellMesh->SetSimulatePhysics(true);
 	BulletShellMesh->SetEnableGravity(true);
 	BulletShellMesh->SetNotifyRigidBodyCollision(true);
+	
 	ShellEjectionImpulse = 10.f;
 }
 
