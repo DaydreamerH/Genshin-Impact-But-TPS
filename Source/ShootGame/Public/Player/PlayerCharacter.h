@@ -79,7 +79,9 @@ protected:
 	void OnActionTossGrenade(const FInputActionValue& InputActionValue);
 	UFUNCTION()
 	void OnActionSwapWeapons(const FInputActionValue& InputActionValue);
-
+	UFUNCTION()
+	void OnActionQuit(const FInputActionValue& InputActionValue);
+	
 	void AimOffset(float DeltaTime);
 	
 	void UpdateMPC();
@@ -195,6 +197,8 @@ private:
 	class UInputAction* IA_TossGrenade;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* IA_SwapWeapons;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* IA_Quit;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "EnhancedInput|Action", meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* InputMappingContext;
 

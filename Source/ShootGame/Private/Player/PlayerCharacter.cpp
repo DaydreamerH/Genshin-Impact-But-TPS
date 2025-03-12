@@ -437,6 +437,17 @@ void APlayerCharacter::OnActionSwapWeapons(const FInputActionValue& InputActionV
 	}
 }
 
+void APlayerCharacter::OnActionQuit(const FInputActionValue& InputActionValue)
+{
+	PlayerController = PlayerController == nullptr ?
+			Cast<AMyPlayerController>(Controller):PlayerController;
+	UE_LOG(LogTemp, Log, TEXT("quit"));
+	if(PlayerController)
+	{
+		PlayerController->ShowBackToMainMenu();
+	}
+}
+
 void APlayerCharacter::AimOffset(float DeltaTime)
 {
 	if(Combat && Combat->EquippedWeapon==nullptr)return;
@@ -928,6 +939,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		if(IA_SwapWeapons)
 		{
 			inputComponent->BindAction(IA_SwapWeapons, ETriggerEvent::Started, this, &ThisClass::OnActionSwapWeapons);
+		}
+		if(IA_Quit)
+		{
+			inputComponent->BindAction(IA_Quit, ETriggerEvent::Started, this, &ThisClass::OnActionQuit);
 		}
 	}
 	

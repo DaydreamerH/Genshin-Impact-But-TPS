@@ -3,6 +3,8 @@
 
 #include "PlayerController/MyPlayerController.h"
 
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 #include "Components/CombatComponent.h"
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
@@ -12,6 +14,7 @@
 #include "GameMode/ShootGameMode.h"
 #include "GameState/ShootGameState.h"
 #include "HUD/Announcement.h"
+#include "HUD/BackToMainMenu.h"
 #include "HUD/CharacterOverlay.h"
 #include "HUD/PlayerHUD.h"
 #include "Kismet/GameplayStatics.h"
@@ -469,6 +472,27 @@ void AMyPlayerController::CheckPing(const float DeltaSeconds)
 		if(PingAnimationRunningTime>HighPingDuration)
 		{
 			StopHighPingWarning();
+		}
+	}
+}
+
+void AMyPlayerController::ShowBackToMainMenu()
+{
+	if(BackToMainMenuWidget == nullptr)return;
+	if(BackToMainMenu == nullptr)
+	{
+		BackToMainMenu = CreateWidget<UBackToMainMenu>(this, BackToMainMenuWidget);
+	}
+	if(BackToMainMenu)
+	{
+		bBackToMainMenuOpen = !bBackToMainMenuOpen;
+		if(bBackToMainMenuOpen)
+		{
+			BackToMainMenu->MenuSetup();
+		}
+		else
+		{
+			BackToMainMenu->MenuTeardown();
 		}
 	}
 }

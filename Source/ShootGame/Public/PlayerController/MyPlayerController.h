@@ -37,6 +37,8 @@ public:
 	float SingleTripTime = 0.f;
 	
 	FHighPingDelegate HighPingDelegate;
+
+	void ShowBackToMainMenu();
 protected:
 	virtual void BeginPlay() override;
 	void SetHUDTime();
@@ -69,6 +71,14 @@ protected:
 	void StopHighPingWarning();
 	void CheckPing(float DeltaSeconds);
 private:
+	UPROPERTY(EditAnywhere, Category=HUD)
+	TSubclassOf<class UUserWidget> BackToMainMenuWidget;
+
+	UPROPERTY()
+	class UBackToMainMenu* BackToMainMenu;
+
+	bool bBackToMainMenuOpen = false;
+	
 	UPROPERTY()
 	class APlayerHUD* PlayerHUD;
 

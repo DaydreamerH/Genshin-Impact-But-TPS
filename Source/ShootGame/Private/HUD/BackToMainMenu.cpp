@@ -23,7 +23,7 @@ void UBackToMainMenu::MenuSetup()
 			PlayerController->SetShowMouseCursor(true);
 		}
 	}
-	if(ReturnButton)
+	if(ReturnButton && !ReturnButton->OnClicked.IsBound())
 	{
 		ReturnButton->OnClicked.AddDynamic(this, &ThisClass::ReturnButtonClicked);
 	}
@@ -79,6 +79,16 @@ void UBackToMainMenu::MenuTeardown()
 			PlayerController->SetInputMode(InputModeData);
 			PlayerController->SetShowMouseCursor(false);
 		}
+	}
+	if(ReturnButton && ReturnButton->OnClicked.IsBound())
+	{
+		ReturnButton->OnClicked.RemoveDynamic(this, &ThisClass::ReturnButtonClicked);
+	}
+	if(MultiPlayerSessionsSubsystem &&
+		MultiPlayerSessionsSubsystem->MultiPlayerOnDestroySessionComplete.IsBound())
+	{
+		MultiPlayerSessionsSubsystem->
+			MultiPlayerOnDestroySessionComplete.RemoveDynamic(this, &ThisClass::OnDestroySession);
 	}
 	RemoveFromParent();
 }
