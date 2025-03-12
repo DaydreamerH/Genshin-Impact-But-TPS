@@ -212,7 +212,7 @@ void APlayerCharacter::PostInitializeComponents()
 	}
 }
 
-void APlayerCharacter::Elim()
+void APlayerCharacter::Elim(bool bPlayerLeftGame)
 {
 	if(Combat && Combat->EquippedWeapon)
 	{
@@ -222,20 +222,15 @@ void APlayerCharacter::Elim()
 			Combat->SecondaryWeapon->Dropped();
 		}
 	}
-	
-	MulticastElim();
+	bLeftGame = bPlayerLeftGame;
+	MulticastElim(bPlayerLeftGame);
 	StartHealthRecovery();
 	StartShieldRecovery();
-	GetWorldTimerManager().SetTimer(
-		ElimTimer,
-		this,
-		&ThisClass::ElimTimerFinished,
-		ElimDelay
-	);
 }
 
-void APlayerCharacter::MulticastElim_Implementation()
+void APlayerCharacter::MulticastElim_Implementation(bool bPlayerLeftGame)
 {
+	bLeftGame = bPlayerLeftGame;
 	if(PlayerController)
 	{
 		PlayerController->SetHUDWeaponAmmo(0);
@@ -254,15 +249,25 @@ void APlayerCharacter::MulticastElim_Implementation()
 	{
 		ShowSniperScopeWidget(false);
 	}
+	GetWorldTimerManager().SetTimer(
+		ElimTimer,
+		this,
+		&ThisClass::ElimTimerFinished,
+		ElimDelay
+	);
 }
 
 void APlayerCharacter::ElimTimerFinished()
 {
-	if(AShootGameMode* ShootGameMode = GetWorld()->GetAuthGameMode<AShootGameMode>())
+	if(AShootGameMode* ShootGameMode = GetWorld()->GetAuthGameMode<AShootGameMode>();
+		 ShootGameMode && !bLeftGame)
 	{
 		ShootGameMode->RequestRespawn(this, PlayerController);
 	}
-	
+	else if(bLeftGame && IsLocallyControlled())
+	{
+		OnLeftGame.Broadcast();
+	}
 }
 
 void APlayerCharacter::BeginPlay()
@@ -962,6 +967,17 @@ AWeapon* APlayerCharacter::GetEuippedWeapon() const
 {
 	if(Combat == nullptr)return nullptr;
 	return Combat->EquippedWeapon;
+}
+
+void APlayerCharacter::ServerLeaveGame_Implementation()
+{
+	MyPlayerState = MyPlayerState == nullptr ?
+		GetPlayerState<AMyPlayerState>() : MyPlayerState;
+	if(AShootGameMode* ShootGameMode = GetWorld()->GetAuthGameMode<AShootGameMode>();
+		ShootGameMode && MyPlayerState)
+	{
+		ShootGameMode->PlayerLeftGame(MyPlayerState);
+	}
 }
 
 void APlayerCharacter::StartHealthRecovery()

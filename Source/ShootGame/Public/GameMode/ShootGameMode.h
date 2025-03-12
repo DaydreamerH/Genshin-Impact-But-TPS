@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
+#include "Player/MyPlayerState.h"
 #include "ShootGameMode.generated.h"
 
 namespace MatchState
@@ -33,7 +34,7 @@ public:
 		class AMyPlayerController* VictimController,
 		class AMyPlayerController* AttackController);
 	virtual void RequestRespawn(class ACharacter* ElimmedCharacter, AController* ElimmedController);
-
+	void PlayerLeftGame(AMyPlayerState* PlayerLeaving);
 	UPROPERTY(EditDefaultsOnly)
 	float WarmUpTime = 10.f;
 	UPROPERTY(EditDefaultsOnly)

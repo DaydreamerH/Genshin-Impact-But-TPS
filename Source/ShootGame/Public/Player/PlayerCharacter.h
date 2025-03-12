@@ -10,6 +10,8 @@
 #include "Components/CombatStates.h"
 #include "PlayerCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeftGame);
+
 UCLASS()
 class SHOOTGAME_API APlayerCharacter : public ACharacter
 {
@@ -32,10 +34,10 @@ public:
 
 	virtual void PostInitializeComponents() override;
 
-	void Elim(); // 只在服务器上
+	void Elim(bool bPlayerLeftGame); // 只在服务器上
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastElim();
+	void MulticastElim(bool bPlayerLeftGame);
 
 	FTimerHandle ElimTimer;
 	FTimerHandle HealthRecoveryTimerHandle;
@@ -48,6 +50,11 @@ public:
 
 	UPROPERTY()
 	TMap<FName, class UBoxComponent*> HitCollisionBoxes;
+
+	UFUNCTION(Server, Reliable)
+	void ServerLeaveGame();
+
+	FOnLeftGame OnLeftGame;
 protected:
 	virtual void BeginPlay() override;
 
@@ -282,6 +289,7 @@ private:
 	class AMyPlayerController* PlayerController;
 
 	bool bElimmed = false;
+	bool bLeftGame = false;
 
 	void StartHealthRecovery();
 	UFUNCTION()

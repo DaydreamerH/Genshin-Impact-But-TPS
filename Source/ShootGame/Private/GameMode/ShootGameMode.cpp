@@ -9,6 +9,7 @@
 #include "Player/MyPlayerState.h"
 #include "Player/PlayerCharacter.h"
 #include "PlayerController/MyPlayerController.h"
+#include "Player/MyPlayerState.h"
 
 namespace MatchState
 {
@@ -86,8 +87,8 @@ void AShootGameMode::PlayerEliminated(APlayerCharacter* EliminatedCharacter, AMy
 	AMyPlayerState* VictimPlayerState = VictimController ? Cast<AMyPlayerState>(VictimController->PlayerState):nullptr;
 
 
-	AShootGameState* ShootGameState = GetGameState<AShootGameState>();
-	if(AttackerPlayerState && AttackerPlayerState!=VictimPlayerState
+	if(AShootGameState* ShootGameState = GetGameState<AShootGameState>();
+		AttackerPlayerState && AttackerPlayerState!=VictimPlayerState
 		&& ShootGameState)
 	{
 		AttackerPlayerState->AddToScore(1.f);
@@ -101,7 +102,7 @@ void AShootGameMode::PlayerEliminated(APlayerCharacter* EliminatedCharacter, AMy
 	
 	if(EliminatedCharacter)
 	{
-		EliminatedCharacter->Elim();
+		EliminatedCharacter->Elim(false);
 	}
 }
 
@@ -118,5 +119,19 @@ void AShootGameMode::RequestRespawn(ACharacter* ElimmedCharacter, AController* E
 		UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), PlayerStarts);
 		int32 Selection = FMath::RandRange(0, PlayerStarts.Num()-1);
 		RestartPlayerAtPlayerStart(ElimmedController, PlayerStarts[Selection]);
+	}
+}
+
+void AShootGameMode::PlayerLeftGame(AMyPlayerState* PlayerLeaving)
+{
+	if(AShootGameState* ShootGameState = GetGameState<AShootGameState>();
+		ShootGameState && ShootGameState->TopScoringPlayers.Contains(PlayerLeaving))
+	{
+		ShootGameState->TopScoringPlayers.Remove(PlayerLeaving);
+	}
+	if(APlayerCharacter* CharacterLeaving =
+		Cast<APlayerCharacter>(PlayerLeaving->GetPawn()))
+	{
+		CharacterLeaving->Elim(true);
 	}
 }
