@@ -602,6 +602,12 @@ void UCombatComponent::OnRep_CombatState()
 			ShowGrenade(true);
 		}
 		break;
+	case ECombatState::ECS_SwapingWeapons:
+		if(Character && !Character->IsLocallyControlled())
+		{
+			Character->PlaySwapMontage();
+		}
+		break;
 	default:
 		break;		
 	}
@@ -673,6 +679,28 @@ void UCombatComponent::FinishReloading()
 		CombatState = ECombatState::ECS_Unoccupied;
 		UpdateAmmoValue();
 	}
+}
+
+void UCombatComponent::FinishSwap()
+{
+	if(Character && Character->HasAuthority())
+	{
+		CombatState = ECombatState::ECS_Unoccupied;
+	}
+}
+
+void UCombatComponent::FinishSwapAttachWeapons()
+{
+	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+	AttachActorToRightHand(EquippedWeapon);
+	EquippedWeapon->SetHUDAmmo();
+	UpdateCarriedAmmo();
+	PlayEquipWeaponSound(EquippedWeapon);
+	ZoomedFOV = EquippedWeapon->GetZoomedFOV();
+	ZoomInterpSpeed = EquippedWeapon->GetZoomInterpSpeed();
+	
+	SecondaryWeapon->SetWeaponState(EWeaponState::EWS_EquippedSecondary);
+	AttachActorToBackpack(SecondaryWeapon);
 }
 
 void UCombatComponent::JumpToShotGunEnd()
@@ -835,20 +863,14 @@ void UCombatComponent::Reload()
 
 void UCombatComponent::SwapWeapons()
 {
+	if(CombatState != ECombatState::ECS_Unoccupied || Character == nullptr)return;
+	Character->PlaySwapMontage();
+	CombatState = ECombatState::ECS_SwapingWeapons;
+	
 	AWeapon* LastEquippedWeapon = EquippedWeapon;
 	EquippedWeapon = SecondaryWeapon;
 	SecondaryWeapon = LastEquippedWeapon;
-
-	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
-	AttachActorToRightHand(EquippedWeapon);
-	EquippedWeapon->SetHUDAmmo();
-	UpdateCarriedAmmo();
-	PlayEquipWeaponSound(EquippedWeapon);
-	ZoomedFOV = EquippedWeapon->GetZoomedFOV();
-	ZoomInterpSpeed = EquippedWeapon->GetZoomInterpSpeed();
 	
-	SecondaryWeapon->SetWeaponState(EWeaponState::EWS_EquippedSecondary);
-	AttachActorToBackpack(SecondaryWeapon);
 }
 
 void UCombatComponent::ServerReload_Implementation()

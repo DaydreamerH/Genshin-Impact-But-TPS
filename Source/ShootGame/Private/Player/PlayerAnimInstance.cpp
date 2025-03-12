@@ -59,7 +59,8 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	AO_Pitch = PlayerCharacter->GetAO_Pitch();
 
 	bUseFABRIK = PlayerCharacter->GetCombatState() != ECombatState::ECS_Reloading
-		&& PlayerCharacter->GetCombatState() != ECombatState::ECS_TossGrenade;
+		&& PlayerCharacter->GetCombatState() != ECombatState::ECS_TossGrenade
+		&& PlayerCharacter->GetCombatState() != ECombatState::ECS_SwapingWeapons;
 
 	if(!bUseFABRIK && PlayerCharacter->IsLocallyControlled()
 		&& PlayerCharacter->GetCombatState() == ECombatState::ECS_Reloading)

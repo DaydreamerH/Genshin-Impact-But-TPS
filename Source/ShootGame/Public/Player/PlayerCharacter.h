@@ -243,6 +243,8 @@ private:
 	UAnimMontage* ReloadMontage;
 	UPROPERTY(EditAnywhere, Category=Combat)
 	UAnimMontage* TossGrenadeMontage;
+	UPROPERTY(EditAnywhere, Category=Combat)
+	UAnimMontage* SwapMontage;
 	
 	float CurrentRadius;
 
@@ -313,6 +315,7 @@ public:
 	void PlayElimMontage() const;
 	void PlayReloadMontage() const;
 	void PlayTossGrenadeMontage() const;
+	void PlaySwapMontage() const;
 	
 	FVector GetHitTarget() const;
 

@@ -428,8 +428,13 @@ void APlayerCharacter::OnActionTossGrenade(const FInputActionValue& InputActionV
 
 void APlayerCharacter::OnActionSwapWeapons(const FInputActionValue& InputActionValue)
 {
-	if(bDisableGameplay || !Combat->CouldSwapWeapons())return;
+	if(bDisableGameplay || Combat==nullptr || !Combat->CouldSwapWeapons())return;
 	ServerOnActionSwapWeapons();
+	if(!HasAuthority())
+	{
+		PlaySwapMontage();
+		Combat->CombatState = ECombatState::ECS_SwapingWeapons;
+	}
 }
 
 void APlayerCharacter::AimOffset(float DeltaTime)
@@ -667,11 +672,17 @@ void APlayerCharacter::PlayReloadMontage() const
 
 void APlayerCharacter::PlayTossGrenadeMontage() const
 {
-	UE_LOG(LogTemp, Log, TEXT("Play Montage"));
 	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && TossGrenadeMontage)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Ready Play Montage"));
-		UE_LOG(LogTemp,Log,TEXT("%f"), AnimInstance->Montage_Play(TossGrenadeMontage));
+		AnimInstance->Montage_Play(TossGrenadeMontage);
+	}
+}
+
+void APlayerCharacter::PlaySwapMontage() const
+{
+	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && TossGrenadeMontage)
+	{
+		AnimInstance->Montage_Play(SwapMontage);
 	}
 }
 
