@@ -38,16 +38,32 @@ public:
 	
 	void AddCharacterOverlay();
 	void AddAnnouncement();
+	void AddElimAnnouncement(FString Attacker, FString Victim);
 protected:
 	virtual void BeginPlay() override;
 	
 private:
+	UPROPERTY()
+	class APlayerController* OwingPlayer;
+	
 	FHUDPackage HUDPackage;
 
 	void DrawCrosshair(UTexture2D* Texture, FVector2d ViewportCenter, FVector2d Spread);
 
 	UPROPERTY(EditAnywhere)
 	float CrosshairSpreadMax = 16.f;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UElimAnnouncement> ElimAnnouncementClass;
+
+	UPROPERTY(EditAnywhere)
+	float ElimAnnouncementTime = 3.f;
+
+	UFUNCTION()
+	void ElimAnnouncementTimerFinished(UElimAnnouncement* MsgToRemove);
+
+	UPROPERTY()
+	TArray<UElimAnnouncement*> ElimMsgs;
 public:
 	FORCEINLINE void SetHUDPackage(const FHUDPackage& Package){ HUDPackage = Package; }
 };

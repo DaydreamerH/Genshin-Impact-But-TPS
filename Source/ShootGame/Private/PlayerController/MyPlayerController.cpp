@@ -497,6 +497,23 @@ void AMyPlayerController::ShowBackToMainMenu()
 	}
 }
 
+void AMyPlayerController::BroadcastElim(APlayerState* Attacker, APlayerState* Victim)
+{
+	ClientElimAnnouncement(Attacker, Victim);
+}
+
+void AMyPlayerController::ClientElimAnnouncement_Implementation(APlayerState* Attacker, APlayerState* Victim)
+{
+	if(Attacker && Victim)
+	{
+		PlayerHUD = PlayerHUD == nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+		if(PlayerHUD)
+		{
+			PlayerHUD->AddElimAnnouncement(Attacker->GetPlayerName(), Victim->GetPlayerName());
+		}
+	}
+}
+
 void AMyPlayerController::ClientJoinMidgame_Implementation
 	(FName StateOfMatch, float Warmup, float Match, float StartingTime, float Cooldown)
 {

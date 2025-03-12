@@ -39,6 +39,8 @@ public:
 	FHighPingDelegate HighPingDelegate;
 
 	void ShowBackToMainMenu();
+
+	void BroadcastElim(APlayerState* Attacker, APlayerState* Victim);
 protected:
 	virtual void BeginPlay() override;
 	void SetHUDTime();
@@ -70,6 +72,9 @@ protected:
 	void HighPingWarning();
 	void StopHighPingWarning();
 	void CheckPing(float DeltaSeconds);
+
+	UFUNCTION(Client, Reliable)
+	void ClientElimAnnouncement(APlayerState* Attacker, APlayerState* Victim);
 private:
 	UPROPERTY(EditAnywhere, Category=HUD)
 	TSubclassOf<class UUserWidget> BackToMainMenuWidget;

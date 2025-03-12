@@ -4,13 +4,16 @@
 #include "HUD/PlayerHUD.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
+#include "Components/CanvasPanelSlot.h"
+#include "Components/HorizontalBox.h"
 #include "HUD/Announcement.h"
 #include "HUD/CharacterOverlay.h"
+#include "HUD/ElimAnnouncement.h"
 
 void APlayerHUD::DrawHUD()
 {
 	Super::DrawHUD();
-
 	
 	FVector2d ViewportSize;
 	if(GEngine)
@@ -55,8 +58,8 @@ void APlayerHUD::BeginPlay()
 
 void APlayerHUD::AddCharacterOverlay()
 {
-	APlayerController* PlayerController = GetOwningPlayerController();
-	if(PlayerController && CharacterOverlayClass)
+	if(APlayerController* PlayerController = GetOwningPlayerController();
+		PlayerController && CharacterOverlayClass)
 	{
 		CharacterOverlay = CreateWidget<UCharacterOverlay>(PlayerController, CharacterOverlayClass);
 		CharacterOverlay->AddToViewport();
@@ -65,11 +68,60 @@ void APlayerHUD::AddCharacterOverlay()
 
 void APlayerHUD::AddAnnouncement()
 {
-	APlayerController* PlayerController = GetOwningPlayerController();
-	if(PlayerController && AnnouncementClass)
+	if(APlayerController* PlayerController
+		= GetOwningPlayerController(); PlayerController && AnnouncementClass)
 	{
 		Announcement = CreateWidget<UAnnouncement>(PlayerController, AnnouncementClass);
 		Announcement->AddToViewport();
+	}
+}
+
+void APlayerHUD::AddElimAnnouncement(FString Attacker, FString Victim)
+{
+	OwingPlayer = OwingPlayer == nullptr?GetOwningPlayerController():OwingPlayer;
+	if(OwingPlayer && ElimAnnouncementClass)
+	{
+		if(UElimAnnouncement* ElimAnnouncement
+			= CreateWidget<UElimAnnouncement>(OwingPlayer, ElimAnnouncementClass))
+		{
+			ElimAnnouncement->SetElimAnnouncementText(Attacker, Victim);
+			ElimAnnouncement->AddToViewport();
+
+			for(auto Msg:ElimMsgs)
+			{
+				if(Msg && Msg->AnnouncementBox)
+				{
+					if(UCanvasPanelSlot* CanvasPanelSlot =
+						UWidgetLayoutLibrary::SlotAsCanvasSlot(Msg->AnnouncementBox))
+					{
+						const FVector2d Position = CanvasPanelSlot->GetPosition();
+						const FVector2d NewPosition(
+							CanvasPanelSlot->GetPosition().X,
+							Position.Y + CanvasPanelSlot->GetSize().Y);
+						CanvasPanelSlot->SetPosition(NewPosition);
+					}
+					
+				}
+			}
+
+			
+			
+			ElimMsgs.Add(ElimAnnouncement);
+			FTimerHandle ElimMsgTimer;
+			FTimerDelegate ElimMsgDelegate;
+			ElimMsgDelegate.BindUFunction(this,
+				FName("ElimAnnouncementTimerFinished"),
+				ElimAnnouncement);
+			GetWorldTimerManager().SetTimer(ElimMsgTimer, ElimMsgDelegate, ElimAnnouncementTime, false);
+		}
+	}
+}
+
+void APlayerHUD::ElimAnnouncementTimerFinished(UElimAnnouncement* MsgToRemove)
+{
+	if(MsgToRemove)
+	{
+		MsgToRemove->RemoveFromParent();
 	}
 }
 
@@ -95,3 +147,5 @@ void APlayerHUD::DrawCrosshair(UTexture2D* Texture, FVector2d ViewportCenter, FV
 		FLinearColor::White
 	);
 }
+
+

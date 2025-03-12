@@ -104,6 +104,15 @@ void AShootGameMode::PlayerEliminated(APlayerCharacter* EliminatedCharacter, AMy
 	{
 		EliminatedCharacter->Elim(false);
 	}
+
+	for(FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		if(AMyPlayerController* PlayerController = Cast<AMyPlayerController>(*It);
+			PlayerController && AttackerPlayerState && VictimPlayerState)
+		{
+			PlayerController->BroadcastElim(AttackerPlayerState, VictimPlayerState);
+		}
+	}
 }
 
 void AShootGameMode::RequestRespawn(ACharacter* ElimmedCharacter, AController* ElimmedController)
