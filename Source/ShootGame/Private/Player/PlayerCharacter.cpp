@@ -273,7 +273,16 @@ void APlayerCharacter::ElimTimerFinished()
 
 void APlayerCharacter::SetTeamColor(const ETeam Team)
 {
-	switch (Team)
+	if(GetWorld()->GetFirstPlayerController()->GetPlayerState<AMyPlayerState>()->GetTeam() == Team)
+	{
+		GetMesh()->SetOverlayMaterial(FriendMat);
+	}
+	else
+	{
+		GetMesh()->SetOverlayMaterial(EnemyMat);
+	}
+	
+	/*switch (Team)
 	{
 	case ETeam::ET_RedTeam:
 		if(EnemyMat && GetMesh())
@@ -289,7 +298,7 @@ void APlayerCharacter::SetTeamColor(const ETeam Team)
 		break;
 	default:
 		break;
-	}
+	}*/
 }
 
 void APlayerCharacter::BeginPlay()
@@ -587,6 +596,7 @@ void APlayerCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UD
 {
 	if(bElimmed) return;
 
+	AShootGameMode* ShootGameMode = GetWorld()->GetAuthGameMode<AShootGameMode>();
 	float DamageToHealth = Damage;
 	if(Shield > 0.f)
 	{
@@ -611,7 +621,7 @@ void APlayerCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UD
 
 	if(Health <= 0.f)
 	{
-		if(AShootGameMode* ShootGameMode = GetWorld()->GetAuthGameMode<AShootGameMode>())
+		if(ShootGameMode)
 		{
 			if((PlayerController = PlayerController == nullptr ? Cast<AMyPlayerController>(GetController()):PlayerController))
 			{
