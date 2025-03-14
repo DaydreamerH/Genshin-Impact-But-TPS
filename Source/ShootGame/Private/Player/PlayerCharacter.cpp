@@ -644,7 +644,10 @@ void APlayerCharacter::PollInit()
 		{
 			MyPlayerState->AddToScore(0.f);
 			MyPlayerState->AddToDefeats(0);
-			SetTeamColor(MyPlayerState->GetTeam());
+			if(!IsLocallyControlled())
+			{
+				SetTeamColor(MyPlayerState->GetTeam());
+			}
 		}
 		
 	}
