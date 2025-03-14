@@ -593,9 +593,11 @@ void ULagCompensationComponent::ServerScoreRequest_Implementation(APlayerCharact
 
 	if(HitCharacter && DamageCauser && Character && Confirm.bHitConfirmed)
 	{
+		const float DamageToCause = Confirm.bHeadShot ?
+			DamageCauser->GetHeadShotDamage() : DamageCauser->GetDamage();
 		UGameplayStatics::ApplyDamage(
 			HitCharacter,
-			DamageCauser->GetDamage(),
+			DamageToCause,
 			Character->Controller,
 			DamageCauser,
 			UDamageType::StaticClass()
@@ -616,13 +618,13 @@ void ULagCompensationComponent::ServerShotGunScoreRequest_Implementation(const T
 		float TotalDamage = 0.f;
 		if(Confirm.HeadShots.Contains(HitCharacter))
 		{
-			TotalDamage += Confirm.HeadShots[HitCharacter]*DamageCauser->GetDamage();
+			TotalDamage += Confirm.HeadShots[HitCharacter]*DamageCauser->GetHeadShotDamage();
 		}
 		if(Confirm.BodyShots.Contains(HitCharacter))
 		{
 			TotalDamage += Confirm.BodyShots[HitCharacter]*DamageCauser->GetDamage();	
 		}
-		UE_LOG(LogTemp, Log, TEXT("%f"),TotalDamage);
+		
 		if(HitCharacter && Character && Character->Controller)
 		{
 			UGameplayStatics::ApplyDamage(
@@ -643,9 +645,11 @@ void ULagCompensationComponent::ServerProjectileScoreRequest_Implementation(APla
 
 	if(HitCharacter && Character && Confirm.bHitConfirmed && DamageCauser)
 	{
+		const float DamageToCause = Confirm.bHeadShot ?
+			DamageCauser->HeadShotDamage : DamageCauser->Damage;
 		UGameplayStatics::ApplyDamage(
 			HitCharacter,
-			DamageCauser->Damage,
+			DamageToCause,
 			Character->Controller,
 			DamageCauser,
 			UDamageType::StaticClass()
