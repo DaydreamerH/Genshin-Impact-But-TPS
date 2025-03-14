@@ -338,7 +338,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	HideCamera();
 	PollInit();
 
-	// DropShield(DeltaTime);
+	DropShield(DeltaTime);
 }
 
 void APlayerCharacter::OnActionMoveForward(const FInputActionValue& InputActionValue)
@@ -863,6 +863,7 @@ void APlayerCharacter::OnRep_Health(float LastHealth)
 
 void APlayerCharacter::DropShield(float DeltaTime)
 {
+	if(!HasAuthority())return;
 	if(Shield <= 0.f)return;
 	const float AmountShieldToDrop = DeltaTime*ShieldDropEverySecond;
 	Shield = FMath::Clamp(Shield - AmountShieldToDrop, 0.f, MaxShield);
