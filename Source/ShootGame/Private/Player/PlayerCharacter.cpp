@@ -23,6 +23,7 @@
 #include "PlayerController/MyPlayerController.h"
 #include "ShootGame/ShootGame.h"
 #include "Sound/SoundCue.h"
+#include "Tracks/MovieSceneMaterialTrack.h"
 #include "Weapon/Weapon.h"
 
 APlayerCharacter::APlayerCharacter()
@@ -267,6 +268,27 @@ void APlayerCharacter::ElimTimerFinished()
 	else if(bLeftGame && IsLocallyControlled())
 	{
 		OnLeftGame.Broadcast();
+	}
+}
+
+void APlayerCharacter::SetTeamColor(const ETeam Team)
+{
+	switch (Team)
+	{
+	case ETeam::ET_RedTeam:
+		if(EnemyMat && GetMesh())
+		{
+			GetMesh()->SetOverlayMaterial(EnemyMat);
+		}
+		break;
+	case ETeam::ET_BlueTeam:
+		if(EnemyMat && GetMesh())
+		{
+			GetMesh()->SetOverlayMaterial(FriendMat);
+		}
+		break;
+	default:
+		break;
 	}
 }
 
@@ -612,6 +634,7 @@ void APlayerCharacter::PollInit()
 		{
 			MyPlayerState->AddToScore(0.f);
 			MyPlayerState->AddToDefeats(0);
+			SetTeamColor(MyPlayerState->GetTeam());
 		}
 		
 	}

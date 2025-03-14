@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "team.h"
 #include "TurningPlace.h"
 #include "GameFramework/Character.h"
 #include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/inputActionValue.h"
@@ -55,6 +56,9 @@ public:
 	void ServerLeaveGame();
 
 	FOnLeftGame OnLeftGame;
+
+	void SetTeamColor(ETeam Team);
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -306,6 +310,12 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	USoundCue* HealSound;
+
+	UPROPERTY(EditAnywhere)
+	UMaterialInstance* FriendMat;
+
+	UPROPERTY(EditAnywhere)
+	UMaterialInstance* EnemyMat;
 public:
 	void UpdateHUDHealth();
 	void UpdateHUDShield();
