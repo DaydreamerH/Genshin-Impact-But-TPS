@@ -45,6 +45,9 @@ public:
 	float CooldownTime = 10.f;
 
 	FORCEINLINE float GetCountdownTime() const {return CountDownTime;}
+
+	virtual float CalculateDamage(AController* Attacker, AController* Victim, float BaseDamage);
+	
 private:
 	float CountDownTime = 0.f;
 	

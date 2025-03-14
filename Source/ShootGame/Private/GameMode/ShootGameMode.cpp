@@ -144,3 +144,8 @@ void AShootGameMode::PlayerLeftGame(AMyPlayerState* PlayerLeaving)
 		CharacterLeaving->Elim(true);
 	}
 }
+
+float AShootGameMode::CalculateDamage(AController* Attacker, AController* Victim, float BaseDamage)
+{
+	return BaseDamage;
+}

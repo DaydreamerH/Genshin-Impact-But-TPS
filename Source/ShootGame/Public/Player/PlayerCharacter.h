@@ -9,6 +9,7 @@
 #include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/inputActionValue.h"
 #include "Components/CombatComponent.h"
 #include "Components/CombatStates.h"
+#include "GameMode/ShootGameMode.h"
 #include "PlayerCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeftGame);
@@ -316,6 +317,10 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	UMaterialInstance* EnemyMat;
+
+	UPROPERTY()
+	AShootGameMode* ShootGameMode;
+	
 public:
 	void UpdateHUDHealth();
 	void UpdateHUDShield();

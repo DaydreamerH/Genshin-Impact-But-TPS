@@ -260,8 +260,9 @@ void APlayerCharacter::MulticastElim_Implementation(bool bPlayerLeftGame)
 
 void APlayerCharacter::ElimTimerFinished()
 {
-	if(AShootGameMode* ShootGameMode = GetWorld()->GetAuthGameMode<AShootGameMode>();
-		 ShootGameMode && !bLeftGame)
+	ShootGameMode = ShootGameMode == nullptr ?
+		GetWorld()->GetAuthGameMode<AShootGameMode>() : ShootGameMode;
+	if(ShootGameMode && !bLeftGame)
 	{
 		ShootGameMode->RequestRespawn(this, PlayerController);
 	}
@@ -594,9 +595,14 @@ void APlayerCharacter::Jump()
 void APlayerCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UDamageType* DamageType,
 	AController* InstigatorController, AActor* DamageCauser)
 {
-	if(bElimmed) return;
 
-	AShootGameMode* ShootGameMode = GetWorld()->GetAuthGameMode<AShootGameMode>();
+	ShootGameMode = ShootGameMode == nullptr ?
+		GetWorld()->GetAuthGameMode<AShootGameMode>() : ShootGameMode;
+	if(bElimmed || ShootGameMode == nullptr) return;
+
+	Damage = ShootGameMode->CalculateDamage
+	(InstigatorController, Controller, Damage);
+	
 	float DamageToHealth = Damage;
 	if(Shield > 0.f)
 	{
@@ -617,7 +623,11 @@ void APlayerCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UD
 	
 	UpdateHUDHealth();
 	UpdateHUDShield();
-	PlayHitReactMontage();
+	
+	if(Damage<1.f)
+	{
+		PlayHitReactMontage();
+	}
 
 	if(Health <= 0.f)
 	{
@@ -845,7 +855,7 @@ void APlayerCharacter::HideCamera()
 void APlayerCharacter::OnRep_Health(float LastHealth)
 {
 	UpdateHUDHealth();
-	if(Health<LastHealth)
+	if(LastHealth - Health > 1.f)
 	{
 		PlayHitReactMontage();
 	}
@@ -854,7 +864,7 @@ void APlayerCharacter::OnRep_Health(float LastHealth)
 void APlayerCharacter::DropShield(float DeltaTime)
 {
 	if(Shield <= 0.f)return;
-	float AmountShieldToDrop = DeltaTime*ShieldDropEverySecond;
+	const float AmountShieldToDrop = DeltaTime*ShieldDropEverySecond;
 	Shield = FMath::Clamp(Shield - AmountShieldToDrop, 0.f, MaxShield);
 	UpdateHUDShield();
 }
@@ -862,7 +872,7 @@ void APlayerCharacter::DropShield(float DeltaTime)
 void APlayerCharacter::OnRep_Shield(float LastShield)
 {
 	UpdateHUDShield();
-	if(Shield<LastShield)
+	if(LastShield - Shield >= 1.f)
 	{
 		PlayHitReactMontage();
 	}
@@ -1009,8 +1019,9 @@ void APlayerCharacter::ServerLeaveGame_Implementation()
 {
 	MyPlayerState = MyPlayerState == nullptr ?
 		GetPlayerState<AMyPlayerState>() : MyPlayerState;
-	if(AShootGameMode* ShootGameMode = GetWorld()->GetAuthGameMode<AShootGameMode>();
-		ShootGameMode && MyPlayerState)
+	ShootGameMode = ShootGameMode == nullptr ?
+		GetWorld()->GetAuthGameMode<AShootGameMode>() : ShootGameMode;
+	if(ShootGameMode && MyPlayerState)
 	{
 		ShootGameMode->PlayerLeftGame(MyPlayerState);
 	}

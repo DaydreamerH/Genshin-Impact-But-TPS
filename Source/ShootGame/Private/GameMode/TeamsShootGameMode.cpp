@@ -79,3 +79,17 @@ void ATeamsShootGameMode::HandleMatchHasStarted()
 		}
 	}
 }
+
+float ATeamsShootGameMode::CalculateDamage(AController* Attacker, AController* Victim, float BaseDamage)
+{
+	const AMyPlayerState* AttackerState = Attacker->GetPlayerState<AMyPlayerState>();
+	const AMyPlayerState* VictimState = Victim->GetPlayerState<AMyPlayerState>();
+
+	if(AttackerState == nullptr || VictimState == nullptr)return BaseDamage;
+	
+	if(VictimState == AttackerState)return BaseDamage;
+
+	if(AttackerState->GetTeam() == VictimState->GetTeam())return 0.f;
+
+	return BaseDamage;
+}
