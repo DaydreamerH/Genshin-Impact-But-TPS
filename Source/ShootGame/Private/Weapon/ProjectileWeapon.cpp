@@ -40,6 +40,7 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 							SpawnParameters);
 						SpawnedProjectile->bUseServerSideRewind = false;
 						SpawnedProjectile->Damage = Damage;
+						SpawnedProjectile->HeadShotDamage = HeadShotDamage;
 					}
 					else
 					{	
@@ -65,6 +66,7 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 						SpawnedProjectile->InitialVelocity
 							= SpawnedProjectile->GetActorForwardVector() * SpawnedProjectile->InitialSpeed;
 						SpawnedProjectile->Damage = Damage;
+						SpawnedProjectile->HeadShotDamage = HeadShotDamage;
 					}
 					else
 					{

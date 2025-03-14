@@ -113,10 +113,12 @@ protected:
 	float DistanceToSphere = 800.f;
 	UPROPERTY(EditAnywhere, Category="Weapon Scatter")
 	float SphereRadius = 75.f;
-
-	// 射线武器没有子弹
+	
 	UPROPERTY(EditAnywhere)
 	float Damage = 20.f;
+
+	UPROPERTY(EditAnywhere)
+	float HeadShotDamage = 40.f;
 
 	UPROPERTY(Replicated, EditAnywhere)
 	bool bUseServerSideRewind = false;
@@ -190,4 +192,5 @@ public:
 	FORCEINLINE bool IsFull() const { return Ammo >= MagCapcitiy; }
 
 	FORCEINLINE float GetDamage() const { return Damage; }
+	FORCEINLINE float GetHeadShotDamage() const { return HeadShotDamage; }
 };
