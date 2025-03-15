@@ -3,8 +3,6 @@
 
 #include "PlayerController/MyPlayerController.h"
 
-#include "EnhancedInputComponent.h"
-#include "EnhancedInputSubsystems.h"
 #include "Components/CombatComponent.h"
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
@@ -20,6 +18,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/PlayerCharacter.h"
+#include "PlayerController/Announcement.h"
 
 void AMyPlayerController::SetHUDHealth(float Health, float MaxHealth)
 {
@@ -287,31 +286,19 @@ void AMyPlayerController::HandleCooldown()
 			PlayerHUD->Announcement->SetVisibility(ESlateVisibility::Visible);
 			if(PlayerHUD->Announcement->AnnouncementText)
 			{
-				FString AnnouncementText(TEXT("新的一轮即将开始"));
+				FString AnnouncementText = Announcement::NewMatchStartsIn;
 				PlayerHUD->Announcement->AnnouncementText->SetText(FText::FromString(AnnouncementText));
 			}
 
 			if(PlayerHUD->Announcement->InfoText)
 			{
-				AShootGameState* ShootGameState = Cast<AShootGameState>
-					(UGameplayStatics::GetGameState(this));
-				
-				if(ShootGameState)
+				if(AShootGameState* ShootGameState = Cast<AShootGameState>
+					(UGameplayStatics::GetGameState(this)))
 				{
 					TArray<APlayerState*> TopPlayers = ShootGameState->TopScoringPlayers;
-					FString InfoTextString;
-					if(TopPlayers.Num() == 0)
-					{
-						InfoTextString = FString(TEXT("无人得分，卡bug呢？"));
-					}
-					else
-					{
-						InfoTextString = FString::Printf(TEXT("胜利者是：\n"));
-						for(auto TiedPlayer:TopPlayers)
-						{
-							InfoTextString.Append(FString::Printf(TEXT("%s\n"), *TiedPlayer->GetPlayerName()));
-						}
-					}
+					FString InfoTextString = bShowTeamScores ?
+						GetTeamsInfoText(ShootGameState) : GetInfoText(TopPlayers);
+					
 					PlayerHUD->Announcement->InfoText->SetText(FText::FromString(InfoTextString));
 				}
 			}
@@ -502,6 +489,60 @@ void AMyPlayerController::OnRep_ShowTeamScores()
 	{
 		HideTeamScores();
 	}
+}
+
+FString AMyPlayerController::GetInfoText(const TArray<APlayerState*>& PlayerStates)
+{
+	FString InfoTextString;
+	if(PlayerStates.Num() == 0)
+	{
+		InfoTextString = *Announcement::ThereIsNoWinner;
+	}
+	else
+	{
+		InfoTextString = *Announcement::TheWinnerIs;
+		for(auto TiedPlayer:PlayerStates)
+		{
+			InfoTextString.Append(FString::Printf(TEXT("%s\n"), *TiedPlayer->GetPlayerName()));
+		}
+	}
+	return InfoTextString;
+}
+
+FString AMyPlayerController::GetTeamsInfoText(AShootGameState* ShootGameState)
+{
+	if(ShootGameState == nullptr)return FString();
+	FString InfoTextString;
+	int32 RedTeamScore = ShootGameState->RedTeamScore;
+	int32 BlueTeamScore = ShootGameState->BlueTeamScore;
+	ETeam MyTeam = GetPlayerState<AMyPlayerState>()->GetTeam();
+	if(RedTeamScore ==  BlueTeamScore)
+	{
+		InfoTextString = *Announcement::TeamTied;
+	}
+	else if(RedTeamScore > BlueTeamScore)
+	{
+		if(MyTeam == ETeam::ET_RedTeam)
+		{
+			InfoTextString = *Announcement::TeamWin;
+		}
+		else
+		{
+			InfoTextString = *Announcement::TeamLose;
+		}
+	}
+	else
+	{
+		if(MyTeam == ETeam::ET_RedTeam)
+		{
+			InfoTextString = *Announcement::TeamLose;
+		}
+		else
+		{
+			InfoTextString = *Announcement::TeamWin;
+		}
+	}
+	return InfoTextString;
 }
 
 void AMyPlayerController::ShowBackToMainMenu()

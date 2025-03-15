@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "GameState/ShootGameState.h"
+#include "Player/MyPlayerState.h"
 #include "MyPlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHighPingDelegate, bool, bHighPing);
@@ -86,6 +88,9 @@ protected:
 
 	UFUNCTION()
 	void OnRep_ShowTeamScores();
+
+	FString GetInfoText(const TArray<APlayerState*>& PlayerStates);
+	FString GetTeamsInfoText(AShootGameState* ShootGameState);
 private:
 	UPROPERTY(EditAnywhere, Category=HUD)
 	TSubclassOf<class UUserWidget> BackToMainMenuWidget;
