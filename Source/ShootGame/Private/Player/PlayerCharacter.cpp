@@ -495,7 +495,7 @@ void APlayerCharacter::OnActionQuit(const FInputActionValue& InputActionValue)
 
 void APlayerCharacter::AimOffset(float DeltaTime)
 {
-	if(Combat && Combat->EquippedWeapon==nullptr)return;
+	if(Combat && (Combat->EquippedWeapon==nullptr||Combat->bHoldingBomb))return;
 	FVector Velocity = GetVelocity();
 	Velocity.Z = 0.f;
 	float Speed = Velocity.Size();

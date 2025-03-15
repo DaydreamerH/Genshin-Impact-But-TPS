@@ -61,7 +61,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	bUseFABRIK = PlayerCharacter->GetCombatState() != ECombatState::ECS_Reloading
 		&& PlayerCharacter->GetCombatState() != ECombatState::ECS_TossGrenade
-		&& PlayerCharacter->GetCombatState() != ECombatState::ECS_SwapingWeapons;
+		&& PlayerCharacter->GetCombatState() != ECombatState::ECS_SwapingWeapons && !bHoldingBomb;
 
 	if(!bUseFABRIK && PlayerCharacter->IsLocallyControlled()
 		&& PlayerCharacter->GetCombatState() == ECombatState::ECS_Reloading)

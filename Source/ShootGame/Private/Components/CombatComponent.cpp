@@ -926,7 +926,9 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 void UCombatComponent::OnRep_HoldingBomb()
 {
-	if(bHoldingBomb && Character && Character->GetCharacterMovement() && Character->IsLocallyControlled())
+	if(bHoldingBomb
+		&& Character
+		&& Character->GetCharacterMovement() && Character->IsLocallyControlled())
 	{
 		Character->Crouch();
 		Character->GetCharacterMovement()->bOrientRotationToMovement = true;
