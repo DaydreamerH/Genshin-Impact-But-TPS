@@ -23,6 +23,7 @@ private:
 	int NextPlayerIndex;
 protected:
 	virtual void OnMatchStateSet() override;
+	bool bTeams = false;
 public:
 	
 	virtual void BeginPlay() override;

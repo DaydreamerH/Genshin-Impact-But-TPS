@@ -49,4 +49,10 @@ public:
 
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	UWidgetAnimation* HighPingAnimation;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* RedTeamScoreText;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* BlueTeamScoreText;
 };

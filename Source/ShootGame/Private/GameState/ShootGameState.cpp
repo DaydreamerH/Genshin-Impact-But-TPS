@@ -41,3 +41,13 @@ void AShootGameState::OnRep_RedTeamScore()
 void AShootGameState::OnRep_BlueTeamScore()
 {
 }
+
+void AShootGameState::RedTeamScores()
+{
+	++RedTeamScore;
+}
+
+void AShootGameState::BlueTeamScores()
+{
+	++BlueTeamScore;
+}

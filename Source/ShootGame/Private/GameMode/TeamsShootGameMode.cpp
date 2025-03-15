@@ -6,6 +6,11 @@
 #include "GameState/ShootGameState.h"
 #include "Kismet/GameplayStatics.h"
 
+ATeamsShootGameMode::ATeamsShootGameMode()
+{
+	bTeams = true;
+}
+
 void ATeamsShootGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);

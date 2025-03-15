@@ -14,7 +14,7 @@ class SHOOTGAME_API ATeamsShootGameMode : public AShootGameMode
 {
 	GENERATED_BODY()
 public:
-	
+	ATeamsShootGameMode();
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
 	virtual float CalculateDamage(AController* Attacker, AController* Victim, float BaseDamage) override;

@@ -29,9 +29,9 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void ReceivedPlayer() override;
 	virtual float GetServerTime();
-	void OnMatchStateSet(FName State);
+	void OnMatchStateSet(FName State, bool bTeams = false);
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	void HandleMatchHasStarted();
+	void HandleMatchHasStarted(bool bTeams = false);
 	void HandleCooldown();
 
 	float SingleTripTime = 0.f;
@@ -41,6 +41,11 @@ public:
 	void ShowBackToMainMenu();
 
 	void BroadcastElim(APlayerState* Attacker, APlayerState* Victim);
+
+	void HideTeamScores();
+	void InitTeamScores();
+	void SetHUDRedTeamScore(int32 RedScore);
+	void SetHUDBlueTeamScore(int32 BlueScore);
 protected:
 	virtual void BeginPlay() override;
 	void SetHUDTime();
@@ -75,6 +80,12 @@ protected:
 
 	UFUNCTION(Client, Reliable)
 	void ClientElimAnnouncement(APlayerState* Attacker, APlayerState* Victim);
+
+	UPROPERTY(ReplicatedUsing=OnRep_ShowTeamScores)
+	bool bShowTeamScores = false;
+
+	UFUNCTION()
+	void OnRep_ShowTeamScores();
 private:
 	UPROPERTY(EditAnywhere, Category=HUD)
 	TSubclassOf<class UUserWidget> BackToMainMenuWidget;

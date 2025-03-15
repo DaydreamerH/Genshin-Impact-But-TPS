@@ -219,13 +219,13 @@ float AMyPlayerController::GetServerTime()
 	return GetWorld()->GetTimeSeconds() + ClientServerDelta;
 }
 
-void AMyPlayerController::OnMatchStateSet(FName State)
+void AMyPlayerController::OnMatchStateSet(FName State, bool bTeams)
 {
 	MatchState = State;
 	
 	if(MatchState == MatchState::InProgress)
 	{
-		HandleMatchHasStarted();
+		HandleMatchHasStarted(bTeams);
 	}
 	else if(MatchState == MatchState::Cooldown)
 	{
@@ -238,16 +238,32 @@ void AMyPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AMyPlayerController, MatchState);
+	DOREPLIFETIME(AMyPlayerController, bShowTeamScores);
 }
 
-void AMyPlayerController::HandleMatchHasStarted()
+void AMyPlayerController::HandleMatchHasStarted(bool bTeams)
 {
+	if(HasAuthority())
+	{
+		bShowTeamScores = bTeams;
+	}
 	PlayerHUD = PlayerHUD ==nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
 	if(PlayerHUD)
 	{
 		if(PlayerHUD->Announcement)
 		{
 			PlayerHUD->Announcement->SetVisibility(ESlateVisibility::Hidden);
+		}
+		if(HasAuthority())
+		{
+			if(bTeams)
+			{
+				InitTeamScores();
+			}
+			else
+			{
+				HideTeamScores();
+			}
 		}
 		PlayerHUD->AddCharacterOverlay();
 	}
@@ -476,6 +492,18 @@ void AMyPlayerController::CheckPing(const float DeltaSeconds)
 	}
 }
 
+void AMyPlayerController::OnRep_ShowTeamScores()
+{
+	if(bShowTeamScores)
+	{
+		InitTeamScores();
+	}
+	else
+	{
+		HideTeamScores();
+	}
+}
+
 void AMyPlayerController::ShowBackToMainMenu()
 {
 	if(BackToMainMenuWidget == nullptr)return;
@@ -500,6 +528,53 @@ void AMyPlayerController::ShowBackToMainMenu()
 void AMyPlayerController::BroadcastElim(APlayerState* Attacker, APlayerState* Victim)
 {
 	ClientElimAnnouncement(Attacker, Victim);
+}
+
+void AMyPlayerController::HideTeamScores()
+{
+	PlayerHUD = PlayerHUD==nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+	if(PlayerHUD && PlayerHUD->CharacterOverlay &&
+		PlayerHUD->CharacterOverlay->RedTeamScoreText
+		&& PlayerHUD->CharacterOverlay->BlueTeamScoreText)
+	{
+		PlayerHUD->CharacterOverlay->RedTeamScoreText->SetText(FText());
+		PlayerHUD->CharacterOverlay->BlueTeamScoreText->SetText(FText());
+	}
+}
+
+void AMyPlayerController::InitTeamScores()
+{
+	PlayerHUD = PlayerHUD==nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+	if(PlayerHUD && PlayerHUD->CharacterOverlay &&
+		PlayerHUD->CharacterOverlay->RedTeamScoreText
+		&& PlayerHUD->CharacterOverlay->BlueTeamScoreText)
+	{
+		const FString Zero("0");
+		PlayerHUD->CharacterOverlay->RedTeamScoreText->SetText(FText::FromString(Zero));
+		PlayerHUD->CharacterOverlay->BlueTeamScoreText->SetText(FText::FromString(Zero));
+	}
+}
+
+void AMyPlayerController::SetHUDRedTeamScore(int32 RedScore)
+{
+	PlayerHUD = PlayerHUD==nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+	if(PlayerHUD && PlayerHUD->CharacterOverlay &&
+		PlayerHUD->CharacterOverlay->RedTeamScoreText)
+	{
+		const FString ScoreText = FString::Printf(TEXT("%d"), RedScore);
+		PlayerHUD->CharacterOverlay->RedTeamScoreText->SetText(FText::FromString(ScoreText));
+	}	
+}
+
+void AMyPlayerController::SetHUDBlueTeamScore(int32 BlueScore)
+{
+	PlayerHUD = PlayerHUD==nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+	if(PlayerHUD && PlayerHUD->CharacterOverlay &&
+		PlayerHUD->CharacterOverlay->BlueTeamScoreText)
+	{
+		const FString ScoreText = FString::Printf(TEXT("%d"), BlueScore);
+		PlayerHUD->CharacterOverlay->BlueTeamScoreText->SetText(FText::FromString(ScoreText));
+	}	
 }
 
 void AMyPlayerController::ClientElimAnnouncement_Implementation(APlayerState* Attacker, APlayerState* Victim)

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameState.h"
+#include "Player/MyPlayerState.h"
 #include "ShootGameState.generated.h"
 
 /**
@@ -31,7 +32,9 @@ public:
 	float BlueTeamScore = 0.f;
 	UFUNCTION()
 	void OnRep_BlueTeamScore();
-	
+
+	void RedTeamScores();
+	void BlueTeamScores();
 private:
 	float TopScore = 0.f;
 };

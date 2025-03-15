@@ -24,7 +24,7 @@ void AShootGameMode::OnMatchStateSet()
 	{
 		if(AMyPlayerController* PlayerController = Cast<AMyPlayerController>(*It))
 		{
-			PlayerController->OnMatchStateSet(MatchState);
+			PlayerController->OnMatchStateSet(MatchState, bTeams);
 		}
 	}
 
