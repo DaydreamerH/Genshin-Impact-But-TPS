@@ -215,12 +215,19 @@ void APlayerCharacter::PostInitializeComponents()
 
 void APlayerCharacter::Elim(bool bPlayerLeftGame)
 {
-	if(Combat && Combat->EquippedWeapon)
+	if(Combat)
 	{
-		Combat->EquippedWeapon->Dropped();
-		if(Combat->SecondaryWeapon)
+		if(Combat->EquippedWeapon)
 		{
-			Combat->SecondaryWeapon->Dropped();
+			Combat->EquippedWeapon->Dropped();
+			if(Combat->SecondaryWeapon)
+			{
+				Combat->SecondaryWeapon->Dropped();
+			}
+		}
+		if(Combat->bHoldingBomb)
+		{
+			Combat->EquippedBomb->Dropped();
 		}
 	}
 	bLeftGame = bPlayerLeftGame;
@@ -386,19 +393,19 @@ void APlayerCharacter::OnActionLookRight(const FInputActionValue& InputActionVal
 
 void APlayerCharacter::OnActionJump(const FInputActionValue& InputActionValue)
 {
-	if(bDisableGameplay)return;
+	if(bDisableGameplay || Combat == nullptr || Combat->bHoldingBomb)return;
 	Jump();
 }
 
 void APlayerCharacter::OnActionEquip(const FInputActionValue& InputActionValue)
 {
-	if(bDisableGameplay)return;
+	if(bDisableGameplay || Combat == nullptr || Combat->bHoldingBomb)return;
 	ServerOnActionEquip();
 }
 
 void APlayerCharacter::OnActionCrouch(const FInputActionValue& InputActionValue)
 {
-	if(bDisableGameplay)return;
+	if(bDisableGameplay || Combat == nullptr || Combat->bHoldingBomb)return;
 	if(bIsCrouched)
 	{
 		UnCrouch();
@@ -412,7 +419,7 @@ void APlayerCharacter::OnActionCrouch(const FInputActionValue& InputActionValue)
 
 void APlayerCharacter::OnActionAimPressed(const FInputActionValue& InputActionValue)
 {
-	if(bDisableGameplay)return;
+	if(bDisableGameplay || Combat == nullptr || Combat->bHoldingBomb)return;
 	if (Combat)
 	{
 		Combat->SetAiming(true);
@@ -421,7 +428,7 @@ void APlayerCharacter::OnActionAimPressed(const FInputActionValue& InputActionVa
 
 void APlayerCharacter::OnActionAimReleased(const FInputActionValue& InputActionValue)
 {
-	if(bDisableGameplay)return;
+	if(bDisableGameplay  || Combat == nullptr || Combat->bHoldingBomb)return;
 	if (Combat)
 	{
 		Combat->SetAiming(false);
@@ -430,7 +437,7 @@ void APlayerCharacter::OnActionAimReleased(const FInputActionValue& InputActionV
 
 void APlayerCharacter::OnActionFirePressed(const FInputActionValue& InputActionValue)
 {
-	if(bDisableGameplay)return;
+	if(bDisableGameplay || Combat == nullptr || Combat->bHoldingBomb)return;
 	if(Combat)
 	{
 		Combat->FireButtonPressed(true);
@@ -439,7 +446,7 @@ void APlayerCharacter::OnActionFirePressed(const FInputActionValue& InputActionV
 
 void APlayerCharacter::OnActionFireReleased(const FInputActionValue& InputActionValue)
 {
-	if(bDisableGameplay)return;
+	if(bDisableGameplay  || Combat == nullptr || Combat->bHoldingBomb)return;
 	if(Combat)
 	{
 		Combat->FireButtonPressed(false);
@@ -448,7 +455,7 @@ void APlayerCharacter::OnActionFireReleased(const FInputActionValue& InputAction
 
 void APlayerCharacter::OnActionReload(const FInputActionValue& InputActionValue)
 {
-	if(bDisableGameplay)return;
+	if(bDisableGameplay || Combat == nullptr || Combat->bHoldingBomb)return;
 	if(Combat && IsLocallyControlled())
 	{
 		Combat->Reload();
@@ -457,7 +464,7 @@ void APlayerCharacter::OnActionReload(const FInputActionValue& InputActionValue)
 
 void APlayerCharacter::OnActionTossGrenade(const FInputActionValue& InputActionValue)
 {
-	if(Combat)
+	if(Combat && !Combat->bHoldingBomb)
 	{
 		Combat->TossGrenade();
 	}
@@ -465,7 +472,7 @@ void APlayerCharacter::OnActionTossGrenade(const FInputActionValue& InputActionV
 
 void APlayerCharacter::OnActionSwapWeapons(const FInputActionValue& InputActionValue)
 {
-	if(bDisableGameplay || Combat==nullptr || !Combat->CouldSwapWeapons())return;
+	if(bDisableGameplay || Combat==nullptr || !Combat->CouldSwapWeapons() || Combat->bHoldingBomb)return;
 	ServerOnActionSwapWeapons();
 	if(!HasAuthority())
 	{

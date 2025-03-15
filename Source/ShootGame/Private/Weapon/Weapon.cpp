@@ -292,7 +292,6 @@ void AWeapon::Dropped()
 	OwnerPlayerCharacter=nullptr;
 	OwnerPlayerController=nullptr;
 	SetOwner(nullptr);
-	UE_LOG(LogTemp, Log, TEXT("WhenDropped: %d"), Ammo);
 }
 
 void AWeapon::OnRep_Owner()

@@ -809,11 +809,12 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 	{
 		bHoldingBomb = true;
 		Character->Crouch();
-		AttachBombToLeftHand(WeaponToEquip);
 		Character->GetCharacterMovement()->bOrientRotationToMovement = true;
 		Character->bUseControllerRotationYaw = false;
 		WeaponToEquip->SetWeaponState(EWeaponState::EWS_Equipped);
 		WeaponToEquip->SetOwner(Character);
+		AttachBombToLeftHand(WeaponToEquip);
+		EquippedBomb = WeaponToEquip;
 	}
 	else
 	{

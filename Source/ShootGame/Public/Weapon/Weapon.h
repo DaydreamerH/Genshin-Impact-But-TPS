@@ -38,7 +38,7 @@ public:
 	void ShowPickupWidget(bool bShowWidget);
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Fire(const FVector& HitTarget);
-	void Dropped();
+	virtual void Dropped();
 	virtual void OnRep_Owner() override;
 	void SetHUDAmmo();
 	void AddAmmo(int32 AmmoToAdd);

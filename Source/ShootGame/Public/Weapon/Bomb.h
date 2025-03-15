@@ -15,4 +15,8 @@ class SHOOTGAME_API ABomb : public AWeapon
 	GENERATED_BODY()
 public:
 	ABomb();
+	virtual void Dropped() override;
+protected:
+	virtual void OnEquipped() override;
+	virtual void OnDropped() override;
 };

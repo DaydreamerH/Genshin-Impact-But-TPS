@@ -120,6 +120,9 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_SecondaryWeapon)
 	AWeapon* SecondaryWeapon;
 
+	UPROPERTY(Replicated)
+	AWeapon* EquippedBomb;
+
 	UPROPERTY(ReplicatedUsing=OnRep_Aiming)
 	bool bAiming;
 
