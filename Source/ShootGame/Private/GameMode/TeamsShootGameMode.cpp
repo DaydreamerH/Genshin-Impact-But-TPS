@@ -5,6 +5,7 @@
 
 #include "GameState/ShootGameState.h"
 #include "Kismet/GameplayStatics.h"
+#include "PlayerController/MyPlayerController.h"
 
 ATeamsShootGameMode::ATeamsShootGameMode()
 {
@@ -98,3 +99,28 @@ float ATeamsShootGameMode::CalculateDamage(AController* Attacker, AController* V
 
 	return BaseDamage;
 }
+
+void ATeamsShootGameMode::PlayerEliminated(APlayerCharacter* EliminatedCharacter,
+	AMyPlayerController* VictimController, AMyPlayerController* AttackController)
+{
+	Super::PlayerEliminated(EliminatedCharacter, VictimController, AttackController);
+
+	AShootGameState* TGameState =
+		Cast<AShootGameState>(UGameplayStatics::GetGameState(this));
+	AMyPlayerState* AttackerPlayerState = AttackController ?
+		Cast<AMyPlayerState>(AttackController->PlayerState) : nullptr;
+	AMyPlayerState* VictimPlayerState = VictimController ?
+		Cast<AMyPlayerState>(VictimController->PlayerState) : nullptr;
+	if(TGameState && AttackerPlayerState && VictimPlayerState)
+	{
+		if(AttackerPlayerState->GetTeam() == VictimPlayerState->GetTeam())return;
+		if(AttackerPlayerState->GetTeam() == ETeam::ET_RedTeam)
+		{
+			TGameState->RedTeamScores();
+		}
+		else if(AttackerPlayerState->GetTeam() == ETeam::ET_BlueTeam)
+		{
+			TGameState->BlueTeamScores();
+		}
+	}
+}	

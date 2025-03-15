@@ -5,6 +5,7 @@
 
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
+#include "PlayerController/MyPlayerController.h"
 
 void AShootGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -36,18 +37,39 @@ void AShootGameState::UpdateTopScore(APlayerState* ScoringPlayer)
 
 void AShootGameState::OnRep_RedTeamScore()
 {
+	if(AMyPlayerController* PlayerController
+		= Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController()))
+	{
+		PlayerController->SetHUDRedTeamScore(RedTeamScore);
+	}
 }
 
 void AShootGameState::OnRep_BlueTeamScore()
 {
+	if(AMyPlayerController* PlayerController
+		= Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController()))
+	{
+		PlayerController->SetHUDBlueTeamScore(RedTeamScore);
+	}
 }
 
 void AShootGameState::RedTeamScores()
 {
 	++RedTeamScore;
+
+	if(AMyPlayerController* PlayerController
+		= Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController()))
+	{
+		PlayerController->SetHUDRedTeamScore(RedTeamScore);
+	}
 }
 
 void AShootGameState::BlueTeamScores()
 {
 	++BlueTeamScore;
+	if(AMyPlayerController* PlayerController
+		= Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController()))
+	{
+		PlayerController->SetHUDBlueTeamScore(RedTeamScore);
+	}
 }
