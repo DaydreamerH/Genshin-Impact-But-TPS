@@ -17,6 +17,9 @@ enum class EWeaponState : uint8
 	EWS_MAX UMETA(DisplayName = "DefaultMax")
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponStateChanged, EWeaponState, WeaponState);
+
+
 UENUM(BlueprintType)
 enum class EFireType: uint8
 {
@@ -57,6 +60,8 @@ public:
 
 	UFUNCTION()
 	FVector TraceEndWithScatter(const FVector& HitTarget) const;
+
+	FOnWeaponStateChanged OnWeaponStateChanged;
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnWeaponStateSet();
@@ -136,7 +141,7 @@ private:
 	class USphereComponent* AreaSphere;
 
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = "OnRep_WeaponState", Category="WeaponProperties")
-	EWeaponState WeaponState;
+	EWeaponState WeaponState = EWeaponState::EWS_Initial;
 
 	UFUNCTION()
 	void OnRep_WeaponState();

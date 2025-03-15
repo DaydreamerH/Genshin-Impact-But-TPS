@@ -148,6 +148,8 @@ void AWeapon::SetWeaponState(EWeaponState State)
 {
 	WeaponState = State;
 	OnWeaponStateSet();
+
+	OnWeaponStateChanged.Broadcast(WeaponState);
 }
 
 void AWeapon::OnWeaponStateSet()
