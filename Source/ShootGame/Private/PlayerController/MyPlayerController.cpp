@@ -575,11 +575,11 @@ void AMyPlayerController::HideTeamScores()
 {
 	PlayerHUD = PlayerHUD==nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
 	if(PlayerHUD && PlayerHUD->CharacterOverlay &&
-		PlayerHUD->CharacterOverlay->RedTeamScoreText
-		&& PlayerHUD->CharacterOverlay->BlueTeamScoreText)
+		PlayerHUD->CharacterOverlay->EnemyTeamScoreText
+		&& PlayerHUD->CharacterOverlay->MyTeamScoreText)
 	{
-		PlayerHUD->CharacterOverlay->RedTeamScoreText->SetText(FText());
-		PlayerHUD->CharacterOverlay->BlueTeamScoreText->SetText(FText());
+		PlayerHUD->CharacterOverlay->EnemyTeamScoreText->SetText(FText());
+		PlayerHUD->CharacterOverlay->MyTeamScoreText->SetText(FText());
 	}
 }
 
@@ -587,34 +587,34 @@ void AMyPlayerController::InitTeamScores()
 {
 	PlayerHUD = PlayerHUD==nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
 	if(PlayerHUD && PlayerHUD->CharacterOverlay &&
-		PlayerHUD->CharacterOverlay->RedTeamScoreText
-		&& PlayerHUD->CharacterOverlay->BlueTeamScoreText)
+		PlayerHUD->CharacterOverlay->EnemyTeamScoreText
+		&& PlayerHUD->CharacterOverlay->MyTeamScoreText)
 	{
 		const FString Zero("0");
-		PlayerHUD->CharacterOverlay->RedTeamScoreText->SetText(FText::FromString(Zero));
-		PlayerHUD->CharacterOverlay->BlueTeamScoreText->SetText(FText::FromString(Zero));
+		PlayerHUD->CharacterOverlay->EnemyTeamScoreText->SetText(FText::FromString(Zero));
+		PlayerHUD->CharacterOverlay->MyTeamScoreText->SetText(FText::FromString(Zero));
 	}
 }
 
-void AMyPlayerController::SetHUDRedTeamScore(int32 RedScore)
+void AMyPlayerController::SetHUDEnemyTeamScore(int32 Score)
 {
 	PlayerHUD = PlayerHUD==nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
 	if(PlayerHUD && PlayerHUD->CharacterOverlay &&
-		PlayerHUD->CharacterOverlay->RedTeamScoreText)
+		PlayerHUD->CharacterOverlay->EnemyTeamScoreText)
 	{
-		const FString ScoreText = FString::Printf(TEXT("%d"), RedScore);
-		PlayerHUD->CharacterOverlay->RedTeamScoreText->SetText(FText::FromString(ScoreText));
+		const FString ScoreText = FString::Printf(TEXT("%d"), Score);
+		PlayerHUD->CharacterOverlay->EnemyTeamScoreText->SetText(FText::FromString(ScoreText));
 	}	
 }
 
-void AMyPlayerController::SetHUDBlueTeamScore(int32 BlueScore)
+void AMyPlayerController::SetHUDMyTeamScore(int32 Score)
 {
 	PlayerHUD = PlayerHUD==nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
 	if(PlayerHUD && PlayerHUD->CharacterOverlay &&
-		PlayerHUD->CharacterOverlay->BlueTeamScoreText)
+		PlayerHUD->CharacterOverlay->MyTeamScoreText)
 	{
-		const FString ScoreText = FString::Printf(TEXT("%d"), BlueScore);
-		PlayerHUD->CharacterOverlay->BlueTeamScoreText->SetText(FText::FromString(ScoreText));
+		const FString ScoreText = FString::Printf(TEXT("%d"), Score);
+		PlayerHUD->CharacterOverlay->MyTeamScoreText->SetText(FText::FromString(ScoreText));
 	}	
 }
 

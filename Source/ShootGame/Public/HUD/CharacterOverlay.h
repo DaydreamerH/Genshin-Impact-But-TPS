@@ -51,8 +51,8 @@ public:
 	UWidgetAnimation* HighPingAnimation;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* RedTeamScoreText;
+	UTextBlock* EnemyTeamScoreText;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* BlueTeamScoreText;
+	UTextBlock* MyTeamScoreText;
 };

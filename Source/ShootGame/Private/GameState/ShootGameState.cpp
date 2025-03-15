@@ -40,7 +40,17 @@ void AShootGameState::OnRep_RedTeamScore()
 	if(AMyPlayerController* PlayerController
 		= Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController()))
 	{
-		PlayerController->SetHUDRedTeamScore(RedTeamScore);
+		if(AMyPlayerState* MyPlayerState = PlayerController->GetPlayerState<AMyPlayerState>())
+		{
+			if(MyPlayerState->GetTeam() == ETeam::ET_RedTeam)
+			{
+				PlayerController->SetHUDMyTeamScore(RedTeamScore);
+			}
+			else if(MyPlayerState->GetTeam() == ETeam::ET_BlueTeam)
+			{
+				PlayerController->SetHUDEnemyTeamScore(RedTeamScore);
+			}
+		}
 	}
 }
 
@@ -49,27 +59,58 @@ void AShootGameState::OnRep_BlueTeamScore()
 	if(AMyPlayerController* PlayerController
 		= Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController()))
 	{
-		PlayerController->SetHUDBlueTeamScore(RedTeamScore);
+		if(AMyPlayerState* MyPlayerState = PlayerController->GetPlayerState<AMyPlayerState>())
+		{
+			if(MyPlayerState->GetTeam() == ETeam::ET_RedTeam)
+			{
+				PlayerController->SetHUDEnemyTeamScore(BlueTeamScore);
+			}
+			else if(MyPlayerState->GetTeam() == ETeam::ET_BlueTeam)
+			{
+				PlayerController->SetHUDMyTeamScore(BlueTeamScore);
+			}
+		}
 	}
 }
 
-void AShootGameState::RedTeamScores()
+void AShootGameState::RedTeamScores(const float Score)
 {
-	++RedTeamScore;
+	RedTeamScore += Score;
 
 	if(AMyPlayerController* PlayerController
 		= Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController()))
 	{
-		PlayerController->SetHUDRedTeamScore(RedTeamScore);
+		if(AMyPlayerState* MyPlayerState = PlayerController->GetPlayerState<AMyPlayerState>())
+		{
+			if(MyPlayerState->GetTeam() == ETeam::ET_RedTeam)
+			{
+				PlayerController->SetHUDMyTeamScore(RedTeamScore);
+			}
+			else if(MyPlayerState->GetTeam() == ETeam::ET_BlueTeam)
+			{
+				PlayerController->SetHUDEnemyTeamScore(RedTeamScore);
+			}
+		}
 	}
 }
 
-void AShootGameState::BlueTeamScores()
+void AShootGameState::BlueTeamScores(const float Score)
 {
-	++BlueTeamScore;
+	BlueTeamScore += Score;
+	
 	if(AMyPlayerController* PlayerController
 		= Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController()))
 	{
-		PlayerController->SetHUDBlueTeamScore(RedTeamScore);
+		if(AMyPlayerState* MyPlayerState = PlayerController->GetPlayerState<AMyPlayerState>())
+		{
+			if(MyPlayerState->GetTeam() == ETeam::ET_RedTeam)
+			{
+				PlayerController->SetHUDEnemyTeamScore(BlueTeamScore);
+			}
+			else if(MyPlayerState->GetTeam() == ETeam::ET_BlueTeam)
+			{
+				PlayerController->SetHUDMyTeamScore(BlueTeamScore);
+			}
+		}
 	}
 }

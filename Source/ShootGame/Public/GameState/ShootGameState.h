@@ -20,7 +20,9 @@ public:
 	UPROPERTY(Replicated)
 	TArray<class APlayerState*> TopScoringPlayers;
 
+	UPROPERTY()
 	TArray<AMyPlayerState*> RedTeam;
+	UPROPERTY()
 	TArray<AMyPlayerState*> BlueTeam;
 
 	UPROPERTY(ReplicatedUsing=OnRep_RedTeamScore)
@@ -33,8 +35,8 @@ public:
 	UFUNCTION()
 	void OnRep_BlueTeamScore();
 
-	void RedTeamScores();
-	void BlueTeamScores();
+	void RedTeamScores(float Score = 1.f);
+	void BlueTeamScores(float Score = 1.f);
 private:
 	float TopScore = 0.f;
 };

@@ -46,8 +46,8 @@ public:
 
 	void HideTeamScores();
 	void InitTeamScores();
-	void SetHUDRedTeamScore(int32 RedScore);
-	void SetHUDBlueTeamScore(int32 BlueScore);
+	void SetHUDEnemyTeamScore(int32 Score);
+	void SetHUDMyTeamScore(int32 Score);
 protected:
 	virtual void BeginPlay() override;
 	void SetHUDTime();
