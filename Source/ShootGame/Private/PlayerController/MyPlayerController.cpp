@@ -24,12 +24,12 @@ void AMyPlayerController::SetHUDHealth(float Health, float MaxHealth)
 {
 	PlayerHUD = PlayerHUD==nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
 	if(PlayerHUD && PlayerHUD->CharacterOverlay &&
-		PlayerHUD->CharacterOverlay->HealthBar &&PlayerHUD->CharacterOverlay->HealthText)
+		PlayerHUD->CharacterOverlay->HealthBar && PlayerHUD->CharacterOverlay->HealthText)
 	{
 		const float HealthPercent = Health/MaxHealth;
 		PlayerHUD->CharacterOverlay->HealthBar->SetPercent(HealthPercent);
 		FString HealthText =
-			FString::Printf(TEXT("%d/%d"), FMath::CeilToInt(Health), FMath::CeilToInt(MaxHealth));
+			FString::Printf(TEXT("%d"), FMath::CeilToInt(Health));
 
 		PlayerHUD->CharacterOverlay->HealthText->SetText(FText::FromString(HealthText));
 	}
@@ -50,7 +50,7 @@ void AMyPlayerController::SetHUDShield(float Shield, float MaxShield)
 		const float ShieldPercent = Shield/MaxShield;
 		PlayerHUD->CharacterOverlay->ShieldBar->SetPercent(ShieldPercent);
 		FString ShieldText =
-			FString::Printf(TEXT("%d/%d"), FMath::CeilToInt(Shield), FMath::CeilToInt(MaxShield));
+			FString::Printf(TEXT("%d"), FMath::CeilToInt(Shield));
 
 		PlayerHUD->CharacterOverlay->ShieldText->SetText(FText::FromString(ShieldText));
 	}
