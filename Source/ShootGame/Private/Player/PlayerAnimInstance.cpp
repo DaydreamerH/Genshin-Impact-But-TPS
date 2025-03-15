@@ -38,6 +38,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bIsCrouched = PlayerCharacter->bIsCrouched;
 	bAiming = PlayerCharacter->IsAiming();
 	bElimmed = PlayerCharacter->IsElimmed();
+	bHoldingBomb = PlayerCharacter->isHoldingBomb();
 	EquippedWeapon = PlayerCharacter->GetEuippedWeapon();
 	TurningInPlace = PlayerCharacter->GetTurningInPlace();
 

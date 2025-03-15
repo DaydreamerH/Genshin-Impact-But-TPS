@@ -90,6 +90,7 @@ protected:
 	void DropEquippedWeapon();
 	void AttachActorToRightHand(AActor* ActorToAttach) const;
 	void AttachActorToBackpack(AActor* ActorToAttach);
+	void AttachBombToLeftHand(AWeapon* Bomb);
 	void UpdateCarriedAmmo();
 	void PlayEquipWeaponSound(AWeapon* WeaponToEquip);
 	void AttachActorToLeftHand(AActor* ActorToAttach);
@@ -199,6 +200,13 @@ private:
 	void OnRep_Grenades();
 
 	bool bLocallyReloading = false;
+
+	UPROPERTY(ReplicatedUsing=OnRep_HoldingBomb)
+	bool bHoldingBomb = false;
+
+	UFUNCTION()
+	void OnRep_HoldingBomb();
+	
 public:	
 	
 	void SetCrosshairShootingFactor(float f);

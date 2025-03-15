@@ -445,6 +445,19 @@ void UCombatComponent::AttachActorToBackpack(AActor* ActorToAttach)
 	}
 }
 
+void UCombatComponent::AttachBombToLeftHand(AWeapon* Bomb)
+{
+	if(Bomb == nullptr
+		|| Character == nullptr
+		|| Character->GetMesh() == nullptr)return;
+	
+	if(const USkeletalMeshSocket* BombSocket
+		= Character->GetMesh()->GetSocketByName(FName("LeftBombSocket")))
+	{
+		BombSocket->AttachActor(Bomb, Character->GetMesh());
+	}
+}
+
 void UCombatComponent::AttachActorToLeftHand(AActor* ActorToAttach)
 {
 	if(ActorToAttach == nullptr
@@ -792,17 +805,31 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 	if(Character == nullptr || WeaponToEquip == nullptr)return;
 	if(CombatState != ECombatState::ECS_Unoccupied) return;
 
-	if(EquippedWeapon != nullptr && SecondaryWeapon == nullptr)
+	if(WeaponToEquip->GetWeaponType() == EWeaponType::EWT_Bomb)
 	{
-		EquipSecondaryWeapon(WeaponToEquip);
+		bHoldingBomb = true;
+		Character->Crouch();
+		AttachBombToLeftHand(WeaponToEquip);
+		Character->GetCharacterMovement()->bOrientRotationToMovement = true;
+		Character->bUseControllerRotationYaw = false;
+		WeaponToEquip->SetWeaponState(EWeaponState::EWS_Equipped);
+		WeaponToEquip->SetOwner(Character);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("Equip: %d"), WeaponToEquip->GetAmmo());
-		EquipPrimaryWeapon(WeaponToEquip);
+		if(EquippedWeapon != nullptr && SecondaryWeapon == nullptr)
+		{
+			EquipSecondaryWeapon(WeaponToEquip);
+		}
+		else 
+		{
+			EquipPrimaryWeapon(WeaponToEquip);
+		}
+		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+		Character->bUseControllerRotationYaw = true;
 	}
-	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
-	Character->bUseControllerRotationYaw = true;
+	
+	
 }
 
 void UCombatComponent::EquipPrimaryWeapon(AWeapon* WeaponToEquip)
@@ -893,5 +920,15 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_CONDITION(UCombatComponent, CarriedAmmo, COND_OwnerOnly);
 	DOREPLIFETIME(UCombatComponent, CombatState);
 	DOREPLIFETIME(UCombatComponent, Grenades);
+	DOREPLIFETIME(UCombatComponent, bHoldingBomb);
 }
 
+void UCombatComponent::OnRep_HoldingBomb()
+{
+	if(bHoldingBomb && Character && Character->GetCharacterMovement() && Character->IsLocallyControlled())
+	{
+		Character->Crouch();
+		Character->GetCharacterMovement()->bOrientRotationToMovement = true;
+		Character->bUseControllerRotationYaw = false;
+	}
+}

@@ -377,4 +377,6 @@ public:
 	FORCEINLINE ULagCompensationComponent* GetLagCompensation() const { return LagCompensation; }
 
 	FORCEINLINE AWeapon* GetEquippedWeapon() const { return Combat->EquippedWeapon; }
+
+	FORCEINLINE bool isHoldingBomb() const {return Combat->bHoldingBomb;}
 };

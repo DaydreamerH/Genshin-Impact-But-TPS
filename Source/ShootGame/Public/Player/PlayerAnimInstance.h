@@ -74,6 +74,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category=Movement)
 	bool bUseFABRIK;
+
+	UPROPERTY(BlueprintReadOnly, Category=Movement)
+	bool bHoldingBomb;
 private:
 	
 };
