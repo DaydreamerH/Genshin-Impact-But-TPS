@@ -109,6 +109,9 @@ protected:
 
 	void PollInit();
 
+	void SetSpawnPoint();
+	void OnPlayerStateInitialized();
+
 	// 服务器倒带延迟补偿用
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* Head;

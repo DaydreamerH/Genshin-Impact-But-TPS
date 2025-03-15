@@ -21,6 +21,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Player/MyPlayerState.h"
 #include "PlayerController/MyPlayerController.h"
+#include "PlayerStart/TeamPlayerStart.h"
 #include "ShootGame/ShootGame.h"
 #include "Sound/SoundCue.h"
 #include "Tracks/MovieSceneMaterialTrack.h"
@@ -659,15 +660,48 @@ void APlayerCharacter::PollInit()
 		MyPlayerState = GetPlayerState<AMyPlayerState>();
 		if(MyPlayerState)
 		{
-			MyPlayerState->AddToScore(0.f);
-			MyPlayerState->AddToDefeats(0);
-			if(!IsLocallyControlled())
-			{
-				SetTeamColor(MyPlayerState->GetTeam());
-			}
+			OnPlayerStateInitialized();
 		}
 		
 	}
+}
+
+void APlayerCharacter::SetSpawnPoint()
+{
+	if(HasAuthority() && MyPlayerState->GetTeam() != ETeam::ET_NoTeam)
+	{
+		TArray<AActor*>PlayerStarts;
+		UGameplayStatics::GetAllActorsOfClass
+			(this, ATeamPlayerStart::StaticClass(), PlayerStarts);
+
+		TArray<ATeamPlayerStart*>TeamPlayerStarts;
+		for(auto Start: PlayerStarts)
+		{
+			ATeamPlayerStart* TeamStart = Cast<ATeamPlayerStart>(Start);
+			if(TeamStart && TeamStart->Team==MyPlayerState->GetTeam())
+			{
+				TeamPlayerStarts.Add(TeamStart);
+			}
+		}
+		if(TeamPlayerStarts.Num() > 0)
+		{
+			ATeamPlayerStart* ChosenPlayerStart =
+				TeamPlayerStarts[FMath::RandRange(0, TeamPlayerStarts.Num() - 1)];
+			SetActorLocationAndRotation
+				(ChosenPlayerStart->GetActorLocation(), ChosenPlayerStart->GetActorRotation());
+		}
+	}
+}
+
+void APlayerCharacter::OnPlayerStateInitialized()
+{
+	MyPlayerState->AddToScore(0.f);
+	MyPlayerState->AddToDefeats(0);
+	if(!IsLocallyControlled())
+	{
+		SetTeamColor(MyPlayerState->GetTeam());
+	}
+	SetSpawnPoint();
 }
 
 void APlayerCharacter::PlayFireMontage(bool bAiming) const
