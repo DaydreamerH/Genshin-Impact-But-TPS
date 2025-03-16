@@ -76,6 +76,7 @@ void AShootGameState::OnRep_BlueTeamScore()
 void AShootGameState::RedTeamScores(const float Score)
 {
 	RedTeamScore += Score;
+	RedTeamScore = FMath::Clamp(RedTeamScore, 0, RedTeamScore);
 
 	if(AMyPlayerController* PlayerController
 		= Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController()))
@@ -97,6 +98,7 @@ void AShootGameState::RedTeamScores(const float Score)
 void AShootGameState::BlueTeamScores(const float Score)
 {
 	BlueTeamScore += Score;
+	BlueTeamScore = FMath::Clamp(BlueTeamScore, 0, BlueTeamScore);
 	
 	if(AMyPlayerController* PlayerController
 		= Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController()))

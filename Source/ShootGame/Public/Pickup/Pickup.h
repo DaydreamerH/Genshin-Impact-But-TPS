@@ -23,7 +23,7 @@ protected:
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex,
 		bool bFromSweep,
-		const FHitResult& SweepResule
+		const FHitResult& SweepResult
 	);
 	
 	UPROPERTY(EditAnywhere)
