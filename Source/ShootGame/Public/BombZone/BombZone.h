@@ -8,6 +8,8 @@
 #include "BombZone.generated.h"
 
 
+class UBoxComponent;
+
 UCLASS()
 class SHOOTGAME_API ABombZone : public AActor
 {
@@ -20,7 +22,7 @@ protected:
 	virtual void BeginPlay() override;
 private:
 	UPROPERTY(EditAnywhere)
-	UShapeComponent* ZoneSphere;
+	UBoxComponent* ZoneSphere;
 
 	UPROPERTY(EditAnywhere)
 	ETeam Team;

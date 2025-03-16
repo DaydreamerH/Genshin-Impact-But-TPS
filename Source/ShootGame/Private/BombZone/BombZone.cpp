@@ -2,6 +2,7 @@
 
 #include "BombZone/BombZone.h"
 
+#include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameState/ShootGameState.h"
 #include "PlayerController/MyPlayerController.h"
@@ -11,7 +12,7 @@
 ABombZone::ABombZone()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	ZoneSphere = CreateDefaultSubobject<USphereComponent>(TEXT("ZoneSphere"));
+	ZoneSphere = CreateDefaultSubobject<UBoxComponent>(TEXT("ZoneSphere"));
 	ZoneSphere->SetCollisionObjectType(ECC_BombStorage);
 	ZoneSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	ZoneSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
