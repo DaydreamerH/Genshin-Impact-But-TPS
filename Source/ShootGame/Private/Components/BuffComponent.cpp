@@ -143,3 +143,10 @@ void UBuffComponent::ReplenishShield(const float ShieldAmount) const
 		Character->GetMaxShield()));
 	Character->UpdateHUDShield();
 }
+
+void UBuffComponent::StopHealing()
+{
+	bHealing = false;
+	AmountToHeal = 0.f;
+	HealingRate = 0.f;
+}

@@ -610,6 +610,10 @@ void APlayerCharacter::Jump()
 void APlayerCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UDamageType* DamageType,
 	AController* InstigatorController, AActor* DamageCauser)
 {
+	if(Buff && Buff->IsHealing())
+	{
+		Buff->StopHealing();
+	}
 
 	ShootGameMode = ShootGameMode == nullptr ?
 		GetWorld()->GetAuthGameMode<AShootGameMode>() : ShootGameMode;

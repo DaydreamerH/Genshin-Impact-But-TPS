@@ -49,4 +49,8 @@ public:
 	void SetInitialJumpVelocity(float Velocity);
 
 	void ReplenishShield(float ShieldAmount) const;
+
+	void StopHealing();
+
+	FORCEINLINE bool IsHealing() const {return bHealing;}
 };
