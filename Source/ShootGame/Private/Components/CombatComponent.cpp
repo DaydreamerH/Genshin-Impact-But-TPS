@@ -181,8 +181,11 @@ void UCombatComponent::DropBomb()
 		bHoldingBomb = false;
 		EquippedBomb->Dropped();
 		Character->UnCrouch();
-		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
-		Character->bUseControllerRotationYaw = true;
+		if(EquippedWeapon!=nullptr)
+		{
+			Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+			Character->bUseControllerRotationYaw = true;
+		}
 	}
 }
 
@@ -946,8 +949,11 @@ void UCombatComponent::OnRep_HoldingBomb()
 		else
 		{
 			Character->UnCrouch();
-			Character->GetCharacterMovement()->bOrientRotationToMovement = false;
-			Character->bUseControllerRotationYaw = true;
+			if(EquippedWeapon!=nullptr)
+			{
+				Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+				Character->bUseControllerRotationYaw = true;
+			}
 		}
 	}
 }
