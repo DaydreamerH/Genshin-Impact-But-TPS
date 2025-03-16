@@ -14,8 +14,6 @@ UBuffComponent::UBuffComponent()
 void UBuffComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	
 }
 
 
@@ -47,10 +45,11 @@ void UBuffComponent::Heal(float HealingAmount, float HealingTime)
 	bHealing = true;
 	HealingRate = HealingAmount/HealingTime;
 	AmountToHeal += HealingAmount;
-	// if(Character)
-	// {
-		// Character->PlayHealthSound();
-	// }
+
+	if(Character)
+	{
+		Character->PlaySound(ESoundType::EST_HealSound);
+	}
 }
 
 void UBuffComponent::SetInitialSpeed(float BaseSpeed, float CrouchSpeed)
@@ -75,6 +74,10 @@ void UBuffComponent::BuffSpeed(float BuffBaseSpeed, float BuffCrouchSpeed, float
 		Character->GetCharacterMovement()->MaxWalkSpeedCrouched = BuffCrouchSpeed;
 	}
 	MulticastSpeedBuff(BuffBaseSpeed, BuffCrouchSpeed);
+
+
+	Character->PlaySound(ESoundType::EST_SpeedSound);
+
 }
 
 void UBuffComponent::ResetSpeed()
@@ -119,6 +122,9 @@ void UBuffComponent::BuffJump(float BuffJumpVelocity, float BuffTime)
 		Character->GetCharacterMovement()->JumpZVelocity = BuffJumpVelocity;
 	}
 	MulticastJumpBuff(BuffJumpVelocity);
+
+	Character->PlaySound(ESoundType::EST_JumpSound);
+
 }
 
 void UBuffComponent::SetInitialJumpVelocity(float Velocity)
@@ -142,6 +148,7 @@ void UBuffComponent::ReplenishShield(const float ShieldAmount) const
 		0.f,
 		Character->GetMaxShield()));
 	Character->UpdateHUDShield();
+	Character->PlaySound(ESoundType::EST_ShieldSound);
 }
 
 void UBuffComponent::StopHealing()
