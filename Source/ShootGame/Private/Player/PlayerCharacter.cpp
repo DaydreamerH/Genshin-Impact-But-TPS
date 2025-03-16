@@ -831,15 +831,58 @@ void APlayerCharacter::CancelCombatComponentFireButtonPressed() const
 	}
 }
 
-void APlayerCharacter::PlayHealthSound() const
+void APlayerCharacter::PlaySound(ESoundType SoundType) const
 {
-	if(HealSound)
+	if(IsLocallyControlled())
 	{
-		UGameplayStatics::PlaySoundAtLocation(
-			this,
-			HealSound,
-			GetActorLocation()
-		);
+		HandlePlaySound(SoundType);
+	}
+	else
+	{
+		ClientPlaySound(SoundType);
+	}
+}
+
+void APlayerCharacter::ClientPlaySound_Implementation(ESoundType SoundType) const
+{
+	if(IsLocallyControlled())
+	{
+		HandlePlaySound(SoundType);
+	}
+}
+
+void APlayerCharacter::HandlePlaySound(ESoundType SoundType) const
+{
+	USoundCue* SoundToPlay = nullptr;
+	switch (SoundType)
+	{
+	case ESoundType::EST_JumpSound:
+		SoundToPlay = JumpSound;
+		break;
+	case ESoundType::EST_BombSound:
+		SoundToPlay = BombSound;
+		break;
+	case ESoundType::EST_EquipSound:
+		SoundToPlay = EquipSound;
+		break;
+	case ESoundType::EST_KillSound:
+		SoundToPlay = KillSound;
+		break;
+	case ESoundType::EST_HealSound:
+		SoundToPlay = HealSound;
+		break;
+	case ESoundType::EST_ShieldSound:
+		SoundToPlay = ShieldSound;
+		break;
+	case ESoundType::EST_SpeedSound:
+		SoundToPlay = SpeedSound;
+		break;
+	default:
+		break;
+	}
+	if(SoundToPlay != nullptr)
+	{
+		UGameplayStatics::PlaySound2D(this, SoundToPlay);
 	}
 }
 

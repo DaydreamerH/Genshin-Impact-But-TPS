@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PlayerSoundType.h"
 #include "team.h"
 #include "TurningPlace.h"
 #include "GameFramework/Character.h"
@@ -314,7 +315,20 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	USoundCue* HealSound;
-
+	UPROPERTY(EditAnywhere)
+	USoundCue* ShieldSound;
+	UPROPERTY(EditAnywhere)
+	USoundCue* JumpSound;
+	UPROPERTY(EditAnywhere)
+	USoundCue* SpeedSound;
+	UPROPERTY(EditAnywhere)
+	USoundCue* EquipSound;
+	UPROPERTY(EditAnywhere)
+	USoundCue* BombSound;
+	UPROPERTY(EditAnywhere)
+	USoundCue* KillSound;
+	FTimerHandle SoundTimer;
+	
 	UPROPERTY(EditAnywhere)
 	UMaterialInstance* FriendMat;
 
@@ -373,8 +387,7 @@ public:
 	FORCEINLINE UAnimMontage* GetReloadMontage() const {return ReloadMontage;}
 	FORCEINLINE UStaticMeshComponent* GetGrenade() const {return AttachGrenade;}
 	FORCEINLINE UBuffComponent* GetBuff() const { return Buff; }
-
-	void PlayHealthSound() const;
+	
 	bool IsLocallyReloading();
 
 	FORCEINLINE ULagCompensationComponent* GetLagCompensation() const { return LagCompensation; }
@@ -382,4 +395,12 @@ public:
 	FORCEINLINE AWeapon* GetEquippedWeapon() const { return Combat->EquippedWeapon; }
 
 	FORCEINLINE bool isHoldingBomb() const {return Combat->bHoldingBomb;}
+
+	void PlaySound(ESoundType SoundType) const;
+
+	UFUNCTION(Client, Unreliable)
+	void ClientPlaySound(ESoundType SoundType) const;
+
+	void HandlePlaySound(ESoundType SoundType) const;
+	
 };
