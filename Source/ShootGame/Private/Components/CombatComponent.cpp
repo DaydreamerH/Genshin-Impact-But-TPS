@@ -174,6 +174,18 @@ void UCombatComponent::PickupAmmo(EWeaponType WeaponType, int32 AmmoAmount)
 	}
 }
 
+void UCombatComponent::DropBomb()
+{
+	if(EquippedBomb)
+	{
+		bHoldingBomb = false;
+		EquippedBomb->Dropped();
+		Character->UnCrouch();
+		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+		Character->bUseControllerRotationYaw = true;
+	}
+}
+
 void UCombatComponent::ServerCooldown_Implementation()
 {
 	if(CombatState == ECombatState::ECS_Cooling)
@@ -318,10 +330,7 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 
 void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 {
-	if(EquippedWeapon == nullptr)
-	{
-		
-	}
+	if(EquippedWeapon == nullptr)return;
 	if(Character == nullptr || Character->Controller == nullptr)return;
 	Controller = Controller == nullptr?Cast<AMyPlayerController>(Character->Controller):Controller;
 
@@ -926,12 +935,19 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 void UCombatComponent::OnRep_HoldingBomb()
 {
-	if(bHoldingBomb
-		&& Character
-		&& Character->GetCharacterMovement() && Character->IsLocallyControlled())
+	if(Character && Character->GetCharacterMovement() && Character->IsLocallyControlled())
 	{
-		Character->Crouch();
-		Character->GetCharacterMovement()->bOrientRotationToMovement = true;
-		Character->bUseControllerRotationYaw = false;
+		if(bHoldingBomb)
+		{
+			Character->Crouch();
+			Character->GetCharacterMovement()->bOrientRotationToMovement = true;
+			Character->bUseControllerRotationYaw = false;
+		}
+		else
+		{
+			Character->UnCrouch();
+			Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+			Character->bUseControllerRotationYaw = true;
+		}
 	}
 }

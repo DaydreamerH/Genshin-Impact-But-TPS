@@ -400,7 +400,7 @@ void APlayerCharacter::OnActionJump(const FInputActionValue& InputActionValue)
 
 void APlayerCharacter::OnActionEquip(const FInputActionValue& InputActionValue)
 {
-	if(bDisableGameplay || Combat == nullptr || Combat->bHoldingBomb)return;
+	if(bDisableGameplay || Combat == nullptr)return;
 	ServerOnActionEquip();
 }
 
@@ -534,7 +534,14 @@ void APlayerCharacter::ServerOnActionEquip_Implementation()
 {
 	if(Combat)
 	{
-		Combat->EquipWeapon(OverlappingWeapon);
+		if(Combat->bHoldingBomb)
+		{
+			Combat->DropBomb();
+		}
+		else
+		{
+			Combat->EquipWeapon(OverlappingWeapon);
+		}
 	}
 }
 
@@ -1000,7 +1007,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		if(IA_Equip)
 		{
-			inputComponent->BindAction(IA_Equip, ETriggerEvent::Triggered, this, &ThisClass::OnActionEquip);
+			inputComponent->BindAction(IA_Equip, ETriggerEvent::Started, this, &ThisClass::OnActionEquip);
 		}
 
 		if(IA_Crouch)

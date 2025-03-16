@@ -34,6 +34,8 @@ public:
 	void ShotGunShellReload();
 
 	void PickupAmmo(EWeaponType WeaponType, int32 AmmoAmount);
+
+	void DropBomb();
 protected:
 	virtual void BeginPlay() override;
 	void SetAiming(bool bIsAiming);

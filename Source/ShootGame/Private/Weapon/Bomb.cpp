@@ -14,6 +14,8 @@ ABomb::ABomb()
 	BombMesh->SetGenerateOverlapEvents(true);
 	
 	RootComponent = BombMesh;
+
+	GetWeaponMesh()->SetupAttachment(RootComponent);
 }
 
 void ABomb::BeginPlay()
