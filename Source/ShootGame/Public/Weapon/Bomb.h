@@ -17,6 +17,10 @@ public:
 	ABomb();
 	virtual void Dropped() override;
 protected:
+	virtual void BeginPlay() override;
 	virtual void OnEquipped() override;
 	virtual void OnDropped() override;
+private:
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* BombMesh;
 };
