@@ -51,6 +51,9 @@ public:
 	void ShowHitCrosshair();
 	void HideHitCrosshair();
 	void ShowHitCrosshairWithTimer();
+	void ShowHitCrosshairHandle();
+	UFUNCTION(Client, Unreliable)
+	void ClientShowHitCrosshairHandle();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -153,6 +156,6 @@ private:
 	float PingAnimationRunningTime = 0.f;
 
 	UPROPERTY(EditAnywhere)
-	float HitCrosshairShowTime = 0.5f;
+	float HitCrosshairShowTime = 1.5f;
 	FTimerHandle HitCrosshairTimer;
 };

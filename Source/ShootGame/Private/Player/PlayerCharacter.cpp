@@ -648,24 +648,27 @@ void APlayerCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UD
 		PlayHitReactMontage();
 	}
 
-	if(Health <= 0.f)
+	
+	if((PlayerController = PlayerController == nullptr ? Cast<AMyPlayerController>(GetController()):PlayerController))
 	{
-		if(ShootGameMode)
+		AMyPlayerController* AttackerController = Cast<AMyPlayerController>(InstigatorController);
+		if(Health<=0.f)
 		{
-			if((PlayerController = PlayerController == nullptr ? Cast<AMyPlayerController>(GetController()):PlayerController))
+			if(ShootGameMode)
 			{
-				AMyPlayerController* AttackerController =
-					Cast<AMyPlayerController>(InstigatorController);
-				
-				ShootGameMode->PlayerEliminated
-				(this, PlayerController, AttackerController);
+				ShootGameMode->PlayerEliminated(this, PlayerController, AttackerController);
 				if(APlayerCharacter* Attacker = Cast<APlayerCharacter>(AttackerController->GetPawn()))
 				{
 					Attacker->PlaySound(ECharacterSoundType::EST_KillSound);
 				}
 			}
-		}	
+		}
+		if(AttackerController)
+		{
+			AttackerController->ShowHitCrosshairHandle();
+		}
 	}
+
 }
 
 void APlayerCharacter::PollInit()

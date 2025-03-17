@@ -7,6 +7,7 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/HorizontalBox.h"
+#include "Components/Image.h"
 #include "HUD/Announcement.h"
 #include "HUD/CharacterOverlay.h"
 #include "HUD/ElimAnnouncement.h"
@@ -63,6 +64,10 @@ void APlayerHUD::AddCharacterOverlay()
 	{
 		CharacterOverlay = CreateWidget<UCharacterOverlay>(PlayerController, CharacterOverlayClass);
 		CharacterOverlay->AddToViewport();
+		if(CharacterOverlay->HitCrosshair)
+		{
+			CharacterOverlay->HitCrosshair->SetOpacity(0.f);
+		}
 	}
 }
 

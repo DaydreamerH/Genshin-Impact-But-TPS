@@ -623,12 +623,14 @@ void AMyPlayerController::ShowHitCrosshair()
 	PlayerHUD = PlayerHUD == nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
 	if(PlayerHUD && PlayerHUD->CharacterOverlay && PlayerHUD->CharacterOverlay->HitCrosshair)
 	{
+		UE_LOG(LogTemp, Log, TEXT("SetOpacity1"));
 		PlayerHUD->CharacterOverlay->HitCrosshair->SetOpacity(1.f);
 	}
 }
 
 void AMyPlayerController::HideHitCrosshair()
 {
+	UE_LOG(LogTemp, Log, TEXT("SetOpacity0"));
 	PlayerHUD = PlayerHUD == nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
 	if(PlayerHUD && PlayerHUD->CharacterOverlay && PlayerHUD->CharacterOverlay->HitCrosshair)
 	{
@@ -649,6 +651,26 @@ void AMyPlayerController::ShowHitCrosshairWithTimer()
 		HitCrosshairShowTime, 
 		false
 	);
+}
+
+void AMyPlayerController::ShowHitCrosshairHandle()
+{
+	if(IsLocalController())
+	{
+		ShowHitCrosshairWithTimer();
+	}
+	else
+	{
+		ClientShowHitCrosshairHandle();
+	}
+}
+
+void AMyPlayerController::ClientShowHitCrosshairHandle_Implementation()
+{
+	if(IsLocalController())
+	{
+		ShowHitCrosshairWithTimer();
+	}
 }
 
 
