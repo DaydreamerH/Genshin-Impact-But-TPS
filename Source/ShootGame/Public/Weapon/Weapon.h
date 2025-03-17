@@ -62,6 +62,8 @@ public:
 	FVector TraceEndWithScatter(const FVector& HitTarget) const;
 
 	FOnWeaponStateChanged OnWeaponStateChanged;
+
+	void SwitchAim(bool bAiming);
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnWeaponStateSet();
@@ -116,8 +118,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category="Weapon Scatter")
 	float DistanceToSphere = 800.f;
-	UPROPERTY(EditAnywhere, Category="Weapon Scatter")
 	float SphereRadius = 75.f;
+	UPROPERTY(EditAnywhere, Category="Weapon Scatter")
+	float NormalSphereRadius = 75.f;
+	UPROPERTY(EditAnywhere, Category="Weapon Scatter")
+	float AimingSphereRadius = 50.f;
 	
 	UPROPERTY(EditAnywhere)
 	float Damage = 20.f;
@@ -158,7 +163,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	float DeltaCrosshairShootingFactor = .2f;
 	
-
 
 	UPROPERTY(EditAnywhere)
 	EWeaponType WeaponType;

@@ -34,7 +34,46 @@ AWeapon::AWeapon()
 
 	PickupWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PickupWidget"));
 	PickupWidget->SetupAttachment(RootComponent);
-	
+
+	SphereRadius = NormalSphereRadius;
+}
+
+void AWeapon::SwitchAim(bool bAiming)
+{
+	if(bAiming)
+	{
+		switch (WeaponType)
+		{
+		case EWeaponType::EWT_SniperRifle:
+			bUseScatter = false;
+			break;
+		case EWeaponType::EWT_Pistol:
+			SphereRadius = AimingSphereRadius;
+			break;
+		case EWeaponType::EWT_ShotGun:
+			SphereRadius = AimingSphereRadius;
+			break;
+		default:
+			break;
+		}
+	}
+	else
+	{
+		switch (WeaponType)
+		{
+		case EWeaponType::EWT_SniperRifle:
+			bUseScatter = true;
+			break;
+		case EWeaponType::EWT_Pistol:
+			SphereRadius = NormalSphereRadius;
+			break;
+		case EWeaponType::EWT_ShotGun:
+			SphereRadius = NormalSphereRadius;
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 void AWeapon::BeginPlay()
