@@ -102,7 +102,6 @@ void AMyPlayerController::SetHUDWeaponAmmo(int32 Ammo)
 	{
 		const FString AmmoText = FString::Printf(TEXT("%d"), Ammo);
 		PlayerHUD->CharacterOverlay->WeaponAmmoAmount->SetText(FText::FromString(AmmoText));
-		UE_LOG(LogTemp, Log, TEXT("SetHud: %s"), *AmmoText);
 	}
 }
 
@@ -623,14 +622,12 @@ void AMyPlayerController::ShowHitCrosshair()
 	PlayerHUD = PlayerHUD == nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
 	if(PlayerHUD && PlayerHUD->CharacterOverlay && PlayerHUD->CharacterOverlay->HitCrosshair)
 	{
-		UE_LOG(LogTemp, Log, TEXT("SetOpacity1"));
 		PlayerHUD->CharacterOverlay->HitCrosshair->SetOpacity(1.f);
 	}
 }
 
 void AMyPlayerController::HideHitCrosshair()
 {
-	UE_LOG(LogTemp, Log, TEXT("SetOpacity0"));
 	PlayerHUD = PlayerHUD == nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
 	if(PlayerHUD && PlayerHUD->CharacterOverlay && PlayerHUD->CharacterOverlay->HitCrosshair)
 	{

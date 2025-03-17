@@ -52,7 +52,7 @@ public:
 	void HideHitCrosshair();
 	void ShowHitCrosshairWithTimer();
 	void ShowHitCrosshairHandle();
-	UFUNCTION(Client, Unreliable)
+	UFUNCTION(Client, Reliable)
 	void ClientShowHitCrosshairHandle();
 	
 protected:
