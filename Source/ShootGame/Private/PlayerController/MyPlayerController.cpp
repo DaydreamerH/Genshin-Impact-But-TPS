@@ -618,6 +618,40 @@ void AMyPlayerController::SetHUDMyTeamScore(int32 Score)
 	}	
 }
 
+void AMyPlayerController::ShowHitCrosshair()
+{
+	PlayerHUD = PlayerHUD == nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+	if(PlayerHUD && PlayerHUD->CharacterOverlay && PlayerHUD->CharacterOverlay->HitCrosshair)
+	{
+		PlayerHUD->CharacterOverlay->HitCrosshair->SetOpacity(1.f);
+	}
+}
+
+void AMyPlayerController::HideHitCrosshair()
+{
+	PlayerHUD = PlayerHUD == nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+	if(PlayerHUD && PlayerHUD->CharacterOverlay && PlayerHUD->CharacterOverlay->HitCrosshair)
+	{
+		PlayerHUD->CharacterOverlay->HitCrosshair->SetOpacity(0.f);
+	}
+}
+
+void AMyPlayerController::ShowHitCrosshairWithTimer()
+{
+	ShowHitCrosshair();
+
+	GetWorldTimerManager().ClearTimer(HitCrosshairTimer);
+	
+	GetWorldTimerManager().SetTimer(
+		HitCrosshairTimer, 
+		this, 
+		&AMyPlayerController::HideHitCrosshair, 
+		HitCrosshairShowTime, 
+		false
+	);
+}
+
+
 void AMyPlayerController::ClientElimAnnouncement_Implementation(APlayerState* Attacker, APlayerState* Victim)
 {
 	if(Attacker && Victim)

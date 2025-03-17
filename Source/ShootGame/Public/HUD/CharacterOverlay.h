@@ -55,4 +55,7 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* MyTeamScoreText;
+
+	UPROPERTY(meta = (BindWidget))
+	UImage* HitCrosshair;
 };

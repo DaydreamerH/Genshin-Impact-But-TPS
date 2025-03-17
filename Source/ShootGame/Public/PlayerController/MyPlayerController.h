@@ -48,6 +48,10 @@ public:
 	void InitTeamScores();
 	void SetHUDEnemyTeamScore(int32 Score);
 	void SetHUDMyTeamScore(int32 Score);
+	void ShowHitCrosshair();
+	void HideHitCrosshair();
+	void ShowHitCrosshairWithTimer();
+	
 protected:
 	virtual void BeginPlay() override;
 	void SetHUDTime();
@@ -147,4 +151,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	float HighPingThreshold = 100.f;
 	float PingAnimationRunningTime = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	float HitCrosshairShowTime = 0.5f;
+	FTimerHandle HitCrosshairTimer;
 };
