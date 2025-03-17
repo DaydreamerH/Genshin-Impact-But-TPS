@@ -183,6 +183,23 @@ void AWeapon::OnRep_WeaponState()
 	OnWeaponStateSet();
 }
 
+void AWeapon::ApplyRecoil()
+{
+	OwnerPlayerCharacter = OwnerPlayerCharacter == nullptr
+		? Cast<APlayerCharacter>(Owner) : OwnerPlayerCharacter;
+	if (OwnerPlayerCharacter)
+	{
+		const float ActualHorizontalRecoil = FMath::RandRange(-HorizontalRecoil, HorizontalRecoil);
+
+		FRotator Recoil;
+		Recoil.Pitch = VerticalRecoil; 
+		Recoil.Yaw = ActualHorizontalRecoil;
+		Recoil.Roll = 0.f;
+
+		OwnerPlayerCharacter->AddRecoil(Recoil, RecoilRecoverSpeed);
+	}
+}
+
 void AWeapon::SetWeaponState(EWeaponState State)
 {
 	WeaponState = State;

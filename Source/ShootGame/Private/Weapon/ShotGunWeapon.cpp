@@ -129,6 +129,11 @@ void AShotGunWeapon::FireShotGun(const TArray<FVector_NetQuantize>& HitTargets)
 {
 	if(FireAnimation && !WeaponMesh->IsPlaying())
 	{
+		OwnerPlayerCharacter = OwnerPlayerCharacter == nullptr ? Cast<APlayerCharacter>(GetOwner()):OwnerPlayerCharacter;
+		if(OwnerPlayerCharacter)
+		{
+			OwnerPlayerCharacter->PlayFireMontage(OwnerPlayerCharacter->GetCombat()->GetAiming());
+		}
 		WeaponMesh->PlayAnimation(FireAnimation, false);
 		if(BulletShellClass)
 		{
@@ -301,6 +306,7 @@ void AShotGunWeapon::FireShotGun(const TArray<FVector_NetQuantize>& HitTargets)
 					);
 				}
 			}
+			ApplyRecoil();
 		}
 	}
 }

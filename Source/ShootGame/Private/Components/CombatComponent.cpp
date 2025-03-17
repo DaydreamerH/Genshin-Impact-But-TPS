@@ -211,7 +211,6 @@ void UCombatComponent::ShotGunLocalFire(const TArray<FVector_NetQuantize>& Trace
 	if(CombatState == ECombatState::ECS_Reloading
 		|| CombatState == ECombatState::ECS_Unoccupied)
 	{
-		Character->PlayFireMontage(bAiming);
 		ShotGunWeapon->FireShotGun(TraceHitTarget);
 		CombatState = ECombatState::ECS_Unoccupied;
 	}

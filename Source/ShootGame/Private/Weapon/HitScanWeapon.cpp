@@ -127,6 +127,7 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 				);
 			}
 		}
+		ApplyRecoil();
 	}
 	
 }

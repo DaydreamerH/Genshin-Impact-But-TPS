@@ -341,6 +341,11 @@ private:
 
 	UPROPERTY()
 	AShootGameMode* ShootGameMode;
+
+	// 后坐力系统
+	FRotator RecoilOffset = FRotator::ZeroRotator;
+	UPROPERTY(EditAnywhere, Category="Recoil")
+	float RecoilRecoverySpeed = 5.f;
 	
 public:
 	void UpdateHUDHealth();
@@ -406,4 +411,6 @@ public:
 	void ClientPlaySound(ECharacterSoundType SoundType);
 
 	void HandlePlaySound(ECharacterSoundType SoundType);
+
+	void AddRecoil(const FRotator& RecoilAmount, const float RecoverSpeed);
 };

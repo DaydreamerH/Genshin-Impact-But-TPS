@@ -237,4 +237,6 @@ public:
 
 	FORCEINLINE int32 GetGrenades() const { return Grenades; }
 	bool CouldSwapWeapons() const;
+
+	FORCEINLINE bool GetAiming() const {return bAiming;}
 };

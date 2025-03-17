@@ -347,6 +347,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 	PollInit();
 
 	DropShield(DeltaTime);
+	
+	if (!RecoilOffset.IsZero())
+	{
+		RecoilOffset = FMath::RInterpTo(RecoilOffset, FRotator::ZeroRotator, DeltaTime, RecoilRecoverySpeed);
+		FollowCamera->SetWorldRotation(GetControlRotation() + RecoilOffset);
+	}
 }
 
 void APlayerCharacter::OnActionMoveForward(const FInputActionValue& InputActionValue)
@@ -381,7 +387,7 @@ void APlayerCharacter::OnActionMoveRight(const FInputActionValue& InputActionVal
 void APlayerCharacter::OnActionLookUp(const FInputActionValue& InputActionValue)
 {
 	if(bDisableGameplay)return;
-	float inputValue = InputActionValue.Get<float>();
+	const float inputValue = InputActionValue.Get<float>();
 	AddControllerPitchInput(inputValue);
 }
 
@@ -894,6 +900,12 @@ void APlayerCharacter::HandlePlaySound(const ECharacterSoundType SoundType)
 		bRecentlySound = true;
 		GetWorldTimerManager().SetTimer(SoundTimer, this, &ThisClass::ResetRecentlySound, SoundCoolDown);
 	}
+}
+
+void APlayerCharacter::AddRecoil(const FRotator& RecoilAmount, const float RecoverSpeed)
+{
+	RecoilOffset += RecoilAmount;
+	RecoilRecoverySpeed = RecoverSpeed;
 }
 
 void APlayerCharacter::ResetRecentlySound()

@@ -140,6 +140,8 @@ protected:
 
 	UFUNCTION()
 	void OnPingTooHigh(bool bPingTooHigh);
+
+	void ApplyRecoil();
 private:
 
 	UPROPERTY(VisibleAnywhere, Category="WeaponProperties")
@@ -170,6 +172,12 @@ private:
 	UPROPERTY(EditAnywhere)
 	UMaterialInterface* OverlayMaterial;
 	
+	UPROPERTY(EditAnywhere, Category = "Recoil")
+	float VerticalRecoil = 2.0f;
+	UPROPERTY(EditAnywhere, Category = "Recoil")
+	float HorizontalRecoil = 1.0f;
+	UPROPERTY(EditAnywhere, Category="Recoil")
+	float RecoilRecoverSpeed = 5.f;
 public:
 	void SetWeaponState(EWeaponState State);
 	
