@@ -406,5 +406,4 @@ public:
 	void ClientPlaySound(ECharacterSoundType SoundType);
 
 	void HandlePlaySound(ECharacterSoundType SoundType);
-	
 };

@@ -827,6 +827,7 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 		WeaponToEquip->SetOwner(Character);
 		AttachBombToLeftHand(WeaponToEquip);
 		EquippedBomb = WeaponToEquip;
+		Character->PlaySound(ECharacterSoundType::EST_BombSound);
 	}
 	else
 	{
@@ -840,6 +841,7 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 		}
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;
+		Character->PlaySound(ECharacterSoundType::EST_EquipSound);
 	}
 	
 	

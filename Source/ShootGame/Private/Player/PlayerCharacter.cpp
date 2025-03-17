@@ -659,6 +659,10 @@ void APlayerCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UD
 				
 				ShootGameMode->PlayerEliminated
 				(this, PlayerController, AttackerController);
+				if(APlayerCharacter* Attacker = Cast<APlayerCharacter>(AttackerController->GetPawn()))
+				{
+					Attacker->PlaySound(ECharacterSoundType::EST_KillSound);
+				}
 			}
 		}	
 	}
