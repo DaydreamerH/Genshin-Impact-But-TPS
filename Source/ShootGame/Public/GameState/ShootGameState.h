@@ -30,13 +30,14 @@ public:
 	UFUNCTION()
 	void OnRep_RedTeamScore();
 	
-	UPROPERTY(ReplicatedUsing=OnRep_RedTeamScore)
+	UPROPERTY(ReplicatedUsing=OnRep_BlueTeamScore)
 	float BlueTeamScore = 0.f;
 	UFUNCTION()
 	void OnRep_BlueTeamScore();
 
 	void RedTeamScores(float Score = 1.f);
 	void BlueTeamScores(float Score = 1.f);
+
 private:
 	float TopScore = 0.f;
 };
