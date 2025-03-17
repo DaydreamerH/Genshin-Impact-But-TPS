@@ -328,6 +328,10 @@ private:
 	UPROPERTY(EditAnywhere)
 	USoundCue* KillSound;
 	FTimerHandle SoundTimer;
+	float SoundCoolDown = 10.f;
+	bool bRecentlySound = false;
+	UFUNCTION()
+	void ResetRecentlySound();
 	
 	UPROPERTY(EditAnywhere)
 	UMaterialInstance* FriendMat;
@@ -396,11 +400,11 @@ public:
 
 	FORCEINLINE bool isHoldingBomb() const {return Combat->bHoldingBomb;}
 
-	void PlaySound(ESoundType SoundType) const;
+	void PlaySound(ECharacterSoundType SoundType);
 
 	UFUNCTION(Client, Unreliable)
-	void ClientPlaySound(ESoundType SoundType) const;
+	void ClientPlaySound(ECharacterSoundType SoundType);
 
-	void HandlePlaySound(ESoundType SoundType) const;
+	void HandlePlaySound(ECharacterSoundType SoundType);
 	
 };

@@ -831,7 +831,7 @@ void APlayerCharacter::CancelCombatComponentFireButtonPressed() const
 	}
 }
 
-void APlayerCharacter::PlaySound(ESoundType SoundType) const
+void APlayerCharacter::PlaySound(ECharacterSoundType SoundType)
 {
 	if(IsLocallyControlled())
 	{
@@ -843,7 +843,7 @@ void APlayerCharacter::PlaySound(ESoundType SoundType) const
 	}
 }
 
-void APlayerCharacter::ClientPlaySound_Implementation(ESoundType SoundType) const
+void APlayerCharacter::ClientPlaySound_Implementation(ECharacterSoundType SoundType)
 {
 	if(IsLocallyControlled())
 	{
@@ -851,30 +851,31 @@ void APlayerCharacter::ClientPlaySound_Implementation(ESoundType SoundType) cons
 	}
 }
 
-void APlayerCharacter::HandlePlaySound(ESoundType SoundType) const
+void APlayerCharacter::HandlePlaySound(const ECharacterSoundType SoundType)
 {
+	if(bRecentlySound)return;
 	USoundCue* SoundToPlay = nullptr;
 	switch (SoundType)
 	{
-	case ESoundType::EST_JumpSound:
+	case ECharacterSoundType::EST_JumpSound:
 		SoundToPlay = JumpSound;
 		break;
-	case ESoundType::EST_BombSound:
+	case ECharacterSoundType::EST_BombSound:
 		SoundToPlay = BombSound;
 		break;
-	case ESoundType::EST_EquipSound:
+	case ECharacterSoundType::EST_EquipSound:
 		SoundToPlay = EquipSound;
 		break;
-	case ESoundType::EST_KillSound:
+	case ECharacterSoundType::EST_KillSound:
 		SoundToPlay = KillSound;
 		break;
-	case ESoundType::EST_HealSound:
+	case ECharacterSoundType::EST_HealSound:
 		SoundToPlay = HealSound;
 		break;
-	case ESoundType::EST_ShieldSound:
+	case ECharacterSoundType::EST_ShieldSound:
 		SoundToPlay = ShieldSound;
 		break;
-	case ESoundType::EST_SpeedSound:
+	case ECharacterSoundType::EST_SpeedSound:
 		SoundToPlay = SpeedSound;
 		break;
 	default:
@@ -883,7 +884,14 @@ void APlayerCharacter::HandlePlaySound(ESoundType SoundType) const
 	if(SoundToPlay != nullptr)
 	{
 		UGameplayStatics::PlaySound2D(this, SoundToPlay);
+		bRecentlySound = true;
+		GetWorldTimerManager().SetTimer(SoundTimer, this, &ThisClass::ResetRecentlySound, SoundCoolDown);
 	}
+}
+
+void APlayerCharacter::ResetRecentlySound()
+{
+	bRecentlySound = false;
 }
 
 bool APlayerCharacter::IsLocallyReloading()

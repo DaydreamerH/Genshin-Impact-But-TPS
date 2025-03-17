@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 UENUM(BlueprintType)
-enum class ESoundType : uint8
+enum class ECharacterSoundType : uint8
 {
 	EST_HealSound UMETA(DisplayName="Heal Sound"),
 	EST_ShieldSound UMETA(DisplayName="Shield Sound"),
