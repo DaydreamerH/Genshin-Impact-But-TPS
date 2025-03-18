@@ -155,7 +155,6 @@ void AHitScanWeapon::WeaponTraceHit(const FVector & TraceStart, const FVector & 
 		{
 			OutHit.ImpactPoint = End;
 		}
-		DrawDebugSphere(GetWorld(), BeamEnd, 16.f, 12, FColor::Orange, true);
 		
 		if(BeamParticles)
 		{

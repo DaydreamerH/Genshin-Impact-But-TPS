@@ -238,7 +238,6 @@ void UCombatComponent::FireHitScanWeapon()
 {
 	if(EquippedWeapon && Character)
 	{
-		UE_LOG(LogTemp, Log, TEXT("FireHitScan"));
 		HitTarget = EquippedWeapon->bUseScatter?
 			EquippedWeapon->TraceEndWithScatter(HitTarget) : HitTarget;
 		if(!Character->HasAuthority())
@@ -266,10 +265,6 @@ void UCombatComponent::FireShotGun()
 
 void UCombatComponent::ServerShotGunFire_Implementation(const TArray<FVector_NetQuantize>& TraceHitTargets)
 {
-	if(Character->HasAuthority())
-	{
-		UE_LOG(LogTemp, Log, TEXT("ServerFire"));
-	}
 	MulticastShotGunFire(TraceHitTargets);
 }
 
@@ -279,11 +274,7 @@ void UCombatComponent::MulticastShotGunFire_Implementation(const TArray<FVector_
 	{
 		return;
 	}
-
-	if(!Character->HasAuthority())
-	{
-		UE_LOG(LogTemp, Log, TEXT("ServerOnClientFire"));
-	}
+	
 	ShotGunLocalFire(TraceHitTargets);
 }
 
@@ -640,7 +631,6 @@ void UCombatComponent::OnRep_CombatState()
 
 void UCombatComponent::UpdateAmmoValue()
 {
-	UE_LOG(LogTemp, Log, TEXT("Update Ammo"));
 	if(EquippedWeapon==nullptr || Character ==nullptr)return;
 	
 	int32 ReloadAmount = AmountToReload();
@@ -799,7 +789,6 @@ void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& Trac
 	{
 		CombatState = ECombatState::ECS_Cooling;
 	}
-	UE_LOG(LogTemp, Log, TEXT("FireHitScan"));
 	MulticastFire(TraceHitTarget);
 }
 
