@@ -348,19 +348,32 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	DropShield(DeltaTime);
 	
-	if (!RecoilOffset.IsNearlyZero())
+	if (RecoilOffset != FRotator::ZeroRotator || MaxRecoilAmount != FRotator::ZeroRotator)
 	{
-		FRotator TargetRecoil = FRotator::ZeroRotator;
-		
-		RecoilOffset = FMath::RInterpTo(RecoilOffset, TargetRecoil, DeltaTime, RecoilRecoverySpeed);
-		FRotator Rotation = GetControlRotation() + RecoilOffset;
-		if (RecoilOffset.Equals(TargetRecoil, 0.01f))
+		if(bIsRecoiling)
 		{
-			if (APlayerController* PC = Cast<APlayerController>(GetController()))
+			float InterpSpeed = 15.0f; 
+			RecoilOffset = FMath::RInterpConstantTo(RecoilOffset, MaxRecoilAmount, DeltaTime, InterpSpeed);
+
+			if (RecoilOffset.Equals(MaxRecoilAmount, 1.f))
+			{
+				bIsRecoiling = false;
+				MaxRecoilAmount = FRotator::ZeroRotator;
+			}
+		}
+		else
+		{
+			RecoilOffset =
+				FMath::RInterpTo(RecoilOffset, FRotator::ZeroRotator, DeltaTime, RecoilRecoverySpeed);
+		}
+		const FRotator Rotation = GetControlRotation() + RecoilOffset;
+		if (RecoilOffset.Equals(FRotator::ZeroRotator, .1f))
+		{
+			/*if (APlayerController* PC = Cast<APlayerController>(GetController()))
 			{
 				PC->SetControlRotation(Rotation);
-			}
-			FollowCamera->SetWorldRotation(Rotation);
+			}*/
+			FollowCamera->SetWorldRotation(GetControlRotation());
 			RecoilOffset = FRotator::ZeroRotator;
 		}
 		else
@@ -368,31 +381,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 			FollowCamera->SetWorldRotation(Rotation);
 		}
 	}
-	// 如果当前后坐力偏移不为零，则进行插值恢复
-	/*if (!RecoilOffset.IsNearlyZero())
-	{
-		// 计算目标后坐力（这里使用 MaxRecoilAmount 与 AddRecoilOffset 得到目标偏移）
-		FRotator TargetRecoil = MaxRecoilAmount*0.3;
-
-		// 记录前一帧的 RecoilOffset，用来计算变化量
-		FRotator PrevRecoil = RecoilOffset;
-
-		// 使用插值函数平滑恢复到目标后坐力
-		RecoilOffset = FMath::RInterpTo(RecoilOffset, TargetRecoil, DeltaTime, RecoilRecoverySpeed);
-
-		// 计算这一帧的变化量（差值）
-		FRotator DeltaRecoil = RecoilOffset - PrevRecoil;
-
-		// 将变化量应用到玩家控制器上：Pitch 与 Yaw 分别用 AddControllerPitchInput 与 AddControllerYawInput 处理
-		AddControllerPitchInput(DeltaRecoil.Pitch);
-		AddControllerYawInput(DeltaRecoil.Yaw);
-
-		// 如果当前后坐力足够接近目标后坐力（阈值可根据需求调整），则重置后坐力偏移
-		if (RecoilOffset.Equals(TargetRecoil, 0.5f))
-		{
-			RecoilOffset = FRotator::ZeroRotator;
-		}
-	}*/
 }
 
 void APlayerCharacter::OnActionMoveForward(const FInputActionValue& InputActionValue)
@@ -944,11 +932,23 @@ void APlayerCharacter::HandlePlaySound(const ECharacterSoundType SoundType)
 
 void APlayerCharacter::AddRecoil(const FRotator& RecoilAmount, const float RecoverSpeed)
 {
-	AddRecoilOffset = RecoilAmount - RecoilOffset;
-	RecoilOffset = RecoilAmount;
-	MaxRecoilAmount = RecoilOffset;
-	RecoilRecoverySpeed = RecoverSpeed;
+	// 计算目标后坐力（累加方式，让后坐力逐渐增加）
+	if(MaxRecoilAmount != FRotator::ZeroRotator)
+	{
+		MaxRecoilAmount += RecoilAmount;
+	}
+	else
+	{
+		MaxRecoilAmount = RecoilOffset + RecoilAmount;
+	}
+	MaxRecoilAmount.Pitch = FMath::Clamp(MaxRecoilAmount.Pitch, 0.f, 15.f); // 限制最大后坐力
+	MaxRecoilAmount.Yaw = FMath::Clamp(MaxRecoilAmount.Yaw, -5.f, 5.f);
+	// 逐步叠加
+	RecoilRecoverySpeed = RecoverSpeed; // 记录恢复速度
+
+	bIsRecoiling = true; // 标记正在后坐
 }
+
 
 void APlayerCharacter::ResetRecentlySound()
 {

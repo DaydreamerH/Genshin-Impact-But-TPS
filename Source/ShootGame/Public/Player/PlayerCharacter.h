@@ -350,6 +350,8 @@ private:
 	float MaxPitchRecoil = 10.f;
 	UPROPERTY(EditAnywhere, Category="Recoil")
 	float RecoilRecoverySpeed = 5.f;
+	bool bIsRecoiling = false;
+	FRotator PrevRecoilOffset = FRotator::ZeroRotator;
 	
 public:
 	void UpdateHUDHealth();
