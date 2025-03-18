@@ -185,19 +185,42 @@ void AWeapon::OnRep_WeaponState()
 
 void AWeapon::ApplyRecoil()
 {
-	OwnerPlayerCharacter = OwnerPlayerCharacter == nullptr
+	/*OwnerPlayerCharacter = OwnerPlayerCharacter == nullptr
 		? Cast<APlayerCharacter>(Owner) : OwnerPlayerCharacter;
 	if (OwnerPlayerCharacter)
 	{
 		const float ActualHorizontalRecoil = FMath::RandRange(-HorizontalRecoil, HorizontalRecoil);
 
 		FRotator Recoil;
-		Recoil.Pitch = VerticalRecoil; 
+		Recoil.Pitch = BaseVerticalRecoil; 
 		Recoil.Yaw = ActualHorizontalRecoil;
 		Recoil.Roll = 0.f;
 
 		OwnerPlayerCharacter->AddRecoil(Recoil, RecoilRecoverSpeed);
+	}*/
+	// 如果距离上次开火超过阈值，重置连发计数
+	if (GetWorld()->TimeSince(LastFireTime) > RecoilResetTime)
+	{
+		ConsecutiveShotsCount = 0;
 	}
+
+	// 计算当前后坐力
+	const float CurrentVerticalRecoil = BaseVerticalRecoil + VerticalRecoilIncrement * ConsecutiveShotsCount;
+	const float ActualHorizontalRecoil =
+		FMath::RandRange(-HorizontalRecoil, HorizontalRecoil) * (1 + ConsecutiveShotsCount * 0.1f); // 水平后坐力随连发增加
+
+	
+	
+	FRotator Recoil;
+	Recoil.Pitch = CurrentVerticalRecoil; 
+	Recoil.Yaw = ActualHorizontalRecoil;
+	Recoil.Roll = 0.f;
+
+	OwnerPlayerCharacter->AddRecoil(Recoil, RecoilRecoverSpeed);
+
+	// 更新连发计数和时间
+	ConsecutiveShotsCount++;
+	LastFireTime = GetWorld()->GetTimeSeconds();
 }
 
 void AWeapon::SetWeaponState(EWeaponState State)

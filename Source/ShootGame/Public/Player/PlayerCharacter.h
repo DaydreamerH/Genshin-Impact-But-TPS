@@ -344,6 +344,10 @@ private:
 
 	// 后坐力系统
 	FRotator RecoilOffset = FRotator::ZeroRotator;
+	FRotator AddRecoilOffset = FRotator::ZeroRotator;
+	FRotator MaxRecoilAmount = FRotator::ZeroRotator;
+	UPROPERTY(EditAnywhere, Category="Recoil")
+	float MaxPitchRecoil = 10.f;
 	UPROPERTY(EditAnywhere, Category="Recoil")
 	float RecoilRecoverySpeed = 5.f;
 	

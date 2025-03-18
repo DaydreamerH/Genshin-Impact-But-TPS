@@ -173,11 +173,19 @@ private:
 	UMaterialInterface* OverlayMaterial;
 	
 	UPROPERTY(EditAnywhere, Category = "Recoil")
-	float VerticalRecoil = 2.0f;
+	float BaseVerticalRecoil = 2.0f;
+	UPROPERTY(EditAnywhere, Category="Recoil")
+	float VerticalRecoilIncrement = 2.f;
 	UPROPERTY(EditAnywhere, Category = "Recoil")
 	float HorizontalRecoil = 1.0f;
 	UPROPERTY(EditAnywhere, Category="Recoil")
 	float RecoilRecoverSpeed = 5.f;
+	int32 ConsecutiveShotsCount = 0;
+	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
+	float RecoilResetTime = 1.f;
+	float LastFireTime;
+
+	
 public:
 	void SetWeaponState(EWeaponState State);
 	
