@@ -4,13 +4,50 @@
 #include "HUD/ElimAnnouncement.h"
 
 #include "Components/TextBlock.h"
+#include "Player/PlayerCharacter.h"
+#include "PlayerController/MyPlayerController.h"
 
-void UElimAnnouncement::SetElimAnnouncementText(FString AttackerName, FString VictimName)
+void UElimAnnouncement::SetElimAnnouncementText(AMyPlayerState* Attacker, AMyPlayerState* Victim)
 {
-	const FString ElimAnnouncementText =
-		FString::Printf(TEXT("%s %s %s"), *AttackerName, TEXT("击败"), *VictimName);
-	if(AnnouncementText)
+	if(MyTeam == ETeam::ET_NoTeam)
 	{
-		AnnouncementText->SetText(FText::FromString(ElimAnnouncementText));
+		if(GetWorld())
+		{
+			if(AMyPlayerController* PlayerController =
+				Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController()))
+			{
+				if(AMyPlayerState* PlayerState = PlayerController->GetPlayerState<AMyPlayerState>())
+				{
+					MyTeam = PlayerState->GetTeam();
+				}
+			}
+		}
 	}
+	
+	if(Victim)
+	{
+		VictimText->SetText(FText::FromString(Victim->GetPlayerName()));
+		if(Victim->GetTeam() == MyTeam)
+		{
+			VictimText->SetColorAndOpacity(FriendColor);
+		}
+		else
+		{
+			VictimText->SetColorAndOpacity(EnemyColor);
+		}
+	}
+
+	if(Attacker)
+	{
+		AttackerText->SetText(FText::FromString(Attacker->GetPlayerName()));
+		if(Attacker->GetTeam() == MyTeam)
+		{
+			AttackerText->SetColorAndOpacity(FriendColor);
+		}
+		else
+		{
+			AttackerText->SetColorAndOpacity(EnemyColor);
+		}
+	}
+	
 }

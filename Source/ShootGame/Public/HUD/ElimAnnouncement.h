@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Player/team.h"
+#include "Player/MyPlayerState.h"
 #include "ElimAnnouncement.generated.h"
 
 /**
@@ -15,11 +17,20 @@ class SHOOTGAME_API UElimAnnouncement : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void SetElimAnnouncementText(FString AttackerName, FString VictimName);
+	void SetElimAnnouncementText(AMyPlayerState* Attacker, AMyPlayerState* Victim);
 	
 	UPROPERTY(meta = (BindWidget))
 	class UHorizontalBox* AnnouncementBox;
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* AnnouncementText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* AttackerText;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* VictimText;
+private:
+	ETeam MyTeam = ETeam::ET_NoTeam;
+	const FLinearColor FriendColor = FLinearColor(0.202818f, 0.604446f, 1.000000f, 1.000000f);
+	const FLinearColor EnemyColor = FLinearColor(1.000000f,0.390901f,0.382375f,1.000000f);
 };

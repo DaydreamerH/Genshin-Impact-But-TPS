@@ -81,7 +81,7 @@ void APlayerHUD::AddAnnouncement()
 	}
 }
 
-void APlayerHUD::AddElimAnnouncement(FString Attacker, FString Victim)
+void APlayerHUD::AddElimAnnouncement(AMyPlayerState* Attacker, AMyPlayerState* Victim)
 {
 	OwingPlayer = OwingPlayer == nullptr?GetOwningPlayerController():OwingPlayer;
 	if(OwingPlayer && ElimAnnouncementClass)

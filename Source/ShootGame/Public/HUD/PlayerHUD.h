@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "Player/MyPlayerState.h"
 #include "PlayerHUD.generated.h"
 
 USTRUCT(BlueprintType)
@@ -38,7 +39,7 @@ public:
 	
 	void AddCharacterOverlay();
 	void AddAnnouncement();
-	void AddElimAnnouncement(FString Attacker, FString Victim);
+	void AddElimAnnouncement(AMyPlayerState* Attacker, AMyPlayerState* Victim);
 protected:
 	virtual void BeginPlay() override;
 	

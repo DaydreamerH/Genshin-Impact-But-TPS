@@ -42,7 +42,7 @@ public:
 
 	void ShowBackToMainMenu();
 
-	void BroadcastElim(APlayerState* Attacker, APlayerState* Victim);
+	void BroadcastElim(AMyPlayerState* Attacker, AMyPlayerState* Victim);
 
 	void HideTeamScores();
 	void InitTeamScores();
@@ -88,7 +88,7 @@ protected:
 	void CheckPing(float DeltaSeconds);
 
 	UFUNCTION(Client, Reliable)
-	void ClientElimAnnouncement(APlayerState* Attacker, APlayerState* Victim);
+	void ClientElimAnnouncement(AMyPlayerState* Attacker, AMyPlayerState* Victim);
 
 	UPROPERTY(ReplicatedUsing=OnRep_ShowTeamScores)
 	bool bShowTeamScores = false;

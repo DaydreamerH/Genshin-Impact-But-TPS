@@ -565,7 +565,7 @@ void AMyPlayerController::ShowBackToMainMenu()
 	}
 }
 
-void AMyPlayerController::BroadcastElim(APlayerState* Attacker, APlayerState* Victim)
+void AMyPlayerController::BroadcastElim(AMyPlayerState* Attacker, AMyPlayerState* Victim)
 {
 	ClientElimAnnouncement(Attacker, Victim);
 }
@@ -671,14 +671,14 @@ void AMyPlayerController::ClientShowHitCrosshairHandle_Implementation()
 }
 
 
-void AMyPlayerController::ClientElimAnnouncement_Implementation(APlayerState* Attacker, APlayerState* Victim)
+void AMyPlayerController::ClientElimAnnouncement_Implementation(AMyPlayerState* Attacker, AMyPlayerState* Victim)
 {
 	if(Attacker && Victim)
 	{
 		PlayerHUD = PlayerHUD == nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
 		if(PlayerHUD)
 		{
-			PlayerHUD->AddElimAnnouncement(Attacker->GetPlayerName(), Victim->GetPlayerName());
+			PlayerHUD->AddElimAnnouncement(Attacker, Victim);
 		}
 	}
 }
