@@ -4,6 +4,7 @@
 #include "GameState/ShootGameState.h"
 
 #include "GameFramework/PlayerState.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "PlayerController/MyPlayerController.h"
 
@@ -115,4 +116,10 @@ void AShootGameState::BlueTeamScores(const float Score)
 			}
 		}
 	}
+}
+
+void AShootGameState::BeginPlay()
+{
+	Super::BeginPlay();
+	UGameplayStatics::PlaySound2D(this, BackgroundMusic, 0.5);
 }

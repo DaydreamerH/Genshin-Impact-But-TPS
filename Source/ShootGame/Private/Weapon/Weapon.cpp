@@ -188,7 +188,6 @@ void AWeapon::ApplyRecoil()
 	if (GetWorld()->TimeSince(LastFireTime) > RecoilResetTime)
 	{
 		ConsecutiveShotsCount = 0;
-		LastVerticalRecoil = 0.f;
 	}
 	const float ActualHorizontalRecoil =
 		FMath::RandRange(-HorizontalRecoil, HorizontalRecoil) * (1 + ConsecutiveShotsCount * 0.1f); // 水平后坐力随连发增加

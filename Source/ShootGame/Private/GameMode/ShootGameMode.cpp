@@ -36,8 +36,6 @@ void AShootGameMode::BeginPlay()
 	Super::BeginPlay();
 
 	LevelStartingTime = GetWorld()->GetTimeSeconds();
-
-	UGameplayStatics::PlaySound2D(this, BackgroundMusic, 0.5);
 }
 
 void AShootGameMode::Tick(float DeltaSeconds)

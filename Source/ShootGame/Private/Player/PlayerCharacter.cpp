@@ -352,7 +352,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	{
 		if(bIsRecoiling)
 		{
-			float InterpSpeed = 15.0f; 
+			float InterpSpeed = 10.0f; 
 			RecoilOffset = FMath::RInterpConstantTo(RecoilOffset, MaxRecoilAmount, DeltaTime, InterpSpeed);
 
 			if (RecoilOffset.Equals(MaxRecoilAmount, 1.f))

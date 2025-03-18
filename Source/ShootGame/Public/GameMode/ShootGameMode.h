@@ -51,7 +51,4 @@ public:
 	
 private:
 	float CountDownTime = 0.f;
-	
-	UPROPERTY(EditAnywhere)
-	USoundBase* BackgroundMusic;
 };

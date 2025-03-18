@@ -37,7 +37,9 @@ public:
 
 	void RedTeamScores(float Score = 1.f);
 	void BlueTeamScores(float Score = 1.f);
-
+	virtual void BeginPlay() override;
 private:
 	float TopScore = 0.f;
+	UPROPERTY(EditAnywhere)
+	USoundBase* BackgroundMusic;
 };
