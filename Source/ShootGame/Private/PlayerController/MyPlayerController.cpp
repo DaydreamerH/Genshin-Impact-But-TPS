@@ -288,8 +288,12 @@ void AMyPlayerController::HandleCooldown()
 				FString AnnouncementText = Announcement::NewMatchStartsIn;
 				PlayerHUD->Announcement->AnnouncementText->SetText(FText::FromString(AnnouncementText));
 			}
-
 			if(PlayerHUD->Announcement->InfoText)
+			{
+				PlayerHUD->Announcement->InfoText->SetVisibility(ESlateVisibility::Collapsed);
+			}
+
+			if(PlayerHUD->Announcement->ResultText)
 			{
 				if(AShootGameState* ShootGameState = Cast<AShootGameState>
 					(UGameplayStatics::GetGameState(this)))
@@ -298,7 +302,7 @@ void AMyPlayerController::HandleCooldown()
 					FString InfoTextString = bShowTeamScores ?
 						GetTeamsInfoText(ShootGameState) : GetInfoText(TopPlayers);
 					
-					PlayerHUD->Announcement->InfoText->SetText(FText::FromString(InfoTextString));
+					PlayerHUD->Announcement->ResultText->SetText(FText::FromString(InfoTextString));
 				}
 			}
 		}

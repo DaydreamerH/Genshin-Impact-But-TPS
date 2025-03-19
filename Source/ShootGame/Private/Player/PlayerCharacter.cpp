@@ -369,10 +369,10 @@ void APlayerCharacter::Tick(float DeltaTime)
 		const FRotator Rotation = GetControlRotation() + RecoilOffset;
 		if (RecoilOffset.Equals(FRotator::ZeroRotator, .1f))
 		{
-			/*if (APlayerController* PC = Cast<APlayerController>(GetController()))
+			if (APlayerController* PC = Cast<APlayerController>(GetController()))
 			{
 				PC->SetControlRotation(Rotation);
-			}*/
+			}
 			FollowCamera->SetWorldRotation(GetControlRotation());
 			RecoilOffset = FRotator::ZeroRotator;
 		}
