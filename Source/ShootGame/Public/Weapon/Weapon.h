@@ -185,6 +185,8 @@ private:
 	float RecoilResetTime = 1.f;
 	float LastFireTime;
 
+	FTimerHandle DestroyTimerHandle; 
+	void OnDestroyTimerExpired();
 	
 public:
 	void SetWeaponState(EWeaponState State);

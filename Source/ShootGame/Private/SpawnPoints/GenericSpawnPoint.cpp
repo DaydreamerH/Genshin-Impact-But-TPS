@@ -28,7 +28,7 @@ void AGenericSpawnPoint::SpawnWeapon()
 		// 生成武器
 		SpawnedWeapon = GetWorld()->SpawnActor<AWeapon>
 			(WeaponClasses[Selection], GetActorLocation(), GetActorRotation());
-
+		SpawnedWeapon->SetWeaponState(EWeaponState::EWS_Initial);
 		if (SpawnedWeapon)
 		{
 			SpawnedWeapon->OnWeaponStateChanged.AddDynamic(this, &ThisClass::OnWeaponStateChanged);

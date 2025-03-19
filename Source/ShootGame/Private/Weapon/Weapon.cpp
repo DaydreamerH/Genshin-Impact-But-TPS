@@ -204,8 +204,21 @@ void AWeapon::ApplyRecoil()
 	LastFireTime = GetWorld()->GetTimeSeconds();
 }
 
+void AWeapon::OnDestroyTimerExpired()
+{
+	if(HasAuthority() && WeaponState == EWeaponState::EWS_Dropped)
+	{
+		Destroy();
+	}
+}
+
 void AWeapon::SetWeaponState(EWeaponState State)
 {
+	if(HasAuthority() && WeaponState == EWeaponState::EWS_Dropped)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(DestroyTimerHandle);
+	}
+	
 	WeaponState = State;
 	OnWeaponStateSet();
 
@@ -257,6 +270,12 @@ void AWeapon::OnDropped()
 	if(HasAuthority())
 	{
 		AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		GetWorld()->GetTimerManager().SetTimer(
+			DestroyTimerHandle,
+			this,
+			&AWeapon::OnDestroyTimerExpired,
+			10.0f,
+			false);
 	}
 	WeaponMesh->SetSimulatePhysics(true);
 	WeaponMesh->SetEnableGravity(true);
@@ -311,7 +330,6 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AWeapon, WeaponState);
-	// DOREPLIFETIME(AWeapon, Ammo);
 	DOREPLIFETIME_CONDITION(AWeapon, bUseServerSideRewind, COND_OwnerOnly);
 }
 
