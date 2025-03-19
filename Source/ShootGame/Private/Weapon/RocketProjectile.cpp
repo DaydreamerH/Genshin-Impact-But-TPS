@@ -61,6 +61,11 @@ void ARocketProjectile::Destroyed()
 void ARocketProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                               FVector NormalImpulse, const FHitResult& Hit)
 {
+	if (OtherActor == GetOwner())
+	{
+		return;
+	}
+	
 	ExplodeDamage();
 
 	StartDestroyTimer();
