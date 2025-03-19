@@ -12,7 +12,10 @@ AGenericSpawnPoint::AGenericSpawnPoint()
 void AGenericSpawnPoint::BeginPlay()
 {
 	Super::BeginPlay();
-	StartSpawnWeaponTimer(nullptr);
+	if(HasAuthority())
+	{
+		StartSpawnWeaponTimer(nullptr);
+	}
 }
 
 void AGenericSpawnPoint::Tick(float DeltaTime)
@@ -38,7 +41,7 @@ void AGenericSpawnPoint::SpawnWeapon()
 
 void AGenericSpawnPoint::OnWeaponStateChanged(EWeaponState WeaponState)
 {
-	if (SpawnedWeapon && WeaponState != EWeaponState::EWS_Initial)
+	if (HasAuthority() && SpawnedWeapon && WeaponState != EWeaponState::EWS_Initial)
 	{
 		SpawnedWeapon->OnWeaponStateChanged.RemoveDynamic(this, &AGenericSpawnPoint::OnWeaponStateChanged);
 		SpawnedWeapon = nullptr;
