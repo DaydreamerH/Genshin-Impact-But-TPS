@@ -324,7 +324,7 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 {
 	if(EquippedWeapon == nullptr)return;
-	if(Character == nullptr || Character->Controller == nullptr)return;
+	if(Character == nullptr || Character->Controller == nullptr || Character->GetElimmed())return;
 	Controller = Controller == nullptr?Cast<AMyPlayerController>(Character->Controller):Controller;
 
 	if(Controller)

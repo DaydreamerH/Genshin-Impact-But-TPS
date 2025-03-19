@@ -419,4 +419,6 @@ public:
 	void HandlePlaySound(ECharacterSoundType SoundType);
 
 	void AddRecoil(const FRotator& RecoilAmount, const float RecoverSpeed);
+
+	FORCEINLINE bool GetElimmed () const {return bElimmed;}
 };

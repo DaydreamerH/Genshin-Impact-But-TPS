@@ -130,6 +130,15 @@ void APlayerHUD::ElimAnnouncementTimerFinished(UElimAnnouncement* MsgToRemove)
 	}
 }
 
+void APlayerHUD::RemoveCrosshair()
+{
+	HUDPackage.CrosshairsCenter = nullptr;
+	HUDPackage.CrosshairsRight  = nullptr;
+	HUDPackage.CrosshairsLeft   = nullptr;
+	HUDPackage.CrosshairsTop    = nullptr;
+	HUDPackage.CrosshairsBottom = nullptr;
+}
+
 void APlayerHUD::DrawCrosshair(UTexture2D* Texture, FVector2d ViewportCenter, FVector2d Spread)
 {
 	const float TextureWidth = Texture->GetSizeX();

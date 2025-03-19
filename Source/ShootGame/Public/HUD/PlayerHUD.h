@@ -67,4 +67,5 @@ private:
 	TArray<UElimAnnouncement*> ElimMsgs;
 public:
 	FORCEINLINE void SetHUDPackage(const FHUDPackage& Package){ HUDPackage = Package; }
+	void RemoveCrosshair();
 };

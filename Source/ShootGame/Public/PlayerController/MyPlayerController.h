@@ -54,7 +54,8 @@ public:
 	void ShowHitCrosshairHandle();
 	UFUNCTION(Client, Reliable)
 	void ClientShowHitCrosshairHandle();
-	
+
+	void RemoveCrosshair();
 protected:
 	virtual void BeginPlay() override;
 	void SetHUDTime();

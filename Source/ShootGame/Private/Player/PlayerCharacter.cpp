@@ -243,6 +243,7 @@ void APlayerCharacter::MulticastElim_Implementation(bool bPlayerLeftGame)
 	if(PlayerController)
 	{
 		PlayerController->SetHUDWeaponAmmo(0);
+		PlayerController->RemoveCrosshair();
 	}
 	
 	bElimmed = true;

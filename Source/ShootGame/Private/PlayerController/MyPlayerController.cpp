@@ -717,6 +717,14 @@ void AMyPlayerController::ServerRequestServerTime_Implementation(float TimeOfCli
 	ClientReportServerTime(TimeOfClientRequest, ServerTimeOfReceipt);
 }
 
+void AMyPlayerController::RemoveCrosshair()
+{
+	if(PlayerHUD)
+	{
+		PlayerHUD->RemoveCrosshair();
+	}
+}
+
 void AMyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
