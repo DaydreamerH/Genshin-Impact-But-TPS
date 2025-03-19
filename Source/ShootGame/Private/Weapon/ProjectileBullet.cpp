@@ -41,7 +41,7 @@ void AProjectileBullet::PostEditChangeProperty(FPropertyChangedEvent& PropertyCh
 void AProjectileBullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                               FVector NormalImpulse, const FHitResult& Hit)
 {
-	if(APlayerCharacter* OwnerCharacter = Cast<APlayerCharacter>(GetOwner()))
+	if(const APlayerCharacter* OwnerCharacter = Cast<APlayerCharacter>(GetOwner()))
 	{
 		AController* OwnerController = OwnerCharacter->GetController();
 		if(OwnerCharacter->HasAuthority() && !bUseServerSideRewind)
@@ -56,14 +56,14 @@ void AProjectileBullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 		AMyPlayerController* OwnerPlayerController = Cast<AMyPlayerController>(OwnerCharacter->GetOwner());
 		if(bUseServerSideRewind
 			&& OwnerCharacter->GetLagCompensation()
-			&& OwnerCharacter->IsLocallyControlled())
+			&& OwnerCharacter->IsLocallyControlled()
+			&& HitCharacter)
 		{
 			OwnerCharacter->GetLagCompensation()->ServerProjectileScoreRequest(
 				HitCharacter,
 				TraceStart,
 				InitialVelocity,
-				OwnerPlayerController->GetServerTime() - OwnerPlayerController->SingleTripTime,
-				this
+				OwnerPlayerController->GetServerTime() - OwnerPlayerController->SingleTripTime
 			);
 		}
 	}

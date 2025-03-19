@@ -94,8 +94,7 @@ public:
 		APlayerCharacter* HitCharacter,
 		const FVector_NetQuantize& TraceStart,
 		const FVector_NetQuantize100& InitialVelocity,
-		float HitTime,
-		AProjectile* DamageCauser
+		float HitTime
 	);
 protected:
 	virtual void BeginPlay() override;

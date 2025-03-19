@@ -47,7 +47,7 @@ public:
 	FTimerHandle ShieldRecoveryTimerHandle;
 
 	UPROPERTY(EditDefaultsOnly)
-	float ElimDelay = 2.5f;
+	float ElimDelay = 5.f;
 	
 	void ElimTimerFinished();
 

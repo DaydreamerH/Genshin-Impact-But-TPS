@@ -554,20 +554,25 @@ void ULagCompensationComponent::ServerShotGunScoreRequest_Implementation(const T
 }
 
 void ULagCompensationComponent::ServerProjectileScoreRequest_Implementation(APlayerCharacter* HitCharacter,
-	const FVector_NetQuantize& TraceStart, const FVector_NetQuantize100& InitialVelocity, float HitTime, AProjectile* DamageCauser)
+	const FVector_NetQuantize& TraceStart, const FVector_NetQuantize100& InitialVelocity, float HitTime)
 {
-	FServerSideRewindResult Confirm = ProjectileServerSideRewindResult(HitCharacter, TraceStart, InitialVelocity, HitTime);
-
-	if(HitCharacter && Character && Confirm.bHitConfirmed && DamageCauser)
+	if(const FServerSideRewindResult Confirm
+		= ProjectileServerSideRewindResult(HitCharacter, TraceStart, InitialVelocity, HitTime);
+		HitCharacter && Character && Confirm.bHitConfirmed)
 	{
 		const float DamageToCause = Confirm.bHeadShot ?
-			DamageCauser->HeadShotDamage : DamageCauser->Damage;
+			Character->GetEquippedWeapon()->GetHeadShotDamage()
+				: Character->GetEquippedWeapon()->GetDamage();
 		UGameplayStatics::ApplyDamage(
 			HitCharacter,
 			DamageToCause,
 			Character->Controller,
-			DamageCauser,
+			Character->GetEquippedWeapon(),
 			UDamageType::StaticClass()
 		);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("NoHit"));
 	}
 }

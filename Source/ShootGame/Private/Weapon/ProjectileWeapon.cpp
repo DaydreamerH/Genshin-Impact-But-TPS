@@ -65,8 +65,6 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 						SpawnedProjectile->TraceStart = SocketTransform.GetLocation();
 						SpawnedProjectile->InitialVelocity
 							= SpawnedProjectile->GetActorForwardVector() * SpawnedProjectile->InitialSpeed;
-						SpawnedProjectile->Damage = Damage;
-						SpawnedProjectile->HeadShotDamage = HeadShotDamage;
 					}
 					else
 					{

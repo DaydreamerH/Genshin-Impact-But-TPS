@@ -8,16 +8,15 @@
 void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-	
-	int32 numberOfPlayers =  GameState.Get()->PlayerArray.Num();
 
-	if(numberOfPlayers == 3)
+	if(int32 numberOfPlayers =  GameState.Get()->PlayerArray.Num();
+		numberOfPlayers == 6)
 	{
 		UWorld* world = GetWorld();
 		if(world)
 		{
 			bUseSeamlessTravel = true;
-			world->ServerTravel(FString("/Game/_Game/Maps/FightMap?listen"));
+			world->ServerTravel(FString("/Game/_Game/Maps/TeamMap?listen"));
 		}
 	}
 }
