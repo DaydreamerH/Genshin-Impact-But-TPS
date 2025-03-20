@@ -19,9 +19,9 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 			GetWeaponMesh()->GetSocketByName(FName("MuzzleFlash"));
 			MuzzleFlashSocket && World)
 		{
-			FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(GetWeaponMesh());
-			FVector ToTarget = HitTarget - SocketTransform.GetLocation();
-			FRotator TargetRotation = ToTarget.Rotation();
+			const FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(GetWeaponMesh());
+			const FVector ToTarget = HitTarget - SocketTransform.GetLocation();
+			const FRotator TargetRotation = ToTarget.Rotation();
 			FActorSpawnParameters SpawnParameters;
 			SpawnParameters.Owner = GetOwner();
 			SpawnParameters.Instigator = InstigatorPawn;
@@ -92,11 +92,10 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 			}
 			if(BulletShellClass)
 			{
-				const USkeletalMeshSocket* AmmoEjectSocket = 
-					WeaponMesh->GetSocketByName(FName("AmmoEject"));
-				if(AmmoEjectSocket)
+				if(const USkeletalMeshSocket* AmmoEjectSocket = 
+					WeaponMesh->GetSocketByName(FName("AmmoEject")))
 				{
-					FTransform AmmoSocketTransform = AmmoEjectSocket->GetSocketTransform(WeaponMesh);
+					const FTransform AmmoSocketTransform = AmmoEjectSocket->GetSocketTransform(WeaponMesh);
 					World->SpawnActor<ABulletShell>(
 						BulletShellClass,
 						AmmoSocketTransform.GetLocation(),

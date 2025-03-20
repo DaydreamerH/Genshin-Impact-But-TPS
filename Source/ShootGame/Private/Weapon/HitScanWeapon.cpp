@@ -39,9 +39,8 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 		if(OwnerPawn==nullptr)return;
 		AController* InstigatorController = OwnerPawn->GetController();
 
-		const USkeletalMeshSocket*
-			MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName("MuzzleFlash");
-		if(MuzzleFlashSocket)
+		if(const USkeletalMeshSocket*
+			MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName("MuzzleFlash"))
 		{
 			const UWorld* World = GetWorld();
 			FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform((GetWeaponMesh()));
@@ -133,10 +132,9 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 }
 
 
-void AHitScanWeapon::WeaponTraceHit(const FVector & TraceStart, const FVector & HitTarget, FHitResult& OutHit)
+void AHitScanWeapon::WeaponTraceHit(const FVector & TraceStart, const FVector & HitTarget, FHitResult& OutHit) const
 {
-	UWorld* World = GetWorld();
-	if(World)
+	if(UWorld* World = GetWorld())
 	{
 		FVector End = TraceStart + (HitTarget-TraceStart)*1.25f;
 		
@@ -158,14 +156,13 @@ void AHitScanWeapon::WeaponTraceHit(const FVector & TraceStart, const FVector & 
 		
 		if(BeamParticles)
 		{
-			UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(
+			if(UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(
 				World,
 				BeamParticles,
 				TraceStart,
 				FRotator::ZeroRotator,
 				true
-			);
-			if(Beam)
+			))
 			{
 				Beam->SetVectorParameter(FName("Target"), BeamEnd);
 			}

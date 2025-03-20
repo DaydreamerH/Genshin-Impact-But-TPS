@@ -14,7 +14,15 @@
 #include "Weapon/ShotGunWeapon.h"
 #include "Weapon/Weapon.h"
 
-UCombatComponent::UCombatComponent()
+UCombatComponent::UCombatComponent(): Controller(nullptr), HUD(nullptr), CrosshairVelocityFactor(0),
+                                      CrosshairAimFactor(0),
+                                      CrosshairShootingFactor(0),
+                                      SecondaryWeapon(nullptr),
+                                      EquippedBomb(nullptr),
+                                      bFireButtonPressed(false),
+                                      DefaultFOV(0), CurrentFOV(0),
+                                      CarriedAmmo(0),
+                                      CombatState()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	EquippedWeapon = nullptr;
@@ -382,7 +390,7 @@ void UCombatComponent::HandleReload()
 int32 UCombatComponent::AmountToReload()
 {
 	if(EquippedWeapon == nullptr)return 0;
-	int32 RoomInMag = EquippedWeapon->GetMagCapcity() - EquippedWeapon->GetAmmo();
+	int32 RoomInMag = EquippedWeapon->GetMagCapacity() - EquippedWeapon->GetAmmo();
 	if(CarriedAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
 	{
 		int32 AmountCarried = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
@@ -618,7 +626,7 @@ void UCombatComponent::OnRep_CombatState()
 			ShowGrenade(true);
 		}
 		break;
-	case ECombatState::ECS_SwapingWeapons:
+	case ECombatState::ECS_SwappingWeapons:
 		if(Character && !Character->IsLocallyControlled())
 		{
 			Character->PlaySwapMontage();
@@ -749,7 +757,7 @@ void UCombatComponent::ServerLaunchGrenade_Implementation(const FVector_NetQuant
 		SpawnParams.Instigator = Character;
 		if(UWorld* World = GetWorld())
 		{
-			AProjectile* Grenade = World->SpawnActor<AProjectile>(
+			World->SpawnActor<AProjectile>(
 				GrenadeClass,
 				StartingLocation,
 				ToTarget.Rotation(),
@@ -774,8 +782,6 @@ bool UCombatComponent::CouldSwapWeapons() const
 
 void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
-	// TODO: 这里是bug，服务器会开两次枪
-	
 	if(Character == nullptr || (Character->IsLocallyControlled() && !Character->HasAuthority()))
 	{
 		return;
@@ -897,7 +903,7 @@ void UCombatComponent::SwapWeapons()
 {
 	if(CombatState != ECombatState::ECS_Unoccupied || Character == nullptr)return;
 	Character->PlaySwapMontage();
-	CombatState = ECombatState::ECS_SwapingWeapons;
+	CombatState = ECombatState::ECS_SwappingWeapons;
 	
 	AWeapon* LastEquippedWeapon = EquippedWeapon;
 	EquippedWeapon = SecondaryWeapon;

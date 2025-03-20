@@ -5,7 +5,7 @@
 
 #include "Components/TextBlock.h"
 
-void UOverheadWidget::SetDisplayText(FString TextToDisplay)
+void UOverheadWidget::SetDisplayText(const FString& TextToDisplay) const
 {
 	if(DisplayText)
 	{
@@ -31,6 +31,7 @@ void UOverheadWidget::ShowPlayerNetRole(APawn* InPawn)
 	case ENetRole::ROLE_None:
 		Role = FString("None");
 		break;
+	default: ;
 	}
 
 	FString localRoleString = FString::Printf(TEXT("Local Role: %s"), *Role);

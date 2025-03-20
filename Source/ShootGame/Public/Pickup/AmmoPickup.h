@@ -21,8 +21,8 @@ protected:
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex,
 		bool bFromSweep,
-		const FHitResult& SweepResule
-	);
+		const FHitResult& SweepResult
+	) override;
 private:
 	UPROPERTY(EditAnywhere)
 	int32 AmmoAmount = 30;

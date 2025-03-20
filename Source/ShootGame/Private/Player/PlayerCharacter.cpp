@@ -9,7 +9,6 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/CombatComponent.h"
 #include "Components/LagCompensationComponent.h"
-#include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameMode/LobbyGameMode.h"
@@ -24,7 +23,6 @@
 #include "PlayerStart/TeamPlayerStart.h"
 #include "ShootGame/ShootGame.h"
 #include "Sound/SoundCue.h"
-#include "Tracks/MovieSceneMaterialTrack.h"
 #include "Weapon/Weapon.h"
 
 APlayerCharacter::APlayerCharacter()
@@ -279,7 +277,7 @@ void APlayerCharacter::ElimTimerFinished()
 	}
 }
 
-void APlayerCharacter::SetTeamColor(const ETeam Team)
+void APlayerCharacter::SetTeamColor(const ETeam Team) const
 {
 	if(GetWorld()->GetFirstPlayerController()->GetPlayerState<AMyPlayerState>()->GetTeam() == Team)
 	{
@@ -513,7 +511,7 @@ void APlayerCharacter::OnActionSwapWeapons(const FInputActionValue& InputActionV
 	if(!HasAuthority())
 	{
 		PlaySwapMontage();
-		Combat->CombatState = ECombatState::ECS_SwapingWeapons;
+		Combat->CombatState = ECombatState::ECS_SwappingWeapons;
 	}
 }
 
@@ -593,8 +591,7 @@ void APlayerCharacter::UpdateMPC()
 {
 	if(PlayerIndex != -1)
 	{
-		USkeletalMeshComponent* mesh = GetMesh();
-		if(mesh)
+		if(USkeletalMeshComponent* mesh = GetMesh())
 		{
 			FVector location = mesh->GetComponentLocation();
 
@@ -862,7 +859,7 @@ ECombatState APlayerCharacter::GetCombatState() const
 	{
 		return Combat->CombatState;
 	}
-	return ECombatState::ECS_MAX;
+	return ECombatState::ECS_Max;
 }
 
 void APlayerCharacter::CancelCombatComponentFireButtonPressed() const
@@ -996,7 +993,7 @@ void APlayerCharacter::TurnInPlace(float DeltaTime)
 	}
 }
 
-void APlayerCharacter::HideCamera()
+void APlayerCharacter::HideCamera() const
 {
 	if(!IsLocallyControlled())return;
 	if((FollowCamera->GetComponentLocation()-GetActorLocation()).Size()<CameraThreshold)

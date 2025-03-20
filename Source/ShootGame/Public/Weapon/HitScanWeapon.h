@@ -32,5 +32,5 @@ protected:
 	UPROPERTY(EditAnywhere)
 	USoundCue* HitSound;
 
-	void WeaponTraceHit(const FVector & TraceStart, const FVector & HitTarget, FHitResult& OutHit);
+	void WeaponTraceHit(const FVector & TraceStart, const FVector & HitTarget, FHitResult& OutHit) const;
 };

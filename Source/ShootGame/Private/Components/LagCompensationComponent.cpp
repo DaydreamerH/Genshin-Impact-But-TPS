@@ -9,7 +9,7 @@
 #include "ShootGame/ShootGame.h"
 #include "Weapon/Weapon.h"
 
-ULagCompensationComponent::ULagCompensationComponent()
+ULagCompensationComponent::ULagCompensationComponent(): Character(nullptr), Controller(nullptr)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
@@ -84,14 +84,14 @@ void ULagCompensationComponent::SaveFramePackage()
 }
 
 FServerSideRewindResult ULagCompensationComponent::ServerSideRewind(APlayerCharacter* HitCharacter, const FVector_NetQuantize& TraceStart,
-                                                                    const FVector_NetQuantize& HitLocation, float HitTime)
+                                                                    const FVector_NetQuantize& HitLocation, float HitTime) const
 {
 	const FFramePackage FrameToCheck = GetFrameToCheck(HitCharacter, HitTime);
 	return ConfirmHit(FrameToCheck, HitCharacter, TraceStart, HitLocation);
 }
 
 FServerSideRewindResult ULagCompensationComponent::ProjectileServerSideRewindResult(APlayerCharacter* HitCharacter,
-	const FVector_NetQuantize& TraceStart, const FVector_NetQuantize100& InitialVelocity, float HitTime)
+	const FVector_NetQuantize& TraceStart, const FVector_NetQuantize100& InitialVelocity, float HitTime) const
 {
 	const FFramePackage FrameToCheck = GetFrameToCheck(HitCharacter, HitTime);
 	return ProjectileConfirmHit(FrameToCheck, HitCharacter, TraceStart, InitialVelocity, HitTime);
@@ -212,7 +212,7 @@ FFramePackage ULagCompensationComponent::InterpBetweenFrames(const FFramePackage
 }
 
 FServerSideRewindResult ULagCompensationComponent::ConfirmHit(const FFramePackage& FramePackage,
-	APlayerCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation)
+	APlayerCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation) const
 {
 	if(HitCharacter == nullptr)return FServerSideRewindResult();
 
@@ -274,7 +274,7 @@ FServerSideRewindResult ULagCompensationComponent::ConfirmHit(const FFramePackag
 }
 
 FServerSideRewindResult ULagCompensationComponent::ProjectileConfirmHit(const FFramePackage& FramePackage, APlayerCharacter* HitCharacter,
-	const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& InitializeVelocity, float HitTime)
+	const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& InitializeVelocity, float HitTime) const
 {
 	if(HitCharacter == nullptr)return FServerSideRewindResult();
 
@@ -330,7 +330,7 @@ FServerSideRewindResult ULagCompensationComponent::ProjectileConfirmHit(const FF
 }
 
 FShotGunServerSideRewindResult ULagCompensationComponent::ShotGunConfirmHit(const TArray<FFramePackage>& FramePackages,
-	const FVector_NetQuantize& TraceStart, const TArray<FVector_NetQuantize>& HitLocations)
+	const FVector_NetQuantize& TraceStart, const TArray<FVector_NetQuantize>& HitLocations) const
 {
 	for(auto& Frame : FramePackages)
 	{
@@ -482,8 +482,8 @@ void ULagCompensationComponent::ResetHitBoxes(APlayerCharacter* HitCharacter, co
 	}
 }
 
-void ULagCompensationComponent::EnableCharacterMeshCollision(APlayerCharacter* HitCharacter,
-	ECollisionEnabled::Type CollisionEnabled)
+void ULagCompensationComponent::EnableCharacterMeshCollision(const APlayerCharacter* HitCharacter,
+                                                             ECollisionEnabled::Type CollisionEnabled)
 {
 	if(HitCharacter && HitCharacter->GetMesh())
 	{

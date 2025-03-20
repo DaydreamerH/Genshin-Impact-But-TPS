@@ -32,7 +32,7 @@ public:
 	virtual void ReceivedPlayer() override;
 	virtual float GetServerTime();
 	void OnMatchStateSet(FName State, bool bTeams = false);
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	void HandleMatchHasStarted(bool bTeams = false);
 	void HandleCooldown();
 
@@ -55,7 +55,7 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientShowHitCrosshairHandle();
 
-	void RemoveCrosshair();
+	void RemoveCrosshair() const;
 protected:
 	virtual void BeginPlay() override;
 	void SetHUDTime();
@@ -97,8 +97,8 @@ protected:
 	UFUNCTION()
 	void OnRep_ShowTeamScores();
 
-	FString GetInfoText(const TArray<APlayerState*>& PlayerStates);
-	FString GetTeamsInfoText(AShootGameState* ShootGameState);
+	static FString GetInfoText(const TArray<APlayerState*>& PlayerStates);
+	FString GetTeamsInfoText(const AShootGameState* ShootGameState) const;
 private:
 	UPROPERTY(EditAnywhere, Category=HUD)
 	TSubclassOf<class UUserWidget> BackToMainMenuWidget;

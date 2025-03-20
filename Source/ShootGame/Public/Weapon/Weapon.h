@@ -69,7 +69,7 @@ protected:
 	virtual void OnWeaponStateSet();
 	virtual void OnEquipped();
 	virtual void OnDropped();
-	virtual void OnEquippeedSecondary();
+	virtual void OnEquippedSecondary();
 	
 	UFUNCTION()
 	virtual void OnSphereOverlap(
@@ -78,7 +78,7 @@ protected:
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex,
 		bool bFromSweep,
-		const FHitResult& SweepResule
+		const FHitResult& SweepResult
 	);
 	UFUNCTION()
 	void OnSphereEndOverlap(
@@ -111,7 +111,7 @@ protected:
 	void SpendRound();
 	
 	UPROPERTY(EditAnywhere)
-	int32 MagCapcitiy = 30;
+	int32 MagCapacity = 30;
 
 	UPROPERTY(EditAnywhere)
 	bool AutoFire = true;
@@ -212,11 +212,11 @@ public:
 	FORCEINLINE EWeaponType GetWeaponType() const {return WeaponType;}
 
 	FORCEINLINE int32 GetAmmo() const {return Ammo; }
-	FORCEINLINE int32 GetMagCapcity() const {return MagCapcitiy;}
+	FORCEINLINE int32 GetMagCapacity() const {return MagCapacity;}
 
 	FORCEINLINE bool GetAutoFire() const {return AutoFire;}
 
-	FORCEINLINE bool IsFull() const { return Ammo >= MagCapcitiy; }
+	FORCEINLINE bool IsFull() const { return Ammo >= MagCapacity; }
 
 	FORCEINLINE float GetDamage() const { return Damage; }
 	FORCEINLINE float GetHeadShotDamage() const { return HeadShotDamage; }

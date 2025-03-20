@@ -9,7 +9,6 @@
 #include "Player/MyPlayerState.h"
 #include "Player/PlayerCharacter.h"
 #include "PlayerController/MyPlayerController.h"
-#include "Player/MyPlayerState.h"
 
 namespace MatchState
 {
@@ -131,7 +130,7 @@ void AShootGameMode::RequestRespawn(ACharacter* ElimmedCharacter, AController* E
 	}
 }
 
-void AShootGameMode::PlayerLeftGame(AMyPlayerState* PlayerLeaving)
+void AShootGameMode::PlayerLeftGame(AMyPlayerState* PlayerLeaving) const
 {
 	if(AShootGameState* ShootGameState = GetGameState<AShootGameState>();
 		ShootGameState && ShootGameState->TopScoringPlayers.Contains(PlayerLeaving))

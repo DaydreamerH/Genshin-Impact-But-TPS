@@ -59,7 +59,7 @@ public:
 
 	FOnLeftGame OnLeftGame;
 
-	void SetTeamColor(ETeam Team);
+	void SetTeamColor(ETeam Team) const;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -265,7 +265,7 @@ private:
 	
 	float CurrentRadius;
 
-	void HideCamera();
+	void HideCamera() const;
 	UPROPERTY(EditAnywhere)
 	float CameraThreshold = 200.f;
 

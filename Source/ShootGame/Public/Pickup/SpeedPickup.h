@@ -20,8 +20,8 @@ protected:
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex,
 		bool bFromSweep,
-		const FHitResult& SweepResule
-	);
+		const FHitResult& SweepResult
+	) override;
 private:
 	UPROPERTY(EditAnywhere)
 	float BaseSpeedBuff = 1600.f;

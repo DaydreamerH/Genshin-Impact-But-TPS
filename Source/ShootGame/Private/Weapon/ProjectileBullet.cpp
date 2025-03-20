@@ -39,7 +39,7 @@ void AProjectileBullet::PostEditChangeProperty(FPropertyChangedEvent& PropertyCh
 #endif
 
 void AProjectileBullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-                              FVector NormalImpulse, const FHitResult& Hit)
+                              const FVector NormalImpulse, const FHitResult& Hit)
 {
 	if(const APlayerCharacter* OwnerCharacter = Cast<APlayerCharacter>(GetOwner()))
 	{

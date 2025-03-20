@@ -12,7 +12,7 @@ void UShotGunReloadAnimNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSeq
 	
 	if(MeshComp && MeshComp->GetOwner())
 	{
-		if(APlayerCharacter* PlayerCharacter =
+		if(const APlayerCharacter* PlayerCharacter =
 			Cast<APlayerCharacter>(MeshComp->GetOwner());
 			PlayerCharacter && PlayerCharacter->GetCombat() && PlayerCharacter->HasAuthority())
 		{

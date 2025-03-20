@@ -35,7 +35,7 @@ void ABombZone::BeginPlay()
 void ABombZone::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(ABomb* Bomb = Cast<ABomb>(OtherActor))
+	if(Cast<ABomb>(OtherActor))
 	{
 		if(AShootGameState* GameState = GetWorld()->GetGameState<AShootGameState>())
 		{
@@ -54,7 +54,7 @@ void ABombZone::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Othe
 void ABombZone::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex)
 {
-	if(ABomb* Bomb = Cast<ABomb>(OtherActor))
+	if(Cast<ABomb>(OtherActor))
 	{
 		if(AShootGameState* GameState = GetWorld()->GetGameState<AShootGameState>())
 		{

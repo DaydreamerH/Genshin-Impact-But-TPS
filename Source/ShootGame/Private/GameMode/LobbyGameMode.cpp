@@ -12,8 +12,7 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 	if(int32 numberOfPlayers =  GameState.Get()->PlayerArray.Num();
 		numberOfPlayers == 6)
 	{
-		UWorld* world = GetWorld();
-		if(world)
+		if(UWorld* world = GetWorld())
 		{
 			bUseSeamlessTravel = true;
 			world->ServerTravel(FString("/Game/_Game/Maps/TeamMap?listen"));

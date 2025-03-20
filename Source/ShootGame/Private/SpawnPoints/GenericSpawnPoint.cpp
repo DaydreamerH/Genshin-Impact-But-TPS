@@ -18,7 +18,7 @@ void AGenericSpawnPoint::BeginPlay()
 	}
 }
 
-void AGenericSpawnPoint::Tick(float DeltaTime)
+void AGenericSpawnPoint::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
@@ -39,7 +39,7 @@ void AGenericSpawnPoint::SpawnWeapon()
 	}
 }
 
-void AGenericSpawnPoint::OnWeaponStateChanged(EWeaponState WeaponState)
+void AGenericSpawnPoint::OnWeaponStateChanged(const EWeaponState WeaponState)
 {
 	if (HasAuthority() && SpawnedWeapon && WeaponState != EWeaponState::EWS_Initial)
 	{

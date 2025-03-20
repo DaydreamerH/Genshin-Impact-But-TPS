@@ -35,7 +35,7 @@ public:
 		class AMyPlayerController* VictimController,
 		class AMyPlayerController* AttackController);
 	virtual void RequestRespawn(class ACharacter* ElimmedCharacter, AController* ElimmedController);
-	void PlayerLeftGame(AMyPlayerState* PlayerLeaving);
+	void PlayerLeftGame(AMyPlayerState* PlayerLeaving) const;
 	UPROPERTY(EditDefaultsOnly)
 	float WarmUpTime = 10.f;
 	UPROPERTY(EditDefaultsOnly)

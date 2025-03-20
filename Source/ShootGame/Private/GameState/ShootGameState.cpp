@@ -36,7 +36,7 @@ void AShootGameState::UpdateTopScore(APlayerState* ScoringPlayer)
 	}
 }
 
-void AShootGameState::OnRep_RedTeamScore()
+void AShootGameState::OnRep_RedTeamScore() const
 {
 	if(AMyPlayerController* PlayerController
 		= Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController()))
@@ -55,7 +55,7 @@ void AShootGameState::OnRep_RedTeamScore()
 	}
 }
 
-void AShootGameState::OnRep_BlueTeamScore()
+void AShootGameState::OnRep_BlueTeamScore() const
 {
 	if(AMyPlayerController* PlayerController
 		= Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController()))

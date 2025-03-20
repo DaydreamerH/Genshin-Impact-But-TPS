@@ -7,7 +7,7 @@
 #include "Player/PlayerCharacter.h"
 #include "PlayerController/MyPlayerController.h"
 
-void UElimAnnouncement::SetElimAnnouncementText(AMyPlayerState* Attacker, AMyPlayerState* Victim)
+void UElimAnnouncement::SetElimAnnouncementText(const AMyPlayerState* Attacker, const AMyPlayerState* Victim)
 {
 	if(MyTeam == ETeam::ET_NoTeam)
 	{

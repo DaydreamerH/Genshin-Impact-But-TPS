@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Player/PlayerCharacter.h"
-#include "Weapon/Projectile.h"
 #include "LagCompensationComponent.generated.h"
 
 USTRUCT(BlueprintType)
@@ -108,17 +107,17 @@ protected:
 		APlayerCharacter* HitCharacter,
 		const FVector_NetQuantize& TraceStart,
 		const FVector_NetQuantize& HitLocation,
-		float HitTime);
+		float HitTime) const;
 
 	FServerSideRewindResult ProjectileServerSideRewindResult(
 		APlayerCharacter* HitCharacter,
 		const FVector_NetQuantize& TraceStart,
 		const FVector_NetQuantize100& InitialVelocity,
 		float HitTime
-	);
-	
-	
-	FFramePackage InterpBetweenFrames(
+	) const;
+
+
+	static FFramePackage InterpBetweenFrames(
 		const FFramePackage& OlderFrame,
 		const FFramePackage& YoungerFrame,
 		float HitTime);
@@ -127,17 +126,17 @@ protected:
 		const FFramePackage& FramePackage,
 		APlayerCharacter* HitCharacter,
 		const FVector_NetQuantize& TraceStart,
-		const FVector_NetQuantize& HitLocation);
+		const FVector_NetQuantize& HitLocation) const;
 
-	void CacheBoxPosition(APlayerCharacter* HitCharacter, FFramePackage& OutFramePackage);
+	static void CacheBoxPosition(APlayerCharacter* HitCharacter, FFramePackage& OutFramePackage);
 
-	void MoveBoxes(APlayerCharacter* HitCharacter, const FFramePackage& Package);
+	static void MoveBoxes(APlayerCharacter* HitCharacter, const FFramePackage& Package);
 
-	void ResetHitBoxes(APlayerCharacter* HitCharacter, const FFramePackage& Package);
+	static void ResetHitBoxes(APlayerCharacter* HitCharacter, const FFramePackage& Package);
 
-	void EnableCharacterMeshCollision(APlayerCharacter* HitCharacter, ECollisionEnabled::Type CollisionEnabled);
+	static void EnableCharacterMeshCollision(const APlayerCharacter* HitCharacter, ECollisionEnabled::Type CollisionEnabled);
 
-	FFramePackage GetFrameToCheck(APlayerCharacter* HitCharacter, float HitTime);
+	static FFramePackage GetFrameToCheck(APlayerCharacter* HitCharacter, float HitTime);
 
 	FShotGunServerSideRewindResult ShotGunServerSideRewind(
 		const TArray<APlayerCharacter*>& HitCharacters,
@@ -149,7 +148,7 @@ protected:
 		const TArray<FFramePackage>& FramePackages,
 		const FVector_NetQuantize& TraceStart,
 		const TArray<FVector_NetQuantize>& HitLocations
-	);
+	) const;
 
 	FServerSideRewindResult ProjectileConfirmHit(
 		const FFramePackage& FramePackage,
@@ -157,7 +156,7 @@ protected:
 		const FVector_NetQuantize& TraceStart,
 		const FVector_NetQuantize& InitializeVelocity,
 		float HitTime
-	);
+	) const;
 private:
 	UPROPERTY()
 	APlayerCharacter* Character;

@@ -311,7 +311,7 @@ void AShotGunWeapon::FireShotGun(const TArray<FVector_NetQuantize>& HitTargets)
 	}
 }
 
-void AShotGunWeapon::ShotGunTraceEndWithScatter(const FVector& HitTarget, TArray<FVector_NetQuantize>& HitTargets)
+void AShotGunWeapon::ShotGunTraceEndWithScatter(const FVector& HitTarget, TArray<FVector_NetQuantize>& HitTargets) const
 {
 	const USkeletalMeshSocket*
 			MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName("MuzzleFlash");

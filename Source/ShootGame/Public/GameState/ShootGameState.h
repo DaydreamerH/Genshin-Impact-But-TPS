@@ -28,12 +28,12 @@ public:
 	UPROPERTY(ReplicatedUsing=OnRep_RedTeamScore)
 	float RedTeamScore = 0.f;
 	UFUNCTION()
-	void OnRep_RedTeamScore();
+	void OnRep_RedTeamScore() const;
 	
 	UPROPERTY(ReplicatedUsing=OnRep_BlueTeamScore)
 	float BlueTeamScore = 0.f;
 	UFUNCTION()
-	void OnRep_BlueTeamScore();
+	void OnRep_BlueTeamScore() const;
 
 	void RedTeamScores(float Score = 1.f);
 	void BlueTeamScores(float Score = 1.f);

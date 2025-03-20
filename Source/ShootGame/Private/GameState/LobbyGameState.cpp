@@ -12,7 +12,7 @@ void ALobbyGameState::BeginPlay()
 	PlayBackGroundMusic();
 }
 
-void ALobbyGameState::PlayBackGroundMusic()
+void ALobbyGameState::PlayBackGroundMusic() const
 {
 	UGameplayStatics::PlaySound2D(this, LobbyMusic, 0.3);
 }

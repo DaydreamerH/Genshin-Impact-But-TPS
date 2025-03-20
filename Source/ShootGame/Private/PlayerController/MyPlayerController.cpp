@@ -512,7 +512,7 @@ FString AMyPlayerController::GetInfoText(const TArray<APlayerState*>& PlayerStat
 	return InfoTextString;
 }
 
-FString AMyPlayerController::GetTeamsInfoText(AShootGameState* ShootGameState)
+FString AMyPlayerController::GetTeamsInfoText(const AShootGameState* ShootGameState) const
 {
 	if(ShootGameState == nullptr)return FString();
 	FString InfoTextString;
@@ -717,7 +717,7 @@ void AMyPlayerController::ServerRequestServerTime_Implementation(float TimeOfCli
 	ClientReportServerTime(TimeOfClientRequest, ServerTimeOfReceipt);
 }
 
-void AMyPlayerController::RemoveCrosshair()
+void AMyPlayerController::RemoveCrosshair() const
 {
 	if(PlayerHUD)
 	{

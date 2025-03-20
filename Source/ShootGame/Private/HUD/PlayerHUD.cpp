@@ -15,10 +15,10 @@
 void APlayerHUD::DrawHUD()
 {
 	Super::DrawHUD();
-	
-	FVector2d ViewportSize;
+
 	if(GEngine)
 	{
+		FVector2d ViewportSize;
 		GEngine->GameViewport->GetViewportSize(ViewportSize);
 		const FVector2d ViewportCenter(ViewportSize.X/2.f, ViewportSize.Y/2.f);
 
@@ -81,7 +81,7 @@ void APlayerHUD::AddAnnouncement()
 	}
 }
 
-void APlayerHUD::AddElimAnnouncement(AMyPlayerState* Attacker, AMyPlayerState* Victim)
+void APlayerHUD::AddElimAnnouncement(const AMyPlayerState* Attacker, const AMyPlayerState* Victim)
 {
 	OwingPlayer = OwingPlayer == nullptr?GetOwningPlayerController():OwingPlayer;
 	if(OwingPlayer && ElimAnnouncementClass)

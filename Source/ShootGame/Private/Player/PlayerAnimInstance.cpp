@@ -43,7 +43,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	TurningInPlace = PlayerCharacter->GetTurningInPlace();
 
 	FRotator AimRotation = PlayerCharacter->GetBaseAimRotation();
-	FRotator MoveMentRotation = UKismetMathLibrary::MakeRotFromX(PlayerCharacter->GetVelocity());
+	const FRotator MoveMentRotation = UKismetMathLibrary::MakeRotFromX(PlayerCharacter->GetVelocity());
 	FRotator DeltaRote = UKismetMathLibrary::NormalizedDeltaRotator(MoveMentRotation, AimRotation);
 	DeltaRotation = FMath::RInterpTo(DeltaRotation, DeltaRote, DeltaSeconds, 5.f);
 	YawOffset= DeltaRotation.Yaw;
@@ -61,7 +61,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	bUseFABRIK = PlayerCharacter->GetCombatState() != ECombatState::ECS_Reloading
 		&& PlayerCharacter->GetCombatState() != ECombatState::ECS_TossGrenade
-		&& PlayerCharacter->GetCombatState() != ECombatState::ECS_SwapingWeapons && !bHoldingBomb;
+		&& PlayerCharacter->GetCombatState() != ECombatState::ECS_SwappingWeapons && !bHoldingBomb;
 
 	if(!bUseFABRIK && PlayerCharacter->IsLocallyControlled()
 		&& PlayerCharacter->GetCombatState() == ECombatState::ECS_Reloading)

@@ -38,7 +38,7 @@ AWeapon::AWeapon()
 	SphereRadius = NormalSphereRadius;
 }
 
-void AWeapon::SwitchAim(bool bAiming)
+void AWeapon::SwitchAim(const bool bAiming)
 {
 	if(bAiming)
 	{
@@ -90,17 +90,16 @@ void AWeapon::BeginPlay()
 	WeaponMesh->SetOverlayMaterial(OverlayMaterial);
 }
 
-void AWeapon::Tick(float DeltaTime)
+void AWeapon::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
 void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResule)
+	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	APlayerCharacter* playerCharacter = Cast<APlayerCharacter>(OtherActor);
-	if(playerCharacter)
+	if(APlayerCharacter* playerCharacter = Cast<APlayerCharacter>(OtherActor))
 	{
 		playerCharacter->SetOverlappingWeapon(this);
 	}
@@ -109,8 +108,7 @@ void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	APlayerCharacter* playerCharacter = Cast<APlayerCharacter>(OtherActor);
-	if(playerCharacter)
+	if(APlayerCharacter* playerCharacter = Cast<APlayerCharacter>(OtherActor))
 	{
 		playerCharacter->SetOverlappingWeapon(nullptr);
 	}
@@ -126,7 +124,7 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	SetHUDAmmo();
 }*/
 
-void AWeapon::ClientUpdateAmmo_Implementation(int32 ServerAmmo)
+void AWeapon::ClientUpdateAmmo_Implementation(const int32 ServerAmmo)
 {
 	if(HasAuthority())
 	{
@@ -141,7 +139,7 @@ void AWeapon::ClientUpdateAmmo_Implementation(int32 ServerAmmo)
 void AWeapon::ClientAddAmmo_Implementation(int32 AmmoToAdd)
 {
 	if(HasAuthority())return;
-	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapcitiy);
+	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapacity);
 	OwnerPlayerCharacter = OwnerPlayerCharacter == nullptr ?
 		Cast<APlayerCharacter>(GetOwner()):OwnerPlayerCharacter;
 
@@ -154,7 +152,7 @@ void AWeapon::ClientAddAmmo_Implementation(int32 AmmoToAdd)
 
 void AWeapon::SpendRound()
 {
-	Ammo = FMath::Clamp(Ammo - 1, 0, MagCapcitiy);
+	Ammo = FMath::Clamp(Ammo - 1, 0, MagCapacity);
 	SetHUDAmmo();
 	if(HasAuthority())
 	{
@@ -166,9 +164,9 @@ void AWeapon::SpendRound()
 	}
 }
 
-void AWeapon::AddAmmo(int32 AmmoToAdd)
+void AWeapon::AddAmmo(const int32 AmmoToAdd)
 {
-	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapcitiy);
+	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapacity);
 	SetHUDAmmo();
 	ClientAddAmmo(AmmoToAdd);
 }
@@ -236,7 +234,7 @@ void AWeapon::OnWeaponStateSet()
 		OnDropped();
 		break;
 	case EWeaponState::EWS_EquippedSecondary:
-		OnEquippeedSecondary();
+		OnEquippedSecondary();
 		break;
 	default:
 		break;
@@ -295,7 +293,7 @@ void AWeapon::OnDropped()
 	}
 }
 
-void AWeapon::OnEquippeedSecondary()
+void AWeapon::OnEquippedSecondary()
 {
 	ShowPickupWidget(false);
 	AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);

@@ -16,7 +16,7 @@ class SHOOTGAME_API AShotGunWeapon : public AHitScanWeapon
 public:
 	// virtual void Fire(const FVector& HitTarget) override;
 	virtual void FireShotGun(const TArray<FVector_NetQuantize>& HitTargets);
-	void ShotGunTraceEndWithScatter(const FVector& HitTarget, TArray<FVector_NetQuantize>& HitTargets);
+	void ShotGunTraceEndWithScatter(const FVector& HitTarget, TArray<FVector_NetQuantize>& HitTargets) const;
 private:
 	UPROPERTY(EditAnywhere, Category="Weapon Scatter")
 	uint32 NumberOfPellets = 10;

@@ -17,7 +17,7 @@ class SHOOTGAME_API UElimAnnouncement : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void SetElimAnnouncementText(AMyPlayerState* Attacker, AMyPlayerState* Victim);
+	void SetElimAnnouncementText(const AMyPlayerState* Attacker, const AMyPlayerState* Victim);
 	
 	UPROPERTY(meta = (BindWidget))
 	class UHorizontalBox* AnnouncementBox;

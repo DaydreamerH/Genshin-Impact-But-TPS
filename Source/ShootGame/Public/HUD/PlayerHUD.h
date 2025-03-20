@@ -12,7 +12,7 @@ struct FHUDPackage
 {
 	GENERATED_BODY()
 public:
-	class UTexture2D* CrosshairsCenter = nullptr;
+	UTexture2D* CrosshairsCenter = nullptr;
 	UTexture2D* CrosshairsLeft = nullptr;
 	UTexture2D* CrosshairsRight = nullptr;
 	UTexture2D* CrosshairsTop = nullptr;
@@ -39,7 +39,7 @@ public:
 	
 	void AddCharacterOverlay();
 	void AddAnnouncement();
-	void AddElimAnnouncement(AMyPlayerState* Attacker, AMyPlayerState* Victim);
+	void AddElimAnnouncement(const AMyPlayerState* Attacker, const AMyPlayerState* Victim);
 protected:
 	virtual void BeginPlay() override;
 	
@@ -61,7 +61,7 @@ private:
 	float ElimAnnouncementTime = 3.f;
 
 	UFUNCTION()
-	void ElimAnnouncementTimerFinished(UElimAnnouncement* MsgToRemove);
+	static void ElimAnnouncementTimerFinished(UElimAnnouncement* MsgToRemove);
 
 	UPROPERTY()
 	TArray<UElimAnnouncement*> ElimMsgs;

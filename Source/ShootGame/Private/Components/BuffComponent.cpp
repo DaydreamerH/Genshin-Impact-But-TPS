@@ -4,10 +4,10 @@
 #include "Player/PlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-UBuffComponent::UBuffComponent()
+UBuffComponent::UBuffComponent():
+	Character(nullptr), InitBaseSpeed(0), InitCrouchSpeed(0), InitialJumpVelocity(0)
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
 }
 
 

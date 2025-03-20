@@ -19,5 +19,5 @@ private:
 	UPROPERTY(EditAnywhere)
 	USoundBase* LobbyMusic;
 
-	void PlayBackGroundMusic();
+	void PlayBackGroundMusic() const;
 };
