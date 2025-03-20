@@ -346,15 +346,17 @@ void APlayerCharacter::Tick(float DeltaTime)
 	PollInit();
 
 	DropShield(DeltaTime);
+
+	const float TimeScale = 1.f / (GetWorld()->DeltaTimeSeconds * 60.f);
 	
 	if (RecoilOffset != FRotator::ZeroRotator || MaxRecoilAmount != FRotator::ZeroRotator)
 	{
 		if(bIsRecoiling)
 		{
-			const float InterpSpeed = 5.0f; 
-			RecoilOffset = FMath::RInterpConstantTo(RecoilOffset, MaxRecoilAmount, DeltaTime, InterpSpeed);
+			constexpr float InterpSpeed = 15.0f; 
+			RecoilOffset = FMath::RInterpConstantTo(RecoilOffset, MaxRecoilAmount, DeltaTime, InterpSpeed*TimeScale);
 
-			if (RecoilOffset.Equals(MaxRecoilAmount, .1f))
+			if (RecoilOffset.Equals(MaxRecoilAmount, 1.f))
 			{
 				bIsRecoiling = false;
 				MaxRecoilAmount = FRotator::ZeroRotator;
@@ -363,7 +365,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		else
 		{
 			RecoilOffset =
-				FMath::RInterpTo(RecoilOffset, FRotator::ZeroRotator, DeltaTime, RecoilRecoverySpeed);
+				FMath::RInterpTo(RecoilOffset, FRotator::ZeroRotator, DeltaTime, RecoilRecoverySpeed*TimeScale);
 		}
 		const FRotator Rotation = GetControlRotation() + RecoilOffset;
 		if (RecoilOffset.Equals(FRotator::ZeroRotator, .15f))

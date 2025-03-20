@@ -349,7 +349,13 @@ private:
 	float RecoilRecoverySpeed = 5.f;
 	bool bIsRecoiling = false;
 	FRotator PrevRecoilOffset = FRotator::ZeroRotator;
-	
+	// 新增：记录初始后坐偏移、后坐/恢复持续时间及计时器
+	FRotator InitialRecoilOffset = FRotator::ZeroRotator;
+	float RecoilDuration = 0.2f;      // 后坐阶段持续时间（秒）
+	float RecoilElapsedTime = 0.0f;   // 后坐计时器
+
+	float RecoveryDuration = 0.3f;    // 恢复阶段持续时间（秒）
+	float RecoveryElapsedTime = 0.0f; // 恢复计时器
 public:
 	void UpdateHUDHealth();
 	void UpdateHUDShield();
