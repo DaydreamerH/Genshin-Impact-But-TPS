@@ -121,5 +121,5 @@ void AShootGameState::BlueTeamScores(const float Score)
 void AShootGameState::BeginPlay()
 {
 	Super::BeginPlay();
-	UGameplayStatics::PlaySound2D(this, BackgroundMusic, 0.5);
+	UGameplayStatics::PlaySound2D(this, BackgroundMusic, 0.3);
 }

@@ -44,9 +44,7 @@ APlayerCharacter::APlayerCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bReplicates = true;
-
-	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
-	OverheadWidget->SetupAttachment(RootComponent);
+	
 
 	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	Combat->SetIsReplicated(true);
@@ -368,14 +366,14 @@ void APlayerCharacter::Tick(float DeltaTime)
 				FMath::RInterpTo(RecoilOffset, FRotator::ZeroRotator, DeltaTime, RecoilRecoverySpeed);
 		}
 		const FRotator Rotation = GetControlRotation() + RecoilOffset;
-		if (RecoilOffset.Equals(FRotator::ZeroRotator, .1f))
+		if (RecoilOffset.Equals(FRotator::ZeroRotator, .15f))
 		{
 			if (APlayerController* PC = Cast<APlayerController>(GetController()))
 			{
-				PC->SetControlRotation(Rotation);
+				PC->SetControlRotation(FollowCamera->GetComponentRotation());
 			}
-			FollowCamera->SetWorldRotation(GetControlRotation());
 			RecoilOffset = FRotator::ZeroRotator;
+			MaxRecoilAmount = FRotator::ZeroRotator;
 		}
 		else
 		{

@@ -70,7 +70,7 @@ void UCombatComponent::SetAiming(bool bIsAiming)
 	EquippedWeapon->SwitchAim(bAiming);
 	ServerSetAiming(bIsAiming);
 	Character->GetCharacterMovement()->MaxWalkSpeed
-		= bIsAiming ? AimWalkSpeed:BaseWalkSpeed;
+		= bIsAiming ? AimWalkSpeed:Character->GetCharacterMovement()->MaxWalkSpeed;
 
 	if(Character->IsLocallyControlled()
 		&& EquippedWeapon->GetWeaponType()==EWeaponType::EWT_SniperRifle)

@@ -67,26 +67,15 @@ void UBuffComponent::BuffSpeed(float BuffBaseSpeed, float BuffCrouchSpeed, float
 		this,
 		&ThisClass::ResetSpeed,
 		BuffTime);
-
-	if(Character->GetCharacterMovement())
-	{
-		Character->GetCharacterMovement()->MaxWalkSpeed = BuffBaseSpeed;
-		Character->GetCharacterMovement()->MaxWalkSpeedCrouched = BuffCrouchSpeed;
-	}
+	
 	MulticastSpeedBuff(BuffBaseSpeed, BuffCrouchSpeed);
-
-
+	
 	Character->PlaySound(ECharacterSoundType::EST_SpeedSound);
 
 }
 
 void UBuffComponent::ResetSpeed()
 {
-	if(Character && Character->GetCharacterMovement())
-	{
-		Character->GetCharacterMovement()->MaxWalkSpeed = InitBaseSpeed;
-		Character->GetCharacterMovement()->MaxWalkSpeedCrouched = InitCrouchSpeed;
-	}
 	MulticastSpeedBuff(InitBaseSpeed, InitCrouchSpeed);
 }
 

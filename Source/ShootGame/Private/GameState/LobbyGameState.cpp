@@ -14,5 +14,5 @@ void ALobbyGameState::BeginPlay()
 
 void ALobbyGameState::PlayBackGroundMusic()
 {
-	UGameplayStatics::PlaySound2D(this, LobbyMusic, 0.5);
+	UGameplayStatics::PlaySound2D(this, LobbyMusic, 0.3);
 }
