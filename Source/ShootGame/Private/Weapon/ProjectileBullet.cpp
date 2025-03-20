@@ -74,21 +74,5 @@ void AProjectileBullet::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 void AProjectileBullet::BeginPlay()
 {
 	Super::BeginPlay();
-
-	/*
-	FPredictProjectilePathParams Params;
-	Params.bTraceWithChannel = true;
-	Params.bTraceWithCollision = true;
-	Params.DrawDebugTime = 5.f;
-	Params.DrawDebugType = EDrawDebugTrace::ForDuration;
-	Params.LaunchVelocity = GetActorForwardVector()*InitialSpeed;
-	Params.MaxSimTime = 4.f;
-	Params.ProjectileRadius = 5.f;
-	Params.SimFrequency = 30.f;
-	Params.StartLocation = GetActorLocation();
-	Params.TraceChannel = ECC_Visibility;
-	Params.ActorsToIgnore.Add(this);
-	FPredictProjectilePathResult PathResult;
-	UGameplayStatics::PredictProjectilePath(this, Params, PathResult);*/
 	
 }

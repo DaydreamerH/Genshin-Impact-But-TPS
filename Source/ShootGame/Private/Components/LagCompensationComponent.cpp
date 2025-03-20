@@ -296,8 +296,6 @@ FServerSideRewindResult ULagCompensationComponent::ProjectileConfirmHit(const FF
 	Params.ProjectileRadius = 5.f;
 	Params.TraceChannel = ECC_HitBox;
 	Params.ActorsToIgnore.Add(GetOwner());
-	Params.DrawDebugTime = 5.f;
-	Params.DrawDebugType = EDrawDebugTrace::ForDuration;
 	FPredictProjectilePathResult Result;
 	UGameplayStatics::PredictProjectilePath(this, Params, Result);
 
@@ -570,9 +568,5 @@ void ULagCompensationComponent::ServerProjectileScoreRequest_Implementation(APla
 			Character->GetEquippedWeapon(),
 			UDamageType::StaticClass()
 		);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("NoHit"));
 	}
 }
