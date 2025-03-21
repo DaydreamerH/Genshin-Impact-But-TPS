@@ -1,12 +1,12 @@
-# GenshinImpact: ModernWarfare
+# Genshin Impact: Modern Warfare
 
-你说的对，但是 GenshinImpact: ModernWarfare 是一款基于 Unreal Engine 开发的多人在线对战游戏。
+你说的对，但是 Genshin Impact: Modern Warfare 是一款基于 Unreal Engine 开发的多人在线对战游戏。
 
 # 所有素材均来自互联网，仅用于学习交流，不以任何方式盈利或商业化使用，在没有作者允许的情况下不能进行二次开发。
 
 ## 1. 游戏简介
 
-GenshinImpact: ModernWarfare 以团队对抗为核心玩法，结合夺旗玩法，鼓励玩家在战斗中制定灵活策略。主要规则包括：
+Genshin Impact: Modern Warfare 以团队对抗为核心玩法，结合夺旗玩法，鼓励玩家在战斗中制定灵活策略。主要规则包括：
 
 - **击杀对手**：每成功击杀一名敌方玩家获得 1 分。
 - **炸弹传递**：将炸弹送达指定区域获得 20 分；若炸弹被移出指定区域，则扣除 20 分。
