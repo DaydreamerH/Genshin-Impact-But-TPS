@@ -181,9 +181,11 @@ private:
 	UPROPERTY(EditAnywhere, Category="Recoil")
 	float RecoilRecoverSpeed = 5.f;
 	int32 ConsecutiveShotsCount = 0;
-	UPROPERTY(EditDefaultsOnly, Category = "Recoil")
+	UPROPERTY(EditAnywhere, Category = "Recoil")
 	float RecoilResetTime = 1.f;
 	float LastFireTime;
+	UPROPERTY(EditAnywhere, Category="Recoil")
+	float OnceRecoilRiseTime = 0.1f;
 
 	FTimerHandle DestroyTimerHandle; 
 	void OnDestroyTimerExpired();

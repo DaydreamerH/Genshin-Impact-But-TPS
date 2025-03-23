@@ -195,7 +195,7 @@ void AWeapon::ApplyRecoil()
 	Recoil.Yaw = ActualHorizontalRecoil;
 	Recoil.Roll = 0.f;
 
-	OwnerPlayerCharacter->AddRecoil(Recoil, RecoilRecoverSpeed);
+	OwnerPlayerCharacter->AddRecoil(Recoil, RecoilRecoverSpeed, OnceRecoilRiseTime);
 
 	// 更新连发计数和时间
 	ConsecutiveShotsCount++;

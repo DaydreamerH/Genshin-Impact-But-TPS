@@ -356,6 +356,8 @@ private:
 
 	float RecoveryDuration = 0.3f;    // 恢复阶段持续时间（秒）
 	float RecoveryElapsedTime = 0.0f; // 恢复计时器
+
+	float RecoilRiseTime = 0.f;
 public:
 	void UpdateHUDHealth();
 	void UpdateHUDShield();
@@ -421,7 +423,7 @@ public:
 
 	void HandlePlaySound(ECharacterSoundType SoundType);
 
-	void AddRecoil(const FRotator& RecoilAmount, const float RecoverSpeed);
+	void AddRecoil(const FRotator& RecoilAmount, const float RecoverSpeed, const float RecoilRiseTime);
 
 	FORCEINLINE bool GetElimmed () const {return bElimmed;}
 };

@@ -349,12 +349,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 	
 	if (RecoilOffset != FRotator::ZeroRotator || MaxRecoilAmount != FRotator::ZeroRotator)
 	{
-		if(bIsRecoiling)
+		if (bIsRecoiling)
 		{
-			constexpr float InterpSpeed = 15.0f; 
-			RecoilOffset = FMath::RInterpConstantTo(RecoilOffset, MaxRecoilAmount, DeltaTime, InterpSpeed*TimeScale);
+			const float InterpSpeed = 1.f / RecoilRiseTime;
+			RecoilOffset = FMath::RInterpTo(RecoilOffset, MaxRecoilAmount, DeltaTime, InterpSpeed * TimeScale);
 
-			if (RecoilOffset.Equals(MaxRecoilAmount, 1.f))
+			if (RecoilOffset.Equals(MaxRecoilAmount, 0.1f))
 			{
 				bIsRecoiling = false;
 				MaxRecoilAmount = FRotator::ZeroRotator;
@@ -362,22 +362,25 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 		else
 		{
-			RecoilOffset =
-				FMath::RInterpTo(RecoilOffset, FRotator::ZeroRotator, DeltaTime, RecoilRecoverySpeed*TimeScale);
+			RecoilOffset = FMath::RInterpTo(RecoilOffset, FRotator::ZeroRotator, DeltaTime, RecoilRecoverySpeed * TimeScale);
 		}
-		const FRotator Rotation = GetControlRotation() + RecoilOffset;
+		
+		const FRotator CameraRotation = GetControlRotation() + RecoilOffset;
+		FollowCamera->SetWorldRotation(CameraRotation);
+
+		// 计算摄像机的额外旋转，绕着 CameraBoom 末端旋转
+		// float BoomTargetPitch = -RecoilOffset.Pitch * 0.5f; // 旋转比例可调整
+		// FRotator BoomRotation = CameraBoom->GetRelativeRotation();
+		// BoomRotation.Pitch = BoomRotation.Pitch + BoomTargetPitch;
+		// CameraBoom->SetRelativeRotation(BoomRotation);
+
+		// 当后坐力几乎恢复时，重置控制器的旋转
 		if (RecoilOffset.Equals(FRotator::ZeroRotator, .15f))
 		{
 			if (APlayerController* PC = Cast<APlayerController>(GetController()))
 			{
 				PC->SetControlRotation(FollowCamera->GetComponentRotation());
 			}
-			RecoilOffset = FRotator::ZeroRotator;
-			MaxRecoilAmount = FRotator::ZeroRotator;
-		}
-		else
-		{
-			FollowCamera->SetWorldRotation(Rotation);
 		}
 	}
 }
@@ -928,7 +931,7 @@ void APlayerCharacter::HandlePlaySound(const ECharacterSoundType SoundType)
 	}
 }
 
-void APlayerCharacter::AddRecoil(const FRotator& RecoilAmount, const float RecoverSpeed)
+void APlayerCharacter::AddRecoil(const FRotator& RecoilAmount, const float RecoverSpeed, const float RiseTime)
 {
 	// 计算目标后坐力（累加方式，让后坐力逐渐增加）
 	if(MaxRecoilAmount != FRotator::ZeroRotator)
@@ -939,11 +942,11 @@ void APlayerCharacter::AddRecoil(const FRotator& RecoilAmount, const float Recov
 	{
 		MaxRecoilAmount = RecoilOffset + RecoilAmount;
 	}
-	MaxRecoilAmount.Pitch = FMath::Clamp(MaxRecoilAmount.Pitch, 0.f, 15.f); // 限制最大后坐力
+	MaxRecoilAmount.Pitch = FMath::Clamp(MaxRecoilAmount.Pitch, 0.f, 25.f); // 限制最大后坐力
 	MaxRecoilAmount.Yaw = FMath::Clamp(MaxRecoilAmount.Yaw, -5.f, 5.f);
 	// 逐步叠加
 	RecoilRecoverySpeed = RecoverSpeed; // 记录恢复速度
-
+	RecoilRiseTime = RiseTime;
 	bIsRecoiling = true; // 标记正在后坐
 }
 
