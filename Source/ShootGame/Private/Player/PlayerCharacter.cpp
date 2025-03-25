@@ -354,7 +354,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 			const float InterpSpeed = 1.f / RecoilRiseTime;
 			RecoilOffset = FMath::RInterpTo(RecoilOffset, MaxRecoilAmount, DeltaTime, InterpSpeed * TimeScale);
 
-			if (RecoilOffset.Equals(MaxRecoilAmount, 0.1f))
+			if (RecoilOffset.Equals(MaxRecoilAmount, 0.15f))
 			{
 				bIsRecoiling = false;
 				MaxRecoilAmount = FRotator::ZeroRotator;
