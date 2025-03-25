@@ -363,25 +363,23 @@ void APlayerCharacter::Tick(float DeltaTime)
 		else
 		{
 			RecoilOffset = FMath::RInterpTo(RecoilOffset, FRotator::ZeroRotator, DeltaTime, RecoilRecoverySpeed * TimeScale);
-		}
-		
-		const FRotator CameraRotation = GetControlRotation() + RecoilOffset;
-		FollowCamera->SetWorldRotation(CameraRotation);
-
-		// 计算摄像机的额外旋转，绕着 CameraBoom 末端旋转
-		// float BoomTargetPitch = -RecoilOffset.Pitch * 0.5f; // 旋转比例可调整
-		// FRotator BoomRotation = CameraBoom->GetRelativeRotation();
-		// BoomRotation.Pitch = BoomRotation.Pitch + BoomTargetPitch;
-		// CameraBoom->SetRelativeRotation(BoomRotation);
-
-		// 当后坐力几乎恢复时，重置控制器的旋转
-		if (RecoilOffset.Equals(FRotator::ZeroRotator, .15f))
-		{
-			if (APlayerController* PC = Cast<APlayerController>(GetController()))
+			if (RecoilOffset.Equals(FRotator::ZeroRotator, 0.1f))
 			{
-				PC->SetControlRotation(FollowCamera->GetComponentRotation());
+				RecoilOffset = FRotator::ZeroRotator;
 			}
 		}
+		FVector Center = FVector::ZeroVector;
+		// Center.X = -CameraBoom->SocketOffset.Y;
+		// Center.Z = CameraBoom->SocketOffset.Z;
+		FVector NewCameraPosition = Center;
+		float Radius =
+			FMath::Sqrt(FMath::Pow(CameraBoom->TargetArmLength, 2)- FMath::Pow(CameraBoom->SocketOffset.Y, 2)-FMath::Pow(CameraBoom->SocketOffset.Z,2));
+
+		NewCameraPosition.Z -= FMath::Sin(FMath::DegreesToRadians(RecoilOffset.Pitch))*Radius;
+		// NewCameraPosition.X -= FMath::Cos(FMath::DegreesToRadians(RecoilOffset.Pitch))*Radius;
+		FollowCamera->SetRelativeLocation(NewCameraPosition);
+		const FRotator CameraRotation = GetControlRotation() + RecoilOffset;
+		FollowCamera->SetWorldRotation(CameraRotation);
 	}
 }
 
