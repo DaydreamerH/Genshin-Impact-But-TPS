@@ -426,4 +426,6 @@ public:
 	void AddRecoil(const FRotator& RecoilAmount, const float RecoverSpeed, const float RecoilRiseTime);
 
 	FORCEINLINE bool GetElimmed () const {return bElimmed;}
+
+	void ExitAimState() const;
 };

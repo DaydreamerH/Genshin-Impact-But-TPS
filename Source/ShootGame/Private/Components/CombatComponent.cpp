@@ -72,7 +72,7 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 void UCombatComponent::SetAiming(bool bIsAiming)
 {
-	if(Character == nullptr || EquippedWeapon == nullptr)return;
+	if(Character == nullptr || EquippedWeapon == nullptr || bAiming == bIsAiming)return;
 	
 	bAiming = bIsAiming;
 	EquippedWeapon->SwitchAim(bAiming);

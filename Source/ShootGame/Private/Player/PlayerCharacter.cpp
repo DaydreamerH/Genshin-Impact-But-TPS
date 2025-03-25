@@ -948,6 +948,14 @@ void APlayerCharacter::AddRecoil(const FRotator& RecoilAmount, const float Recov
 	bIsRecoiling = true; // 标记正在后坐
 }
 
+void APlayerCharacter::ExitAimState() const
+{
+	if(Combat)
+	{
+		Combat->SetAiming(false);
+	}
+}
+
 
 void APlayerCharacter::ResetRecentlySound()
 {

@@ -127,6 +127,10 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 			}
 		}
 		ApplyRecoil();
+		if(GetWeaponType()==EWeaponType::EWT_SniperRifle && OwnerPlayerCharacter)
+		{
+			OwnerPlayerCharacter->ExitAimState();
+		}
 	}
 	
 }
