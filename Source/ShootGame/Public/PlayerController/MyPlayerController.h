@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CameraShake/FireCameraShake.h"
 #include "GameFramework/PlayerController.h"
 #include "GameState/ShootGameState.h"
 #include "Player/MyPlayerState.h"
+#include "Weapon/Weapon.h"
 #include "MyPlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHighPingDelegate, bool, bHighPing);
@@ -56,6 +58,10 @@ public:
 	void ClientShowHitCrosshairHandle();
 
 	void RemoveCrosshair() const;
+
+	void TriggerCameraShake(FUCameraShakeParams CameraShakeParams);
+
+	UFireCameraShake* CameraShake;
 protected:
 	virtual void BeginPlay() override;
 	void SetHUDTime();

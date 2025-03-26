@@ -10,7 +10,8 @@
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
 				"Engine",
-				"UMG"
+				"UMG",
+				"GameplayCameras"
 			]
 		}
 	],
@@ -26,9 +27,9 @@
 			"Name": "VRM4U",
 			"Enabled": true
 		},
-		 {
-            		"Name": "OnlineSubsystemSteam",
-            		"Enabled": true
-       		 }
+		{
+			"Name": "OnlineSubsystemSteam",
+			"Enabled": true
+		}
 	]
 }

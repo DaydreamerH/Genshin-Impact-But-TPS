@@ -30,6 +30,26 @@ enum class EFireType: uint8
 	EFT_MAX UMETA(DisplayName = "DefaultMax")
 };
 
+USTRUCT()
+struct FUCameraShakeParams
+{
+	GENERATED_BODY()
+
+	float OscillationDuration = 0.2f;  
+	float OscillationBlendInTime = 0.1f;
+	float OscillationBlendOutTime = 0.1f;
+
+	// 旋转抖动
+	float RotOscillationPitchAmplitude = 0.2f;
+	float RotOscillationPitchFrequency = 0.1f;
+
+	float RotOscillationYawAmplitude = 0.2f;
+	float RotOscillationYawFrequency = 0.1f;
+
+	float RotOscillationRollAmplitude = 0.2f;
+	float RotOscillationRollFrequency = 0.1f;
+};
+
 UCLASS()
 class SHOOTGAME_API AWeapon : public AActor
 {
@@ -189,7 +209,9 @@ private:
 
 	FTimerHandle DestroyTimerHandle; 
 	void OnDestroyTimerExpired();
-	
+
+	FUCameraShakeParams CameraShakeParams;
+	void InitCameraShakeParams();
 public:
 	void SetWeaponState(EWeaponState State);
 	
@@ -222,4 +244,6 @@ public:
 
 	FORCEINLINE float GetDamage() const { return Damage; }
 	FORCEINLINE float GetHeadShotDamage() const { return HeadShotDamage; }
+
+	FORCEINLINE FUCameraShakeParams GetCameraShakeParams() const {return CameraShakeParams;}
 };

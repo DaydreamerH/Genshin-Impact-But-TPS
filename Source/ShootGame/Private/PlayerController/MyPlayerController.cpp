@@ -3,6 +3,7 @@
 
 #include "PlayerController/MyPlayerController.h"
 
+#include "CameraShake/FireCameraShake.h"
 #include "Components/CombatComponent.h"
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
@@ -722,6 +723,16 @@ void AMyPlayerController::RemoveCrosshair() const
 	if(PlayerHUD)
 	{
 		PlayerHUD->RemoveCrosshair();
+	}
+}
+
+void AMyPlayerController::TriggerCameraShake(FUCameraShakeParams CameraShakeParams)
+{
+	CameraShake = CameraShake == nullptr ? NewObject<UFireCameraShake>() : CameraShake;
+	if(CameraShake)
+	{
+		CameraShake->SetCameraShakeParams(CameraShakeParams);
+		ClientStartCameraShake(CameraShake->GetClass());
 	}
 }
 

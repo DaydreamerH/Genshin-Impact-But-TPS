@@ -946,6 +946,12 @@ void APlayerCharacter::AddRecoil(const FRotator& RecoilAmount, const float Recov
 	RecoilRecoverySpeed = RecoverSpeed; // 记录恢复速度
 	RecoilRiseTime = RiseTime;
 	bIsRecoiling = true; // 标记正在后坐
+	
+	
+	if(PlayerController && Combat && Combat->EquippedWeapon)
+	{
+		PlayerController->TriggerCameraShake(Combat->EquippedWeapon->GetCameraShakeParams());
+	}
 }
 
 void APlayerCharacter::ExitAimState() const
