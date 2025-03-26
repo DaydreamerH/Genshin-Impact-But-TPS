@@ -344,15 +344,13 @@ void APlayerCharacter::Tick(float DeltaTime)
 	PollInit();
 
 	DropShield(DeltaTime);
-
-	const float TimeScale = 1.f / (GetWorld()->DeltaTimeSeconds * 60.f);
 	
 	if (RecoilOffset != FRotator::ZeroRotator || MaxRecoilAmount != FRotator::ZeroRotator)
 	{
 		if (bIsRecoiling)
 		{
 			const float InterpSpeed = 1.f / RecoilRiseTime;
-			RecoilOffset = FMath::RInterpTo(RecoilOffset, MaxRecoilAmount, DeltaTime, InterpSpeed * TimeScale);
+			RecoilOffset = FMath::RInterpTo(RecoilOffset, MaxRecoilAmount, DeltaTime, InterpSpeed);
 
 			if (RecoilOffset.Equals(MaxRecoilAmount, 0.15f))
 			{
@@ -362,21 +360,19 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 		else
 		{
-			RecoilOffset = FMath::RInterpTo(RecoilOffset, FRotator::ZeroRotator, DeltaTime, RecoilRecoverySpeed * TimeScale);
+			RecoilOffset = FMath::RInterpTo(RecoilOffset, FRotator::ZeroRotator, DeltaTime, RecoilRecoverySpeed);
 			if (RecoilOffset.Equals(FRotator::ZeroRotator, 0.1f))
 			{
 				RecoilOffset = FRotator::ZeroRotator;
 			}
 		}
 		FVector Center = FVector::ZeroVector;
-		// Center.X = -CameraBoom->SocketOffset.Y;
-		// Center.Z = CameraBoom->SocketOffset.Z;
 		FVector NewCameraPosition = Center;
 		float Radius =
 			FMath::Sqrt(FMath::Pow(CameraBoom->TargetArmLength, 2)- FMath::Pow(CameraBoom->SocketOffset.Y, 2)-FMath::Pow(CameraBoom->SocketOffset.Z,2));
 
 		NewCameraPosition.Z -= FMath::Sin(FMath::DegreesToRadians(RecoilOffset.Pitch))*Radius;
-		// NewCameraPosition.X -= FMath::Cos(FMath::DegreesToRadians(RecoilOffset.Pitch))*Radius;
+		
 		FollowCamera->SetRelativeLocation(NewCameraPosition);
 		const FRotator CameraRotation = GetControlRotation() + RecoilOffset;
 		FollowCamera->SetWorldRotation(CameraRotation);
