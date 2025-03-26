@@ -4,6 +4,10 @@
 #include "PlayerController/MyPlayerController.h"
 
 #include "CameraShake/FireCameraShake.h"
+#include "CameraShake/GrenadeLauncherCameraShake.h"
+#include "CameraShake/PistolCameraShake.h"
+#include "CameraShake/RocketLauncherCameraShake.h"
+#include "CameraShake/ShotGunCameraShake.h"
 #include "Components/CombatComponent.h"
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
@@ -726,13 +730,31 @@ void AMyPlayerController::RemoveCrosshair() const
 	}
 }
 
-void AMyPlayerController::TriggerCameraShake(FUCameraShakeParams CameraShakeParams)
+void AMyPlayerController::TriggerCameraShake(EWeaponType WeaponType)
 {
-	CameraShake = CameraShake == nullptr ? NewObject<UFireCameraShake>() : CameraShake;
-	if(CameraShake)
+	if(!PlayerCameraManager)
 	{
-		CameraShake->SetCameraShakeParams(CameraShakeParams);
-		ClientStartCameraShake(CameraShake->GetClass());
+		return;
+	}
+
+	switch (WeaponType)
+	{
+	case EWeaponType::EWT_AssultRifle:
+		PlayerCameraManager->StartCameraShake(UFireCameraShake::StaticClass());
+		break;
+	case EWeaponType::EWT_ShotGun:
+		PlayerCameraManager->StartCameraShake(UShotGunCameraShake::StaticClass());
+		break;
+	case EWeaponType::EWT_Pistol:
+		PlayerCameraManager->StartCameraShake(UPistolCameraShake::StaticClass());
+		break;
+	case EWeaponType::EWT_RocketLauncher:
+		PlayerCameraManager->StartCameraShake(URocketLauncherCameraShake::StaticClass());
+		break;
+	case EWeaponType::EWT_GrenadeLauncher:
+		PlayerCameraManager->StartCameraShake(UGrenadeLauncherCameraShake::StaticClass());
+		break;
+	default: ;
 	}
 }
 

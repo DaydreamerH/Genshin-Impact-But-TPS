@@ -950,7 +950,7 @@ void APlayerCharacter::AddRecoil(const FRotator& RecoilAmount, const float Recov
 	
 	if(PlayerController && Combat && Combat->EquippedWeapon)
 	{
-		PlayerController->TriggerCameraShake(Combat->EquippedWeapon->GetCameraShakeParams());
+		PlayerController->TriggerCameraShake(Combat->EquippedWeapon->GetWeaponType());
 	}
 }
 

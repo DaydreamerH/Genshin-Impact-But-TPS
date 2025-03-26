@@ -59,9 +59,7 @@ public:
 
 	void RemoveCrosshair() const;
 
-	void TriggerCameraShake(FUCameraShakeParams CameraShakeParams);
-
-	UFireCameraShake* CameraShake;
+	void TriggerCameraShake(EWeaponType WeaponType);
 protected:
 	virtual void BeginPlay() override;
 	void SetHUDTime();

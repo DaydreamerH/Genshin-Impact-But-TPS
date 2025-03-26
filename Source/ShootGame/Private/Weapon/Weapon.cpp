@@ -81,9 +81,6 @@ void AWeapon::BeginPlay()
 	Super::BeginPlay();
 
 	if(PickupWidget)PickupWidget->SetVisibility(false);
-
-	InitCameraShakeParams();
-	
 	AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	AreaSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	AreaSphere->OnComponentBeginOverlap.AddDynamic(this, &AWeapon::OnSphereOverlap);
@@ -434,32 +431,3 @@ FVector AWeapon::TraceEndWithScatter(const FVector& HitTarget) const
 	return FVector(TraceStart + ToEndLoc * TRACE_LENGTH);
 }
 
-
-void AWeapon::InitCameraShakeParams()
-{
-	switch (WeaponType)
-	{
-	case EWeaponType::EWT_AssultRifle:
-		CameraShakeParams.OscillationDuration = 0.2f;  
-		CameraShakeParams.OscillationBlendInTime = 0.1f;
-		CameraShakeParams.OscillationBlendOutTime = 0.1f;
-		CameraShakeParams.RotOscillationPitchAmplitude = 0.2f;
-		CameraShakeParams.RotOscillationPitchFrequency = 0.1f;
-		CameraShakeParams.RotOscillationYawAmplitude = 0.2f;
-		CameraShakeParams.RotOscillationYawFrequency = 0.1f;
-		CameraShakeParams.RotOscillationRollAmplitude = 0.2f;
-		CameraShakeParams.RotOscillationRollFrequency = 0.1f;
-	case EWeaponType::EWT_Pistol:
-		break;
-	case EWeaponType::EWT_GrenadeLauncher:
-		break;
-	case EWeaponType::EWT_RocketLauncher:
-		break;
-	case EWeaponType::EWT_ShotGun:
-		break;
-	case EWeaponType::EWT_SniperRifle:
-		break;
-	default:
-		break;
-	}
-}

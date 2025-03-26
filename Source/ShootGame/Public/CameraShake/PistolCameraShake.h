@@ -4,17 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Shakes/LegacyCameraShake.h"
-#include "Weapon/Weapon.h"
-#include "FireCameraShake.generated.h"
+#include "PistolCameraShake.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SHOOTGAME_API UFireCameraShake : public ULegacyCameraShake
+class SHOOTGAME_API UPistolCameraShake : public ULegacyCameraShake
 {
 	GENERATED_BODY()
-
 public:
-	UFireCameraShake();
+	UPistolCameraShake();
 };
