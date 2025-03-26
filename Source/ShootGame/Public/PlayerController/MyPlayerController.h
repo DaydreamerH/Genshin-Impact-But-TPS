@@ -161,6 +161,6 @@ private:
 	float PingAnimationRunningTime = 0.f;
 
 	UPROPERTY(EditAnywhere)
-	float HitCrosshairShowTime = 1.5f;
+	float HitCrosshairShowTime = 0.75f;
 	FTimerHandle HitCrosshairTimer;
 };

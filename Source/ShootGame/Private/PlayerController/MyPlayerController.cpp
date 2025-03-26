@@ -629,18 +629,32 @@ void AMyPlayerController::SetHUDMyTeamScore(int32 Score)
 void AMyPlayerController::ShowHitCrosshair()
 {
 	PlayerHUD = PlayerHUD == nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
-	if(PlayerHUD && PlayerHUD->CharacterOverlay && PlayerHUD->CharacterOverlay->HitCrosshair)
+	if(PlayerHUD
+		&& PlayerHUD->CharacterOverlay
+		&& PlayerHUD->CharacterOverlay->HitCrosshair
+		&& PlayerHUD->CharacterOverlay->HitCrosshairAnimation)
 	{
 		PlayerHUD->CharacterOverlay->HitCrosshair->SetOpacity(1.f);
+		PlayerHUD->CharacterOverlay->PlayAnimation(PlayerHUD->CharacterOverlay->HitCrosshairAnimation);
 	}
 }
 
 void AMyPlayerController::HideHitCrosshair()
 {
 	PlayerHUD = PlayerHUD == nullptr ? Cast<APlayerHUD>(GetHUD()):PlayerHUD;
-	if(PlayerHUD && PlayerHUD->CharacterOverlay && PlayerHUD->CharacterOverlay->HitCrosshair)
+	if(PlayerHUD
+		&& PlayerHUD->CharacterOverlay
+		&& PlayerHUD->CharacterOverlay->HitCrosshair
+		&& PlayerHUD->CharacterOverlay->HitCrosshairAnimation)
 	{
 		PlayerHUD->CharacterOverlay->HitCrosshair->SetOpacity(0.f);
+		
+		if(PlayerHUD->CharacterOverlay->
+			IsAnimationPlaying(PlayerHUD->CharacterOverlay->HitCrosshairAnimation))
+		{
+			PlayerHUD->CharacterOverlay->
+			StopAnimation(PlayerHUD->CharacterOverlay->HitCrosshairAnimation);
+		}
 	}
 }
 

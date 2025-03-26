@@ -58,4 +58,7 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	UImage* HitCrosshair;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	UWidgetAnimation* HitCrosshairAnimation;
 };
