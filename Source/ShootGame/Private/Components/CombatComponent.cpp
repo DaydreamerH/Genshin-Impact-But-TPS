@@ -93,7 +93,7 @@ void UCombatComponent::SetAiming(bool bIsAiming)
 
 void UCombatComponent::OnRep_EquippedWeapon()
 {
-	if(EquippedWeapon && Character)
+	if(EquippedWeapon && Character && CombatState!=ECombatState::ECS_SwappingWeapons)
 	{
 		EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
 		AttachActorToRightHand(EquippedWeapon);
@@ -106,7 +106,7 @@ void UCombatComponent::OnRep_EquippedWeapon()
 
 void UCombatComponent::OnRep_SecondaryWeapon()
 {
-	if(SecondaryWeapon && Character)
+	if(SecondaryWeapon && Character && CombatState!=ECombatState::ECS_SwappingWeapons)
 	{
 		SecondaryWeapon->SetWeaponState(EWeaponState::EWS_EquippedSecondary);
 		AttachActorToBackpack(SecondaryWeapon);

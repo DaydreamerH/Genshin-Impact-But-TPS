@@ -834,7 +834,8 @@ void APlayerCharacter::PlayTossGrenadeMontage() const
 
 void APlayerCharacter::PlaySwapMontage() const
 {
-	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && TossGrenadeMontage)
+	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance && SwapMontage && !AnimInstance->Montage_IsPlaying(SwapMontage))
 	{
 		AnimInstance->Montage_Play(SwapMontage);
 	}
