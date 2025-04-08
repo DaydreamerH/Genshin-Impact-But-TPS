@@ -33,7 +33,11 @@ APlayerCharacter::APlayerCharacter()
 	CameraBoom->SetupAttachment(GetMesh());
 	CameraBoom->TargetArmLength = 400.f;
 	CameraBoom->bUsePawnControlRotation = true;
-
+	CameraBoom->bEnableCameraLag = true;
+	CameraBoom->bEnableCameraRotationLag = true;
+	CameraBoom->CameraLagSpeed = 25.f;
+	CameraBoom->CameraRotationLagSpeed = 25.f;
+	
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false; // 在CameraBoom已经旋转
