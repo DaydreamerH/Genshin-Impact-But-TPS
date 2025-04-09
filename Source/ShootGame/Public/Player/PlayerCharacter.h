@@ -361,14 +361,20 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	class UWidgetComponent* OverheadWidget;
-
 	void ShowFriendOverheadWidget();
+	FTimerHandle ShowOverheadWidgetTimer;
+	UPROPERTY(EditAnywhere)
+	float ShowOverheadWidgetLastingTime = 0.1f;
+	void HideOverheadWidget();
 	
 public:
 	void UpdateOverheadWidget();
 	void UpdateHUDHealth();
 	void UpdateHUDShield();
 	void SetOverheadWidgetPlayerName();
+	void BeTracedShowOverheadWidget();
+	
+	ETeam GetTeam();
 	
 	void SetOverlappingWeapon(AWeapon* Weapon);
 

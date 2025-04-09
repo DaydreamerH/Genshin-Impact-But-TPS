@@ -321,10 +321,18 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 			End,
 			ECC_Visibility
 		);
-
+		
 		if(!TraceHitResult.bBlockingHit)
 		{
 			TraceHitResult.ImpactPoint = End;
+		}
+		else if(APlayerCharacter* TracedCharacter = Cast<APlayerCharacter>(TraceHitResult.GetActor());
+			TracedCharacter && Character)
+		{
+			if(TracedCharacter->GetTeam() != Character->GetTeam())
+			{
+				TracedCharacter->BeTracedShowOverheadWidget();
+			}
 		}
 	}
 }

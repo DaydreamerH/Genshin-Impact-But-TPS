@@ -1068,6 +1068,23 @@ void APlayerCharacter::OnRep_Shield(float LastShield)
 	}
 }
 
+void APlayerCharacter::HideOverheadWidget()
+{
+	OverheadWidget->SetVisibility(false);
+}
+
+void APlayerCharacter::BeTracedShowOverheadWidget()
+{
+	OverheadWidget->SetVisibility(true);
+	GetWorld()->GetTimerManager().SetTimer(
+		   ShowOverheadWidgetTimer, 
+		   this, 
+		   &ThisClass::HideOverheadWidget, 
+		   ShowOverheadWidgetLastingTime, 
+		   false
+	   );
+}
+
 void APlayerCharacter::UpdateOverheadWidget()
 {
 	if(UOverheadWidget* Widget = Cast<UOverheadWidget>(OverheadWidget->GetWidget()))
@@ -1107,6 +1124,16 @@ void APlayerCharacter::SetOverheadWidgetPlayerName()
 			Widget->SetDisplayText(PlayerName);
 		}
 	}
+}
+
+ETeam APlayerCharacter::GetTeam()
+{
+	MyPlayerState = MyPlayerState == nullptr ? GetPlayerState<AMyPlayerState>() : MyPlayerState;
+	if(MyPlayerState)
+	{
+		return MyPlayerState->GetTeam();
+	}
+	return ETeam::ET_NoTeam;
 }
 
 
@@ -1287,18 +1314,17 @@ void APlayerCharacter::RecoverShieldTick()
 
 void APlayerCharacter::ShowFriendOverheadWidget()
 {
+	if(OverheadWidget == nullptr)return;
 	if(IsLocallyControlled())
 	{
-		OverheadWidget->SetVisibility(false);
+		HideOverheadWidget();
 	}
-	else if(MyPlayerState
-		&& GetWorld() && GetWorld()->GetFirstPlayerController() && GetWorld()->GetFirstPlayerController()->GetPlayerState<AMyPlayerState>()
-		&& MyPlayerState->GetTeam() == GetWorld()->GetFirstPlayerController()->GetPlayerState<AMyPlayerState>()->GetTeam())
+	else if(GetTeam() == GetWorld()->GetFirstPlayerController()->GetPlayerState<AMyPlayerState>()->GetTeam())
 	{
 		OverheadWidget->SetVisibility(true);
 	}
 	else
 	{
-		OverheadWidget->SetVisibility(false);
+		HideOverheadWidget();
 	}
 }
