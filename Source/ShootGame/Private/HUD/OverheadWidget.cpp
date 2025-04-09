@@ -3,6 +3,7 @@
 
 #include "HUD/OverheadWidget.h"
 
+#include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 
 void UOverheadWidget::SetDisplayText(const FString& TextToDisplay) const
@@ -13,30 +14,26 @@ void UOverheadWidget::SetDisplayText(const FString& TextToDisplay) const
 	}
 }
 
-void UOverheadWidget::ShowPlayerNetRole(APawn* InPawn)
+void UOverheadWidget::UpdateHealthBar(float Health, float MaxHealth)
 {
-	ENetRole localRole = InPawn->GetLocalRole();
-	FString Role;
-	switch (localRole)
+	if(HealthBar)
 	{
-	case ENetRole::ROLE_Authority:
-		Role = FString("Authority");
-		break;
-	case ENetRole::ROLE_AutonomousProxy:
-		Role = FString("AutonomousProxy");
-		break;
-	case ENetRole::ROLE_SimulatedProxy:
-		Role = FString("SimulatedProxy");
-		break;
-	case ENetRole::ROLE_None:
-		Role = FString("None");
-		break;
-	default: ;
+		HealthBar->SetPercent(Health/MaxHealth);
 	}
+}
 
-	FString localRoleString = FString::Printf(TEXT("Local Role: %s"), *Role);
+void UOverheadWidget::UpdateShieldBar(float Shield, float MaxShield)
+{
+	if(ShieldBar)
+	{
+		ShieldBar->SetPercent(Shield/MaxShield);
+	}
+}
 
-	SetDisplayText(localRoleString);
+void UOverheadWidget::UpdateBar(float Health, float MaxHealth, float Shield, float MaxShield)
+{
+	UpdateHealthBar(Health, MaxHealth);
+	UpdateShieldBar(Shield, MaxShield);
 }
 
 void UOverheadWidget::NativeDestruct()

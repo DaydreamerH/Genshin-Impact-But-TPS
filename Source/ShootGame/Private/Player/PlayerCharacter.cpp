@@ -9,10 +9,12 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/CombatComponent.h"
 #include "Components/LagCompensationComponent.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameMode/LobbyGameMode.h"
 #include "GameMode/ShootGameMode.h"
+#include "HUD/OverheadWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Materials/MaterialParameterCollection.h"
@@ -29,6 +31,9 @@ APlayerCharacter::APlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
+	OverheadWidget->SetupAttachment(RootComponent);
+	
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetMesh());
 	CameraBoom->TargetArmLength = 400.f;
@@ -336,6 +341,7 @@ void APlayerCharacter::BeginPlay()
 	
 	UpdateHUDHealth();
 	UpdateHUDShield();
+	UpdateOverheadWidget();
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
@@ -675,6 +681,7 @@ void APlayerCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UD
 	
 	UpdateHUDHealth();
 	UpdateHUDShield();
+	UpdateOverheadWidget();
 	
 	if(Damage<1.f)
 	{
@@ -712,8 +719,8 @@ void APlayerCharacter::PollInit()
 		if(MyPlayerState)
 		{
 			OnPlayerStateInitialized();
+			SetOverheadWidgetPlayerName();
 		}
-		
 	}
 }
 
@@ -1033,6 +1040,7 @@ void APlayerCharacter::HideCamera() const
 void APlayerCharacter::OnRep_Health(float LastHealth)
 {
 	UpdateHUDHealth();
+	UpdateOverheadWidget();
 	if(LastHealth - Health > 1.f)
 	{
 		PlayHitReactMontage();
@@ -1046,14 +1054,24 @@ void APlayerCharacter::DropShield(float DeltaTime)
 	const float AmountShieldToDrop = DeltaTime*ShieldDropEverySecond;
 	Shield = FMath::Clamp(Shield - AmountShieldToDrop, 0.f, MaxShield);
 	UpdateHUDShield();
+	UpdateOverheadWidget();
 }
 
 void APlayerCharacter::OnRep_Shield(float LastShield)
 {
 	UpdateHUDShield();
+	UpdateOverheadWidget();
 	if(LastShield - Shield >= 1.f)
 	{
 		PlayHitReactMontage();
+	}
+}
+
+void APlayerCharacter::UpdateOverheadWidget()
+{
+	if(UOverheadWidget* Widget = Cast<UOverheadWidget>(OverheadWidget->GetWidget()))
+	{
+		Widget->UpdateBar(Health, MaxHealth, Shield, MaxShield);
 	}
 }
 
@@ -1074,6 +1092,19 @@ void APlayerCharacter::UpdateHUDShield()
 	if(PlayerController)
 	{
 		PlayerController->SetHUDShield(Shield, MaxShield);
+	}
+}
+
+void APlayerCharacter::SetOverheadWidgetPlayerName()
+{
+	if(UOverheadWidget* Widget = Cast<UOverheadWidget>(OverheadWidget->GetWidget()))
+	{
+		MyPlayerState = MyPlayerState == nullptr ? GetPlayerState<AMyPlayerState>() : MyPlayerState;
+		if(MyPlayerState)
+		{
+			FString PlayerName = MyPlayerState->GetPlayerName();
+			Widget->SetDisplayText(PlayerName);
+		}
 	}
 }
 
@@ -1221,6 +1252,7 @@ void APlayerCharacter::RecoverHealthTick()
 		Health = FMath::Min(Health, MaxHealth);
 
 		UpdateHUDHealth();
+		UpdateOverheadWidget();
 	}
 	else
 	{
@@ -1243,6 +1275,7 @@ void APlayerCharacter::RecoverShieldTick()
 		Shield = FMath::Min(Shield, MaxShield);
 
 		UpdateHUDShield();
+		UpdateOverheadWidget();
 	}
 	else
 	{

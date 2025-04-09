@@ -31,6 +31,7 @@ void UBuffComponent::HealRampUp(float DeltaTime)
 	Character->SetHealth(FMath::Clamp(Character->GetHealth()+HealThisFrame,
 				0, Character->GetMaxHealth()));
 	Character->UpdateHUDHealth();
+	Character->UpdateOverheadWidget();
 	AmountToHeal -= HealThisFrame;
 
 	if(AmountToHeal <= 0.f || Character->GetHealth() >= Character->GetMaxHealth())
@@ -137,6 +138,7 @@ void UBuffComponent::ReplenishShield(const float ShieldAmount) const
 		0.f,
 		Character->GetMaxShield()));
 	Character->UpdateHUDShield();
+	Character->UpdateOverheadWidget();
 	Character->PlaySound(ECharacterSoundType::EST_ShieldSound);
 }
 

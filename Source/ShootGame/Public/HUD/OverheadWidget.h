@@ -14,13 +14,21 @@ class SHOOTGAME_API UOverheadWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* DisplayText;
 
 	void SetDisplayText(const FString& TextToDisplay) const;
+	void UpdateHealthBar(float Health, float MaxLife);
+	void UpdateShieldBar(float Shield, float MaxShield);
+	void UpdateBar(float Health, float MaxHealth, float Shield, float MaxShield);
+	
+private:
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* DisplayText;
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* HealthBar;
+	UPROPERTY(meta = (BindWidget))
+	UProgressBar* ShieldBar;
 
-	UFUNCTION(BlueprintCallable)
-	void ShowPlayerNetRole(APawn* InPawn);
+	
 protected:
 	virtual void NativeDestruct() override;
 };

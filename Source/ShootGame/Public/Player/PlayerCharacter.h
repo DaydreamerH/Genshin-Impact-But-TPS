@@ -358,9 +358,15 @@ private:
 	float RecoveryElapsedTime = 0.0f; // 恢复计时器
 
 	float RecoilRiseTime = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	class UWidgetComponent* OverheadWidget;
+	
 public:
+	void UpdateOverheadWidget();
 	void UpdateHUDHealth();
 	void UpdateHUDShield();
+	void SetOverheadWidgetPlayerName();
 	
 	void SetOverlappingWeapon(AWeapon* Weapon);
 
