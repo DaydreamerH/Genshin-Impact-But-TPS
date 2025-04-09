@@ -8,7 +8,7 @@ public class ShootGame : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "MultiPlayerSessions",  "OnlineSubsystem", "OnlineSubsystemSteam", "Niagara"});
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "MultiPlayerSessions",  "OnlineSubsystem", "OnlineSubsystemSteam", "Niagara", "Slate", "SlateCore"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

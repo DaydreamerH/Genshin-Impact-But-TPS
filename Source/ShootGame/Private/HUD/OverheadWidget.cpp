@@ -1,18 +1,38 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "HUD/OverheadWidget.h"
 
+#include "Components/Border.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 
-void UOverheadWidget::SetDisplayText(const FString& TextToDisplay, bool bUseRedColor) const
+void UOverheadWidget::InitOverheadWidget(const FString& TextToDisplay, bool bUseRedColor) const
 {
+	const FLinearColor Color = bUseRedColor
+		? FLinearColor(1.0f, 0.390901f, 0.382375f, 1.0f)
+		: FLinearColor(0.202818f,0.604446f,1.0f,1.0f);
 	if(DisplayText)
 	{
 		DisplayText->SetText(FText::FromString(TextToDisplay));
-		const FSlateColor Color = bUseRedColor ? RedColor : BlueColor;
 		DisplayText->SetColorAndOpacity(Color);
+	}
+	if(LifeBorder)
+	{
+		LifeBorder->SetBrushColor(Color);
+	}
+	if(ShieldBorder)
+	{
+		ShieldBorder->SetBrushColor(Color);
+	}
+	if(HealthBar)
+	{
+		FProgressBarStyle BarStyle = HealthBar->GetWidgetStyle();
+		BarStyle.BackgroundImage.TintColor = Color;
+		HealthBar->SetWidgetStyle(BarStyle);
+	}
+	if(ShieldBar)
+	{
+		FProgressBarStyle BarStyle = ShieldBar->GetWidgetStyle();
+		BarStyle.BackgroundImage.TintColor = Color;
+		ShieldBar->SetWidgetStyle(BarStyle);
 	}
 }
 

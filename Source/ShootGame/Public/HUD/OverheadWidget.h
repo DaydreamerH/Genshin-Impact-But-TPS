@@ -15,7 +15,7 @@ class SHOOTGAME_API UOverheadWidget : public UUserWidget
 	GENERATED_BODY()
 public:
 	void ShowOverheadWidget();
-	void SetDisplayText(const FString& TextToDisplay, bool bUseRedColor) const;
+	void InitOverheadWidget(const FString& TextToDisplay, bool bUseRedColor) const;
 	void UpdateHealthBar(float Health, float MaxLife);
 	void UpdateShieldBar(float Shield, float MaxShield);
 	void UpdateBar(float Health, float MaxHealth, float Shield, float MaxShield);
@@ -27,9 +27,10 @@ private:
 	class UProgressBar* HealthBar;
 	UPROPERTY(meta = (BindWidget))
 	UProgressBar* ShieldBar;
-	FSlateColor RedColor = FSlateColor(FLinearColor(1.0f, 0.390901f, 0.382375f, 1.0f));
-	FSlateColor BlueColor = FSlateColor(FLinearColor(0.202818f,0.604446f,1.0f,1.0f));
-	
+	UPROPERTY(meta = (BindWidget))
+	class UBorder* LifeBorder;
+	UPROPERTY(meta = (BindWidget))
+	UBorder* ShieldBorder;
 protected:
 	virtual void NativeDestruct() override;
 };
