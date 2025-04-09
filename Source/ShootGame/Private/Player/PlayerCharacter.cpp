@@ -40,8 +40,8 @@ APlayerCharacter::APlayerCharacter()
 	CameraBoom->bUsePawnControlRotation = true;
 	CameraBoom->bEnableCameraLag = true;
 	CameraBoom->bEnableCameraRotationLag = true;
-	CameraBoom->CameraLagSpeed = 30.f;
-	CameraBoom->CameraRotationLagSpeed = 30.f;
+	CameraBoom->CameraLagSpeed = 50.f;
+	CameraBoom->CameraRotationLagSpeed = 50.f;
 	
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
