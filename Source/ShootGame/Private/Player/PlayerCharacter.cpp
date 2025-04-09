@@ -390,8 +390,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	float CharacterSpeed = GetVelocity().Size();  
 	
-	CameraBoom->CameraLagSpeed = FMath::Clamp(CharacterSpeed / 200.f, 30.f, 60.f);
-	CameraBoom->CameraRotationLagSpeed = FMath::Clamp(CharacterSpeed / 200.f, 30.f, 60.f);
+	CameraBoom->CameraLagSpeed = FMath::Clamp(CharacterSpeed / 200.f, 30.f, 100.f);
+	CameraBoom->CameraRotationLagSpeed = FMath::Clamp(CharacterSpeed / 200.f, 30.f, 100.f);
 }
 
 void APlayerCharacter::OnActionMoveForward(const FInputActionValue& InputActionValue)
