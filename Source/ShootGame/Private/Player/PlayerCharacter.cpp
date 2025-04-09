@@ -1075,7 +1075,9 @@ void APlayerCharacter::HideOverheadWidget()
 
 void APlayerCharacter::BeTracedShowOverheadWidget()
 {
+	if(OverheadWidget == nullptr)return;
 	OverheadWidget->SetVisibility(true);
+	GetWorld()->GetTimerManager().ClearTimer(ShowOverheadWidgetTimer);
 	GetWorld()->GetTimerManager().SetTimer(
 		   ShowOverheadWidgetTimer, 
 		   this, 
