@@ -1123,7 +1123,9 @@ void APlayerCharacter::SetOverheadWidgetPlayerName()
 		if(MyPlayerState)
 		{
 			FString PlayerName = MyPlayerState->GetPlayerName();
-			Widget->SetDisplayText(PlayerName);
+			bool bUseRedColor =
+				MyPlayerState->GetTeam() != GetWorld()->GetFirstPlayerController()->GetPlayerState<AMyPlayerState>()->GetTeam();
+			Widget->SetDisplayText(PlayerName, bUseRedColor);
 		}
 	}
 }

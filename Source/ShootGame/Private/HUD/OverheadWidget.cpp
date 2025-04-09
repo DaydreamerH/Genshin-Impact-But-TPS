@@ -6,11 +6,13 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 
-void UOverheadWidget::SetDisplayText(const FString& TextToDisplay) const
+void UOverheadWidget::SetDisplayText(const FString& TextToDisplay, bool bUseRedColor) const
 {
 	if(DisplayText)
 	{
 		DisplayText->SetText(FText::FromString(TextToDisplay));
+		const FSlateColor Color = bUseRedColor ? RedColor : BlueColor;
+		DisplayText->SetColorAndOpacity(Color);
 	}
 }
 
