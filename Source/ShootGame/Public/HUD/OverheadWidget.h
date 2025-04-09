@@ -14,7 +14,7 @@ class SHOOTGAME_API UOverheadWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-
+	void ShowOverheadWidget();
 	void SetDisplayText(const FString& TextToDisplay) const;
 	void UpdateHealthBar(float Health, float MaxLife);
 	void UpdateShieldBar(float Shield, float MaxShield);

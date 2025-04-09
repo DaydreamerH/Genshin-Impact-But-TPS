@@ -361,6 +361,8 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	class UWidgetComponent* OverheadWidget;
+
+	void ShowFriendOverheadWidget();
 	
 public:
 	void UpdateOverheadWidget();

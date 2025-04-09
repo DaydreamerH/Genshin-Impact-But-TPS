@@ -720,6 +720,7 @@ void APlayerCharacter::PollInit()
 		{
 			OnPlayerStateInitialized();
 			SetOverheadWidgetPlayerName();
+			ShowFriendOverheadWidget();
 		}
 	}
 }
@@ -1280,5 +1281,24 @@ void APlayerCharacter::RecoverShieldTick()
 	else
 	{
 		GetWorld()->GetTimerManager().ClearTimer(ShieldRecoveryTimerHandle);
+	}
+}
+
+
+void APlayerCharacter::ShowFriendOverheadWidget()
+{
+	if(IsLocallyControlled())
+	{
+		OverheadWidget->SetVisibility(false);
+	}
+	else if(MyPlayerState
+		&& GetWorld() && GetWorld()->GetFirstPlayerController() && GetWorld()->GetFirstPlayerController()->GetPlayerState<AMyPlayerState>()
+		&& MyPlayerState->GetTeam() == GetWorld()->GetFirstPlayerController()->GetPlayerState<AMyPlayerState>()->GetTeam())
+	{
+		OverheadWidget->SetVisibility(true);
+	}
+	else
+	{
+		OverheadWidget->SetVisibility(false);
 	}
 }
