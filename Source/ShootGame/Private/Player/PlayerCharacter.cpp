@@ -291,6 +291,7 @@ void APlayerCharacter::SetTeamColor(const ETeam Team) const
 	if(GetWorld()->GetFirstPlayerController()->GetPlayerState<AMyPlayerState>()->GetTeam() == Team)
 	{
 		GetMesh()->SetOverlayMaterial(FriendMat);
+		GetMesh()->bRenderCustomDepth = true;
 	}
 	else
 	{
