@@ -31,6 +31,9 @@ APlayerCharacter::APlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	GetCharacterMovement()->bUseFlatBaseForFloorChecks = true;
+	GetCharacterMovement()->PerchRadiusThreshold = 0.f;
+	
 	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverheadWidget->SetupAttachment(RootComponent);
 	
@@ -39,9 +42,7 @@ APlayerCharacter::APlayerCharacter()
 	CameraBoom->TargetArmLength = 400.f;
 	CameraBoom->bUsePawnControlRotation = true;
 	CameraBoom->bEnableCameraLag = true;
-	CameraBoom->bEnableCameraRotationLag = true;
 	CameraBoom->CameraLagSpeed = 50.f;
-	CameraBoom->CameraRotationLagSpeed = 50.f;
 	
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
@@ -51,7 +52,6 @@ APlayerCharacter::APlayerCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bReplicates = true;
-	
 
 	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	Combat->SetIsReplicated(true);
@@ -391,7 +391,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 	float CharacterSpeed = GetVelocity().Size();  
 	
 	CameraBoom->CameraLagSpeed = FMath::Clamp(CharacterSpeed / 200.f, 30.f, 100.f);
-	CameraBoom->CameraRotationLagSpeed = FMath::Clamp(CharacterSpeed / 200.f, 30.f, 100.f);
 }
 
 void APlayerCharacter::OnActionMoveForward(const FInputActionValue& InputActionValue)
