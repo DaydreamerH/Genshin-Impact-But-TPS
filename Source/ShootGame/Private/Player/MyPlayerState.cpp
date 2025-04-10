@@ -68,4 +68,10 @@ void AMyPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME(AMyPlayerState, Defeats);
 	DOREPLIFETIME(AMyPlayerState, Team);
+	DOREPLIFETIME(AMyPlayerState, bShowBarInOverheadWidget);
+}
+
+void AMyPlayerState::SetShowBarInOverheadWidget(bool bShow)
+{
+	bShowBarInOverheadWidget = bShow;
 }

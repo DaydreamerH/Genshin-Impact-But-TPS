@@ -32,7 +32,13 @@ private:
 
 	UPROPERTY(Replicated)
 	ETeam Team = ETeam::ET_NoTeam;
+
+	UPROPERTY(Replicated)
+	bool bShowBarInOverheadWidget = false;
 public:
 	FORCEINLINE ETeam GetTeam() const {return Team;}
 	FORCEINLINE void SetTeam(ETeam TeamToSet) {Team = TeamToSet;}
+
+	void SetShowBarInOverheadWidget(bool bShow);
+	FORCEINLINE bool GetShowBarInOverheadWidget(){return bShowBarInOverheadWidget;}
 };

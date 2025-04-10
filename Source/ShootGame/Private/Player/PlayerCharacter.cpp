@@ -1331,6 +1331,14 @@ void APlayerCharacter::ShowFriendOverheadWidget()
 	else if(GetTeam() == GetWorld()->GetFirstPlayerController()->GetPlayerState<AMyPlayerState>()->GetTeam())
 	{
 		OverheadWidget->SetVisibility(true);
+
+		if(MyPlayerState && !MyPlayerState->GetShowBarInOverheadWidget())
+		{
+			if(UOverheadWidget* Widget = Cast<UOverheadWidget>(OverheadWidget->GetWidget()))
+			{
+				Widget->HideBar();
+			}
+		}
 	}
 	else
 	{

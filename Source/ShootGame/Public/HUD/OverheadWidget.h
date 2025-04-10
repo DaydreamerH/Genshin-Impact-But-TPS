@@ -14,11 +14,11 @@ class SHOOTGAME_API UOverheadWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	void ShowOverheadWidget();
 	void InitOverheadWidget(const FString& TextToDisplay, bool bUseRedColor) const;
 	void UpdateHealthBar(float Health, float MaxLife);
 	void UpdateShieldBar(float Shield, float MaxShield);
 	void UpdateBar(float Health, float MaxHealth, float Shield, float MaxShield);
+	void HideBar();
 	
 private:
 	UPROPERTY(meta = (BindWidget))

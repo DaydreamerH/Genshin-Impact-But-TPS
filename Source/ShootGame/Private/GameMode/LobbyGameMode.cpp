@@ -4,6 +4,7 @@
 #include "ShootGame/Public/GameMode/LobbyGameMode.h"
 
 #include "GameFramework/GameStateBase.h"
+#include "Player/MyPlayerState.h"
 
 void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 {
@@ -17,6 +18,10 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 			bUseSeamlessTravel = true;
 			world->ServerTravel(FString("/Game/_Game/Maps/TeamMap?listen"));
 		}
+	}
+	if(AMyPlayerState* MyPlayerState = NewPlayer->GetPlayerState<AMyPlayerState>())
+	{
+		MyPlayerState->SetShowBarInOverheadWidget(false);
 	}
 }
 

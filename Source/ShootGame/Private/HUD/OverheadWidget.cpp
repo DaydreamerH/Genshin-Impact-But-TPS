@@ -58,6 +58,26 @@ void UOverheadWidget::UpdateBar(float Health, float MaxHealth, float Shield, flo
 	UpdateShieldBar(Shield, MaxShield);
 }
 
+void UOverheadWidget::HideBar()
+{
+	if(HealthBar)
+	{
+		HealthBar->SetVisibility(ESlateVisibility::Collapsed);
+	}
+	if(ShieldBar)
+	{
+		ShieldBar->SetVisibility(ESlateVisibility::Collapsed);
+	}
+	if(ShieldBorder)
+	{
+		ShieldBorder->SetVisibility(ESlateVisibility::Collapsed);
+	}
+	if(LifeBorder)
+	{
+		LifeBorder->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
 void UOverheadWidget::NativeDestruct()
 {
 	Super::NativeDestruct();

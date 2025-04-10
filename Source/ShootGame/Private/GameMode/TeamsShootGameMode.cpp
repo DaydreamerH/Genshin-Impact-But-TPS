@@ -32,6 +32,7 @@ void ATeamsShootGameMode::PostLogin(APlayerController* NewPlayer)
 				TGameState->RedTeam.AddUnique(PlayerState);
 				PlayerState->SetTeam(ETeam::ET_RedTeam);
 			}
+			PlayerState->SetShowBarInOverheadWidget(true);
 		}
 	}
 }
