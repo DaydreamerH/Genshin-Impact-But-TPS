@@ -688,7 +688,7 @@ void APlayerCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UD
 	UpdateHUDShield();
 	UpdateOverheadWidget();
 	
-	if(Damage<1.f)
+	if(Damage>10.f)
 	{
 		PlayHitReactMontage();
 	}
