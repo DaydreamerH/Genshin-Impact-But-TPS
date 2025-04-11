@@ -43,7 +43,7 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 			MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName("MuzzleFlash"))
 		{
 			const UWorld* World = GetWorld();
-			FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform((GetWeaponMesh()));
+			FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(GetWeaponMesh());
 			FVector Start = SocketTransform.GetLocation();
 
 			FHitResult FireHit;
@@ -55,7 +55,7 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 				{
 					if(HasAuthority() &&
 						(OwnerPawn->IsLocallyControlled() ||
-							bUseServerSideRewind))
+							!bUseServerSideRewind))
 					{
 						const float DamageToCause =
 							FireHit.BoneName.ToString() == FString(TEXT("頭")) ?
@@ -70,6 +70,7 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 					}
 					else if(!HasAuthority() && bUseServerSideRewind)
 					{
+						UE_LOG(LogTemp, Log, TEXT("Request"));
 						OwnerPlayerCharacter = OwnerPlayerCharacter == nullptr ?
 							Cast<APlayerCharacter>(OwnerPawn) : OwnerPlayerCharacter;
 						OwnerPlayerController = OwnerPlayerController == nullptr ?
