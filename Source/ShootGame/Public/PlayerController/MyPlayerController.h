@@ -168,4 +168,10 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UDamageIndicator> DamageIndicatorClass; 
+
+	UFUNCTION(Client, Reliable)
+	void ClientShowDamageIndicator(FVector_NetQuantize AttackerLocation);
+
+	void SetDamageIndicator(const FVector& AttackerLocation);
+	
 };

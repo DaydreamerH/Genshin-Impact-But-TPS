@@ -189,16 +189,14 @@ void AMyPlayerController::SetHUDGrenades(int32 Grenades)
 void AMyPlayerController::ShowDamageIndicator(AMyPlayerController* AttackerController)
 {
 	if(AttackerController == nullptr)return;
-	FRotator MyForwardDirection = GetControlRotation();
-	FRotator BetweenDirection =
-		UKismetMathLibrary::FindLookAtRotation(GetCharacter()->GetActorLocation(), AttackerController->GetCharacter()->GetActorLocation());
-	float Angle =  BetweenDirection.Yaw - MyForwardDirection.Yaw;
-	Angle = FMath::UnwindDegrees(Angle);
-
-	if(UDamageIndicator* DamageIndicator = CreateWidget<UDamageIndicator>(this, DamageIndicatorClass))
+	const FVector AttackerLocation = AttackerController->GetCharacter()->GetActorLocation();
+	if(IsLocalController())
 	{
-		DamageIndicator->AddToViewport();
-		DamageIndicator->RotateBox(Angle);
+		SetDamageIndicator(AttackerLocation);
+	}
+	else
+	{
+		ClientShowDamageIndicator(AttackerLocation);
 	}
 }
 
@@ -342,6 +340,27 @@ void AMyPlayerController::OnRep_MatchState()
 	{
 		HandleCooldown();
 	}
+}
+
+void AMyPlayerController::SetDamageIndicator(const FVector& AttackerLocation)
+{
+	const FRotator MyForwardDirection = GetControlRotation();
+	const FRotator BetweenDirection =
+		UKismetMathLibrary::FindLookAtRotation(GetCharacter()->GetActorLocation(), AttackerLocation);
+	float Angle =  BetweenDirection.Yaw - MyForwardDirection.Yaw;
+	Angle = FMath::UnwindDegrees(Angle);
+
+	if(UDamageIndicator* DamageIndicator = CreateWidget<UDamageIndicator>(this, DamageIndicatorClass))
+	{
+		DamageIndicator->AddToViewport();
+		DamageIndicator->RotateBox(Angle);
+	}
+}
+
+void AMyPlayerController::ClientShowDamageIndicator_Implementation(FVector_NetQuantize AttackerLocation)
+{
+	if(!IsLocalController())return;
+	SetDamageIndicator(AttackerLocation);
 }
 
 void AMyPlayerController::ServerReportPingStatus_Implementation(bool HighPing)
