@@ -765,6 +765,10 @@ void APlayerCharacter::OnPlayerStateInitialized()
 	{
 		SetTeamColor(MyPlayerState->GetTeam());
 	}
+	else
+	{
+		GetMesh()->bRenderCustomDepth = true;
+	}
 	SetSpawnPoint();
 }
 
