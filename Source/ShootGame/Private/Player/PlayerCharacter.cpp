@@ -236,7 +236,6 @@ void APlayerCharacter::Elim(bool bPlayerLeftGame)
 			Combat->EquippedBomb->Dropped();
 		}
 	}
-	bLeftGame = bPlayerLeftGame;
 	MulticastElim(bPlayerLeftGame);
 	StartHealthRecovery();
 	StartShieldRecovery();
@@ -254,8 +253,8 @@ void APlayerCharacter::MulticastElim_Implementation(bool bPlayerLeftGame)
 	bElimmed = true;
 	PlayElimMontage();
 	
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	/*GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);*/
 	bDisableGameplay = true;
 	
 	if(IsLocallyControlled() && Combat
@@ -783,7 +782,8 @@ void APlayerCharacter::PlayFireMontage(bool bAiming) const
 void APlayerCharacter::PlayHitReactMontage() const
 {
 	if(Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
-	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && HitReactMontage)
+	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance && HitReactMontage && ElimMontage && !AnimInstance->Montage_IsPlaying(ElimMontage))
 	{
 		AnimInstance->Montage_Play(HitReactMontage);
 		const FName SectionName ("FromFront");
@@ -1048,7 +1048,7 @@ void APlayerCharacter::OnRep_Health(float LastHealth)
 {
 	UpdateHUDHealth();
 	UpdateOverheadWidget();
-	if(LastHealth - Health > 1.f)
+	if(LastHealth - Health >= 10.f)
 	{
 		PlayHitReactMontage();
 	}
@@ -1068,7 +1068,7 @@ void APlayerCharacter::OnRep_Shield(float LastShield)
 {
 	UpdateHUDShield();
 	UpdateOverheadWidget();
-	if(LastShield - Shield >= 1.f)
+	if(LastShield - Shield >= 10.f)
 	{
 		PlayHitReactMontage();
 	}
