@@ -7,15 +7,15 @@ UShotGunCameraShake::UShotGunCameraShake()
 {
 	OscillationDuration = 0.3f;  
 	OscillationBlendInTime = 0.15f;
-	OscillationBlendOutTime = 0.15f;
+	OscillationBlendOutTime = 0.05f;
 
 	// 旋转抖动
 	RotOscillation.Pitch.Amplitude = 0.4f;
-	RotOscillation.Pitch.Frequency = 20.f;
+	RotOscillation.Pitch.Frequency = 1.f;
 
 	RotOscillation.Yaw.Amplitude = 0.4f;
-	RotOscillation.Yaw.Frequency = 20.f;
+	RotOscillation.Yaw.Frequency = 1.f;
 
-	RotOscillation.Roll.Amplitude = 0.4f;
-	RotOscillation.Roll.Frequency = 20.f;
+	RotOscillation.Roll.Amplitude = 0.6f;
+	RotOscillation.Roll.Frequency = 60.f;
 }

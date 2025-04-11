@@ -7,7 +7,7 @@ URocketLauncherCameraShake::URocketLauncherCameraShake()
 {
 	OscillationDuration = 0.5f;  
 	OscillationBlendInTime = 0.15f;
-	OscillationBlendOutTime = 0.15f;
+	OscillationBlendOutTime = 0.05f;
 
 	// 旋转抖动
 	RotOscillation.Pitch.Amplitude = 0.7f;
@@ -17,5 +17,5 @@ URocketLauncherCameraShake::URocketLauncherCameraShake()
 	RotOscillation.Yaw.Frequency = 20.f;
 
 	RotOscillation.Roll.Amplitude = 0.7f;
-	RotOscillation.Roll.Frequency = 20.f;
+	RotOscillation.Roll.Frequency = 60.f;
 }

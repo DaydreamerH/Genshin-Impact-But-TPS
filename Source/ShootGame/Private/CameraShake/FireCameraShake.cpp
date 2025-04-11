@@ -7,15 +7,15 @@ UFireCameraShake::UFireCameraShake()
 {
 	OscillationDuration = 0.2f;  
 	OscillationBlendInTime = 0.1f;
-	OscillationBlendOutTime = 0.1f;
+	OscillationBlendOutTime = 0.05f;
 
 	// 旋转抖动
 	RotOscillation.Pitch.Amplitude = 0.2f;
-	RotOscillation.Pitch.Frequency = 0.1f;
+	RotOscillation.Pitch.Frequency = 1.f;
 
 	RotOscillation.Yaw.Amplitude = 0.2f;
-	RotOscillation.Yaw.Frequency = 0.1f;
+	RotOscillation.Yaw.Frequency = 0.5f;
 
-	RotOscillation.Roll.Amplitude = 0.2f;
-	RotOscillation.Roll.Frequency = 0.1f;
+	RotOscillation.Roll.Amplitude = 0.5f;
+	RotOscillation.Roll.Frequency = 60.f;
 }

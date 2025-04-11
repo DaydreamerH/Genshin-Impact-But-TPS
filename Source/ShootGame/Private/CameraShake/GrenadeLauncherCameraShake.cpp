@@ -7,7 +7,7 @@ UGrenadeLauncherCameraShake::UGrenadeLauncherCameraShake()
 {
 	OscillationDuration = 0.3f;  
 	OscillationBlendInTime = 0.1f;
-	OscillationBlendOutTime = 0.1f;
+	OscillationBlendOutTime = 0.05f;
 
 	// 旋转抖动
 	RotOscillation.Pitch.Amplitude = 0.5f;
@@ -16,6 +16,6 @@ UGrenadeLauncherCameraShake::UGrenadeLauncherCameraShake()
 	RotOscillation.Yaw.Amplitude = 0.5f;
 	RotOscillation.Yaw.Frequency = 0.1f;
 
-	RotOscillation.Roll.Amplitude = 0.5f;
-	RotOscillation.Roll.Frequency = 0.1f;
+	RotOscillation.Roll.Amplitude = 0.6f;
+	RotOscillation.Roll.Frequency = 60.f;
 }
