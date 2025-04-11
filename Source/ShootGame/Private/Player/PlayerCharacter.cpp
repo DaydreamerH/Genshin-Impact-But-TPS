@@ -711,6 +711,7 @@ void APlayerCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UD
 		if(AttackerController)
 		{
 			AttackerController->ShowHitCrosshairHandle();
+			PlayerController->ShowDamageIndicator(AttackerController);
 		}
 	}
 

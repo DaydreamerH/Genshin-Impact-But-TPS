@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CameraShake/FireCameraShake.h"
 #include "GameFramework/PlayerController.h"
 #include "GameState/ShootGameState.h"
+#include "HUD/DamageIndicator.h"
 #include "Player/MyPlayerState.h"
 #include "Weapon/Weapon.h"
 #include "MyPlayerController.generated.h"
@@ -29,6 +29,7 @@ public:
 	void SetHUDMatchCountdown(float CountdownTime);
 	void SetHUDAnnouncementCountdown(float CountdownTime);
 	void SetHUDGrenades(int32 Grenades);
+	void ShowDamageIndicator(AMyPlayerController* AttackerController);
 	void ResetHUD();
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void ReceivedPlayer() override;
@@ -103,6 +104,7 @@ protected:
 
 	static FString GetInfoText(const TArray<APlayerState*>& PlayerStates);
 	FString GetTeamsInfoText(const AShootGameState* ShootGameState) const;
+	
 private:
 	UPROPERTY(EditAnywhere, Category=HUD)
 	TSubclassOf<class UUserWidget> BackToMainMenuWidget;
@@ -163,4 +165,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	float HitCrosshairShowTime = 0.75f;
 	FTimerHandle HitCrosshairTimer;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UDamageIndicator> DamageIndicatorClass; 
 };

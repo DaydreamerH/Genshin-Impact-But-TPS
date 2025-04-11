@@ -21,6 +21,7 @@
 #include "HUD/CharacterOverlay.h"
 #include "HUD/PlayerHUD.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/PlayerCharacter.h"
 #include "PlayerController/Announcement.h"
@@ -182,6 +183,22 @@ void AMyPlayerController::SetHUDGrenades(int32 Grenades)
 	else
 	{
 		HUDGrenades = Grenades;
+	}
+}
+
+void AMyPlayerController::ShowDamageIndicator(AMyPlayerController* AttackerController)
+{
+	if(AttackerController == nullptr)return;
+	FRotator MyForwardDirection = GetControlRotation();
+	FRotator BetweenDirection =
+		UKismetMathLibrary::FindLookAtRotation(GetCharacter()->GetActorLocation(), AttackerController->GetCharacter()->GetActorLocation());
+	float Angle =  BetweenDirection.Yaw - MyForwardDirection.Yaw;
+	Angle = FMath::UnwindDegrees(Angle);
+
+	if(UDamageIndicator* DamageIndicator = CreateWidget<UDamageIndicator>(this, DamageIndicatorClass))
+	{
+		DamageIndicator->AddToViewport();
+		DamageIndicator->RotateBox(Angle);
 	}
 }
 
