@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -14,8 +13,10 @@ public:
 	APickup();
 	virtual void Tick(float DeltaTime) override;
 	virtual void Destroyed() override;
+
 protected:
 	virtual void BeginPlay() override;
+
 	UFUNCTION()
 	virtual void OnSphereOverlap(
 		UPrimitiveComponent* OverlappedComponent,
@@ -25,7 +26,7 @@ protected:
 		bool bFromSweep,
 		const FHitResult& SweepResult
 	);
-	
+
 	UPROPERTY(EditAnywhere)
 	float BaseTurnRate = 45.f;
 	
@@ -38,16 +39,14 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* PickupMesh;
-
+	
 	UPROPERTY(VisibleAnywhere)
-	class UNiagaraComponent* PickupEffectComponent;
-
+	UParticleSystemComponent* PickupEffectComponent;
+	
 	UPROPERTY(EditAnywhere)
-	class UNiagaraSystem* PickupEffect;
+	UParticleSystem* PickupEffect;
 
 	FTimerHandle BindOverlapTimer;
 	float BindOverlapTime = 0.25f;
 	void BindOverlapTimerFinished();
-public:	
-	
 };
