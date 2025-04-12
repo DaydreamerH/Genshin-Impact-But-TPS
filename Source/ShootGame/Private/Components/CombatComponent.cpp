@@ -101,6 +101,11 @@ void UCombatComponent::OnRep_EquippedWeapon()
 		Character->bUseControllerRotationYaw = true;
 		PlayEquipWeaponSound(EquippedWeapon);
 		EquippedWeapon->SetHUDAmmo();
+		if(Character->IsLocallyControlled() || Character->IsSameTeamWithTheLocalPlayer())
+		{
+			EquippedWeapon->GetWeaponMesh()->bRenderCustomDepth = true;
+			EquippedWeapon->GetWeaponMesh()->CustomDepthStencilValue = 100;
+		}
 	}
 }
 
@@ -113,6 +118,11 @@ void UCombatComponent::OnRep_SecondaryWeapon()
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;
 		PlayEquipWeaponSound(SecondaryWeapon);
+		if(Character->IsLocallyControlled() || Character->IsSameTeamWithTheLocalPlayer())
+		{
+			SecondaryWeapon->GetWeaponMesh()->bRenderCustomDepth = true;
+			SecondaryWeapon->GetWeaponMesh()->CustomDepthStencilValue = 100;
+		}
 	}
 }
 
@@ -188,6 +198,7 @@ void UCombatComponent::DropBomb()
 	{
 		bHoldingBomb = false;
 		EquippedBomb->Dropped();
+		EquippedBomb->GetWeaponMesh()->bRenderCustomDepth = false;
 		Character->UnCrouch();
 		if(EquippedWeapon!=nullptr)
 		{
@@ -831,6 +842,11 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 		WeaponToEquip->SetOwner(Character);
 		AttachBombToLeftHand(WeaponToEquip);
 		EquippedBomb = WeaponToEquip;
+		if(Character->IsLocallyControlled() || Character->IsSameTeamWithTheLocalPlayer())
+		{
+			EquippedBomb->GetWeaponMesh()->bRenderCustomDepth = true;
+			EquippedBomb->GetWeaponMesh()->CustomDepthStencilValue = 100;
+		}
 		Character->PlaySound(ECharacterSoundType::EST_BombSound);
 	}
 	else
@@ -861,6 +877,11 @@ void UCombatComponent::EquipPrimaryWeapon(AWeapon* WeaponToEquip)
 	
 	EquippedWeapon->SetOwner(Character);
 	EquippedWeapon->SetHUDAmmo();
+	if(Character->IsLocallyControlled() || Character->IsSameTeamWithTheLocalPlayer())
+	{
+		EquippedWeapon->GetWeaponMesh()->bRenderCustomDepth = true;
+		EquippedWeapon->GetWeaponMesh()->CustomDepthStencilValue = 100;
+	}
 
 	UpdateCarriedAmmo();
 	
@@ -876,6 +897,11 @@ void UCombatComponent::EquipSecondaryWeapon(AWeapon* WeaponToEquip)
 	AttachActorToBackpack(WeaponToEquip);
 	SecondaryWeapon->SetOwner(Character);
 	PlayEquipWeaponSound(WeaponToEquip);
+	if(Character->IsLocallyControlled() || Character->IsSameTeamWithTheLocalPlayer())
+	{
+		SecondaryWeapon->GetWeaponMesh()->bRenderCustomDepth = true;
+		SecondaryWeapon->GetWeaponMesh()->CustomDepthStencilValue = 100;
+	}
 }
 
 void UCombatComponent::PlayNoAmmoSound()
@@ -935,6 +961,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(UCombatComponent, EquippedWeapon);
 	DOREPLIFETIME(UCombatComponent, SecondaryWeapon);
+	DOREPLIFETIME(UCombatComponent, EquippedBomb);
 	DOREPLIFETIME(UCombatComponent, bAiming);
 	DOREPLIFETIME_CONDITION(UCombatComponent, CarriedAmmo, COND_OwnerOnly);
 	DOREPLIFETIME(UCombatComponent, CombatState);

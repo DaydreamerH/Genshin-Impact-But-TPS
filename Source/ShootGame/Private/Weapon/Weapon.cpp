@@ -366,6 +366,11 @@ void AWeapon::Dropped()
 	SetWeaponState(EWeaponState::EWS_Dropped);
 	FDetachmentTransformRules DetachmentTransformRules(EDetachmentRule::KeepWorld, true);
 	WeaponMesh->DetachFromComponent(DetachmentTransformRules);
+	if(APlayerCharacter* Character = Cast<APlayerCharacter>(GetOwner());
+		Character && Character->IsSameTeamWithTheLocalPlayer())
+	{
+		WeaponMesh->bRenderCustomDepth = false;
+	}
 	OwnerPlayerCharacter=nullptr;
 	OwnerPlayerController=nullptr;
 	SetOwner(nullptr);

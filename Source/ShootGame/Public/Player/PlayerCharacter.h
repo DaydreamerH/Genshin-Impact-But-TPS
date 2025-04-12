@@ -59,7 +59,7 @@ public:
 
 	FOnLeftGame OnLeftGame;
 
-	void SetTeamColor(ETeam Team) const;
+	void SetTeamColor();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -375,6 +375,7 @@ public:
 	void BeTracedShowOverheadWidget();
 	
 	ETeam GetTeam();
+	bool IsSameTeamWithTheLocalPlayer();
 	
 	void SetOverlappingWeapon(AWeapon* Weapon);
 

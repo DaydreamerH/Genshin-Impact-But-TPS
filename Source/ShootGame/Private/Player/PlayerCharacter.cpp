@@ -285,9 +285,9 @@ void APlayerCharacter::ElimTimerFinished()
 	}
 }
 
-void APlayerCharacter::SetTeamColor(const ETeam Team) const
+void APlayerCharacter::SetTeamColor()
 {
-	if(GetWorld()->GetFirstPlayerController()->GetPlayerState<AMyPlayerState>()->GetTeam() == Team)
+	if(IsSameTeamWithTheLocalPlayer())
 	{
 		GetMesh()->SetOverlayMaterial(FriendMat);
 		GetMesh()->bRenderCustomDepth = true;
@@ -296,24 +296,6 @@ void APlayerCharacter::SetTeamColor(const ETeam Team) const
 	{
 		GetMesh()->SetOverlayMaterial(EnemyMat);
 	}
-	
-	/*switch (Team)
-	{
-	case ETeam::ET_RedTeam:
-		if(EnemyMat && GetMesh())
-		{
-			GetMesh()->SetOverlayMaterial(EnemyMat);
-		}
-		break;
-	case ETeam::ET_BlueTeam:
-		if(EnemyMat && GetMesh())
-		{
-			GetMesh()->SetOverlayMaterial(FriendMat);
-		}
-		break;
-	default:
-		break;
-	}*/
 }
 
 void APlayerCharacter::BeginPlay()
@@ -763,7 +745,7 @@ void APlayerCharacter::OnPlayerStateInitialized()
 	MyPlayerState->AddToDefeats(0);
 	if(!IsLocallyControlled())
 	{
-		SetTeamColor(MyPlayerState->GetTeam());
+		SetTeamColor();
 	}
 	else
 	{
@@ -1148,6 +1130,11 @@ ETeam APlayerCharacter::GetTeam()
 		return MyPlayerState->GetTeam();
 	}
 	return ETeam::ET_NoTeam;
+}
+
+bool APlayerCharacter::IsSameTeamWithTheLocalPlayer()
+{
+	return GetTeam() == GetWorld()->GetFirstPlayerController()->GetPlayerState<AMyPlayerState>()->GetTeam();
 }
 
 
