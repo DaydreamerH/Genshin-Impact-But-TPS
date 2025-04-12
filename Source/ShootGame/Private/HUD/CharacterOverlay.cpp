@@ -34,3 +34,19 @@ void UCharacterOverlay::SetShieldBar(float Percent)
 	
 	ShieldBar->ProcessEvent(Func, &Params);
 }
+
+void UCharacterOverlay::SetCombatBar(float Percent)
+{
+	UFunction* Func = CombatBar->FindFunction(FName("UpdatePercent"));
+
+	if(!Func)return;
+	struct FUpdatePercentParams
+	{
+		double Percent;
+	};
+
+	FUpdatePercentParams Params;
+	Params.Percent = Percent;
+	
+	CombatBar->ProcessEvent(Func, &Params);
+}

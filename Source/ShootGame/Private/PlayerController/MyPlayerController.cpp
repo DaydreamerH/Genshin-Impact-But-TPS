@@ -10,7 +10,6 @@
 #include "CameraShake/ShotGunCameraShake.h"
 #include "Components/CombatComponent.h"
 #include "Components/Image.h"
-#include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "GameFramework/GameMode.h"
 #include "GameFramework/PlayerState.h"
@@ -357,6 +356,19 @@ void AMyPlayerController::SetDamageIndicator(const FVector& AttackerLocation)
 	}
 }
 
+void AMyPlayerController::SetHUDCombatBar()
+{
+	if(const float TotalScore = EnemyScore + MyTeamScore; TotalScore == 0)
+	{
+		PlayerHUD->CharacterOverlay->SetCombatBar(0.5f);
+	}
+	else
+	{
+		const float Percent = MyTeamScore / TotalScore;
+		PlayerHUD->CharacterOverlay->SetCombatBar(Percent);
+	}
+}
+
 void AMyPlayerController::ClientShowDamageIndicator_Implementation(FVector_NetQuantize AttackerLocation)
 {
 	if(!IsLocalController())return;
@@ -646,8 +658,10 @@ void AMyPlayerController::SetHUDEnemyTeamScore(int32 Score)
 	if(PlayerHUD && PlayerHUD->CharacterOverlay &&
 		PlayerHUD->CharacterOverlay->EnemyTeamScoreText)
 	{
+		EnemyScore = Score;
 		const FString ScoreText = FString::Printf(TEXT("%d"), Score);
 		PlayerHUD->CharacterOverlay->EnemyTeamScoreText->SetText(FText::FromString(ScoreText));
+		SetHUDCombatBar();
 	}	
 }
 
@@ -657,8 +671,10 @@ void AMyPlayerController::SetHUDMyTeamScore(int32 Score)
 	if(PlayerHUD && PlayerHUD->CharacterOverlay &&
 		PlayerHUD->CharacterOverlay->MyTeamScoreText)
 	{
+		MyTeamScore = Score;
 		const FString ScoreText = FString::Printf(TEXT("%d"), Score);
 		PlayerHUD->CharacterOverlay->MyTeamScoreText->SetText(FText::FromString(ScoreText));
+		SetHUDCombatBar();
 	}	
 }
 

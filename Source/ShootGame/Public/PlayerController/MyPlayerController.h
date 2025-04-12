@@ -173,5 +173,8 @@ private:
 	void ClientShowDamageIndicator(FVector_NetQuantize AttackerLocation);
 
 	void SetDamageIndicator(const FVector& AttackerLocation);
-	
+
+	int MyTeamScore = 0;
+	int EnemyScore = 0;
+	void SetHUDCombatBar();
 };

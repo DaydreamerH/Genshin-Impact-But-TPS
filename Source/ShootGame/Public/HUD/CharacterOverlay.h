@@ -62,6 +62,10 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UUserWidget* ShieldBar;
 
+	UPROPERTY(meta = (BindWidget))
+	UUserWidget* CombatBar;
+
 	void SetHealthBar(float Percent);
 	void SetShieldBar(float Percent);
+	void SetCombatBar(float Percent);
 };
