@@ -9,10 +9,6 @@ UFireCameraShake::UFireCameraShake()
 	OscillationBlendInTime = 0.1f;
 	OscillationBlendOutTime = 0.05f;
 
-	// 旋转抖动
-	RotOscillation.Pitch.Amplitude = 0.2f;
-	RotOscillation.Pitch.Frequency = 1.f;
-
 	RotOscillation.Yaw.Amplitude = 0.2f;
 	RotOscillation.Yaw.Frequency = 0.5f;
 

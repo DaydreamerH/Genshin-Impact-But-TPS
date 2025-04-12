@@ -9,10 +9,6 @@ UPistolCameraShake::UPistolCameraShake()
 	OscillationBlendInTime = 0.05f;
 	OscillationBlendOutTime = 0.05f;
 
-	// 旋转抖动
-	RotOscillation.Pitch.Amplitude = 0.5f;
-	RotOscillation.Pitch.Frequency = 0.1f;
-
 	RotOscillation.Yaw.Amplitude = 0.2f;
 	RotOscillation.Yaw.Frequency = 0.1f;
 
