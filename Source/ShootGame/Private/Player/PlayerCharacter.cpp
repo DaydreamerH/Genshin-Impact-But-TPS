@@ -636,6 +636,7 @@ void APlayerCharacter::Jump()
 void APlayerCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UDamageType* DamageType,
 	AController* InstigatorController, AActor* DamageCauser)
 {
+	if(IsElimmed())return;
 	if(Buff && Buff->IsHealing())
 	{
 		Buff->StopHealing();
