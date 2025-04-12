@@ -2,6 +2,7 @@
 
 #include "Weapon/Bomb.h"
 #include "Components/SphereComponent.h"
+#include "Player/PlayerCharacter.h"
 #include "ShootGame/ShootGame.h"
 
 ABomb::ABomb()
@@ -42,6 +43,14 @@ void ABomb::OnEquipped()
 {
 	ShowPickupWidget(false);
 	GetAreaSphere()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	if(APlayerCharacter* Character = Cast<APlayerCharacter>(GetOwner());
+		Character &&
+		(Character->IsLocallyControlled() || Character->IsSameTeamWithTheLocalPlayer()))
+	{
+		BombMesh->bRenderCustomDepth = true;
+		BombMesh->CustomDepthStencilValue = 100;
+		BombMesh->MarkRenderStateDirty();
+	}
 }
 
 void ABomb::OnDropped()
@@ -50,4 +59,11 @@ void ABomb::OnDropped()
 	{
 		GetAreaSphere()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	}
+
+	BombMesh->bRenderCustomDepth = false;
+	BombMesh->MarkRenderStateDirty();
+
+	OwnerPlayerCharacter=nullptr;
+	OwnerPlayerController=nullptr;
+	SetOwner(nullptr);
 }

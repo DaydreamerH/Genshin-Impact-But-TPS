@@ -11,6 +11,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Player/PlayerCharacter.h"
 #include "PlayerController/MyPlayerController.h"
+#include "Weapon/Bomb.h"
 #include "Weapon/BulletShell.h"
 
 AWeapon::AWeapon()
@@ -277,7 +278,9 @@ void AWeapon::OnDropped()
 	WeaponMesh->SetSimulatePhysics(true);
 	WeaponMesh->SetEnableGravity(true);
 	WeaponMesh->SetOverlayMaterial(OverlayMaterial);
-
+	WeaponMesh->bRenderCustomDepth = false;
+	WeaponMesh->MarkRenderStateDirty();
+	
 	OwnerPlayerCharacter = OwnerPlayerCharacter==nullptr?
 		Cast<APlayerCharacter>(GetOwner()):OwnerPlayerCharacter;
 	if(OwnerPlayerCharacter && bUseServerSideRewind)
@@ -367,7 +370,8 @@ void AWeapon::Dropped()
 	FDetachmentTransformRules DetachmentTransformRules(EDetachmentRule::KeepWorld, true);
 	WeaponMesh->DetachFromComponent(DetachmentTransformRules);
 	if(APlayerCharacter* Character = Cast<APlayerCharacter>(GetOwner());
-		Character && Character->IsSameTeamWithTheLocalPlayer())
+		Character &&
+		(Character->IsLocallyControlled() || Character->IsSameTeamWithTheLocalPlayer()))
 	{
 		WeaponMesh->bRenderCustomDepth = false;
 		WeaponMesh->MarkRenderStateDirty();

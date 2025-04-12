@@ -199,9 +199,16 @@ void UCombatComponent::DropBomb()
 {
 	if(EquippedBomb)
 	{
+		if(Character->IsLocallyControlled() || Character->IsSameTeamWithTheLocalPlayer())
+		{
+			if(ABomb* Bomb = Cast<ABomb>(EquippedBomb))
+			{
+				Bomb->GetBombMesh()->bRenderCustomDepth = false;
+				Bomb->GetBombMesh()->MarkRenderStateDirty();
+			}
+		}
 		bHoldingBomb = false;
 		EquippedBomb->Dropped();
-		EquippedBomb->GetWeaponMesh()->bRenderCustomDepth = false;
 		Character->UnCrouch();
 		if(EquippedWeapon!=nullptr)
 		{
@@ -841,19 +848,10 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 		Character->Crouch();
 		Character->GetCharacterMovement()->bOrientRotationToMovement = true;
 		Character->bUseControllerRotationYaw = false;
-		WeaponToEquip->SetWeaponState(EWeaponState::EWS_Equipped);
 		WeaponToEquip->SetOwner(Character);
+		WeaponToEquip->SetWeaponState(EWeaponState::EWS_Equipped);
 		AttachBombToLeftHand(WeaponToEquip);
 		EquippedBomb = WeaponToEquip;
-		if(Character->IsLocallyControlled() || Character->IsSameTeamWithTheLocalPlayer())
-		{
-			if(const ABomb* Bomb = Cast<ABomb>(EquippedBomb))
-			{
-				Bomb->GetBombMesh()->bRenderCustomDepth = true;
-				Bomb->GetBombMesh()->bRenderCustomDepth = 100;
-				Bomb->GetBombMesh()->MarkRenderStateDirty();
-			}
-		}
 		Character->PlaySound(ECharacterSoundType::EST_BombSound);
 	}
 	else
