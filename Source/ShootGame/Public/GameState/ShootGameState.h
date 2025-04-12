@@ -42,4 +42,6 @@ private:
 	float TopScore = 0.f;
 	UPROPERTY(EditAnywhere)
 	USoundBase* BackgroundMusic;
+	UPROPERTY()
+	UAudioComponent* FightBgAudioComponent;
 };
