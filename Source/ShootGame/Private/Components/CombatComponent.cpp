@@ -77,7 +77,6 @@ void UCombatComponent::SetAiming(bool bIsAiming)
 	
 	bAiming = bIsAiming;
 	EquippedWeapon->SwitchAim(bAiming);
-	ServerSetAiming(bIsAiming);
 	Character->GetCharacterMovement()->MaxWalkSpeed
 		= bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
 
@@ -89,6 +88,7 @@ void UCombatComponent::SetAiming(bool bIsAiming)
 	if(Character->IsLocallyControlled())
 	{
 		bAimButtonPressed = bIsAiming;
+		ServerSetAiming(bIsAiming);
 	}
 }
 
