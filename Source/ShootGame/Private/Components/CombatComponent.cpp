@@ -11,6 +11,7 @@
 #include "Player/PlayerCharacter.h"
 #include "PlayerController/MyPlayerController.h"
 #include "Sound/SoundCue.h"
+#include "Weapon/Bomb.h"
 #include "Weapon/ShotGunWeapon.h"
 #include "Weapon/Weapon.h"
 
@@ -105,6 +106,7 @@ void UCombatComponent::OnRep_EquippedWeapon()
 		{
 			EquippedWeapon->GetWeaponMesh()->bRenderCustomDepth = true;
 			EquippedWeapon->GetWeaponMesh()->CustomDepthStencilValue = 100;
+			EquippedWeapon->GetWeaponMesh()->MarkRenderStateDirty();
 		}
 	}
 }
@@ -122,6 +124,7 @@ void UCombatComponent::OnRep_SecondaryWeapon()
 		{
 			SecondaryWeapon->GetWeaponMesh()->bRenderCustomDepth = true;
 			SecondaryWeapon->GetWeaponMesh()->CustomDepthStencilValue = 100;
+			SecondaryWeapon->GetWeaponMesh()->MarkRenderStateDirty();
 		}
 	}
 }
@@ -844,8 +847,12 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 		EquippedBomb = WeaponToEquip;
 		if(Character->IsLocallyControlled() || Character->IsSameTeamWithTheLocalPlayer())
 		{
-			EquippedBomb->GetWeaponMesh()->bRenderCustomDepth = true;
-			EquippedBomb->GetWeaponMesh()->CustomDepthStencilValue = 100;
+			if(const ABomb* Bomb = Cast<ABomb>(EquippedBomb))
+			{
+				Bomb->GetBombMesh()->bRenderCustomDepth = true;
+				Bomb->GetBombMesh()->bRenderCustomDepth = 100;
+				Bomb->GetBombMesh()->MarkRenderStateDirty();
+			}
 		}
 		Character->PlaySound(ECharacterSoundType::EST_BombSound);
 	}
@@ -881,6 +888,7 @@ void UCombatComponent::EquipPrimaryWeapon(AWeapon* WeaponToEquip)
 	{
 		EquippedWeapon->GetWeaponMesh()->bRenderCustomDepth = true;
 		EquippedWeapon->GetWeaponMesh()->CustomDepthStencilValue = 100;
+		EquippedWeapon->GetWeaponMesh()->MarkRenderStateDirty();
 	}
 
 	UpdateCarriedAmmo();
@@ -901,6 +909,7 @@ void UCombatComponent::EquipSecondaryWeapon(AWeapon* WeaponToEquip)
 	{
 		SecondaryWeapon->GetWeaponMesh()->bRenderCustomDepth = true;
 		SecondaryWeapon->GetWeaponMesh()->CustomDepthStencilValue = 100;
+		SecondaryWeapon->GetWeaponMesh()->MarkRenderStateDirty();
 	}
 }
 

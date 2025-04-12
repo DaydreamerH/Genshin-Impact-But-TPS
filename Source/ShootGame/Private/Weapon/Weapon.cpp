@@ -370,6 +370,7 @@ void AWeapon::Dropped()
 		Character && Character->IsSameTeamWithTheLocalPlayer())
 	{
 		WeaponMesh->bRenderCustomDepth = false;
+		WeaponMesh->MarkRenderStateDirty();
 	}
 	OwnerPlayerCharacter=nullptr;
 	OwnerPlayerController=nullptr;

@@ -291,6 +291,7 @@ void APlayerCharacter::SetTeamColor()
 	{
 		GetMesh()->SetOverlayMaterial(FriendMat);
 		GetMesh()->bRenderCustomDepth = true;
+		GetMesh()->MarkRenderStateDirty();
 	}
 	else
 	{
@@ -750,6 +751,7 @@ void APlayerCharacter::OnPlayerStateInitialized()
 	else
 	{
 		GetMesh()->bRenderCustomDepth = true;
+		GetMesh()->MarkRenderStateDirty();
 	}
 	SetSpawnPoint();
 }

@@ -23,4 +23,6 @@ protected:
 private:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* BombMesh;
+public:
+	FORCEINLINE UStaticMeshComponent* GetBombMesh() const {return BombMesh;}
 };
