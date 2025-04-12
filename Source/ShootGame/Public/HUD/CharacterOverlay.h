@@ -15,9 +15,6 @@ class SHOOTGAME_API UCharacterOverlay : public UUserWidget
 	GENERATED_BODY()
 public:
 	UPROPERTY(meta=(BindWidget))
-	class UProgressBar* HealthBar;
-
-	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* HealthText;
 
 	UPROPERTY(meta=(BindWidget))
@@ -37,10 +34,7 @@ public:
 
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* GrenadesText;
-
-	UPROPERTY(meta=(BindWidget))
-	UProgressBar* ShieldBar;
-
+	
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock* ShieldText;
 
@@ -61,4 +55,13 @@ public:
 
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	UWidgetAnimation* HitCrosshairAnimation;
+
+	UPROPERTY(meta = (BindWidget))
+	UUserWidget* HealthBar;
+
+	UPROPERTY(meta = (BindWidget))
+	UUserWidget* ShieldBar;
+
+	void SetHealthBar(float Percent);
+	void SetShieldBar(float Percent);
 };
