@@ -1143,7 +1143,13 @@ ETeam APlayerCharacter::GetTeam()
 
 bool APlayerCharacter::IsSameTeamWithTheLocalPlayer()
 {
-	return GetTeam() == GetWorld()->GetFirstPlayerController()->GetPlayerState<AMyPlayerState>()->GetTeam();
+	if(GetWorld()
+		&& GetWorld()->GetFirstPlayerController()
+		&& GetWorld()->GetFirstPlayerController()->GetPlayerState<AMyPlayerState>())
+	{
+		return GetTeam() == GetWorld()->GetFirstPlayerController()->GetPlayerState<AMyPlayerState>()->GetTeam();
+	}
+	return false;
 }
 
 
