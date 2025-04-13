@@ -254,8 +254,8 @@ void APlayerCharacter::MulticastElim_Implementation(bool bPlayerLeftGame)
 	bElimmed = true;
 	PlayElimMontage();
 	
-	/*GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);*/
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	bDisableGameplay = true;
 	
 	if(IsLocallyControlled() && Combat
