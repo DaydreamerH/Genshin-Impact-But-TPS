@@ -548,10 +548,14 @@ void UCombatComponent::PlayEquipWeaponSound(AWeapon* WeaponToEquip)
 	
 	if(WeaponToEquip->EquipSound)
 	{
-		UGameplayStatics::PlaySoundAtLocation
-		(this,
+		UGameplayStatics::SpawnSoundAttached(
 			WeaponToEquip->EquipSound,
-			Character->GetActorLocation());
+			Character->GetRootComponent(),
+			NAME_None,
+			FVector::ZeroVector,
+			EAttachLocation::KeepRelativeOffset,
+			true 
+		);
 	}
 }
 
