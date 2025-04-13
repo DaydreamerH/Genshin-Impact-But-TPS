@@ -409,7 +409,7 @@ void APlayerCharacter::OnActionLookUp(const FInputActionValue& InputActionValue)
 {
 	if(bDisableGameplay)return;
 	const float inputValue = InputActionValue.Get<float>();
-	AddControllerPitchInput(inputValue);
+	AddControllerPitchInput(MouseSensitivity * inputValue);
 }
 
 void APlayerCharacter::OnActionLookRight(const FInputActionValue& InputActionValue)
@@ -964,6 +964,12 @@ void APlayerCharacter::ExitAimState() const
 	{
 		Combat->SetAiming(false);
 	}
+}
+
+void APlayerCharacter::SetMouseSensitivity(float Sensitivity)
+{
+	if(Sensitivity == 0.f)return;
+	MouseSensitivity = FMath::Clamp(Sensitivity, 0.f, 1.f);
 }
 
 

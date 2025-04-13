@@ -366,7 +366,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	float ShowOverheadWidgetLastingTime = 0.1f;
 	void HideOverheadWidget();
-	
+
+	float MouseSensitivity = 1.f;
 public:
 	void UpdateOverheadWidget();
 	void UpdateHUDHealth();
@@ -443,4 +444,6 @@ public:
 	FORCEINLINE bool GetElimmed () const {return bElimmed;}
 
 	void ExitAimState() const;
+
+	void SetMouseSensitivity(float Sensitivity);
 };

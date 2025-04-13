@@ -594,6 +594,10 @@ void UCombatComponent::InterpFOV(float DeltaTime)
 	{
 		Character->GetFollowCamera()->SetFieldOfView(CurrentFOV);
 	}
+	if(Character && Character->IsLocallyControlled())
+	{
+		Character->SetMouseSensitivity(DefaultFOV/CurrentFOV);
+	}
 }
 
 bool UCombatComponent::CanFire()
