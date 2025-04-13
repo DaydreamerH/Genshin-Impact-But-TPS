@@ -13,5 +13,5 @@ UPistolCameraShake::UPistolCameraShake()
 	RotOscillation.Yaw.Frequency = 0.1f;
 
 	RotOscillation.Roll.Amplitude = 2.f;
-	RotOscillation.Roll.Frequency = 60.f;
+	RotOscillation.Roll.Frequency = 30.f;
 }

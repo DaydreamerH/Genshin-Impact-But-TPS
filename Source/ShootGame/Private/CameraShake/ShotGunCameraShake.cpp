@@ -13,5 +13,5 @@ UShotGunCameraShake::UShotGunCameraShake()
 	RotOscillation.Yaw.Frequency = 1.f;
 
 	RotOscillation.Roll.Amplitude = 0.6f;
-	RotOscillation.Roll.Frequency = 60.f;
+	RotOscillation.Roll.Frequency = 30.f;
 }

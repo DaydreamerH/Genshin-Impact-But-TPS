@@ -14,5 +14,5 @@ URocketLauncherCameraShake::URocketLauncherCameraShake()
 	RotOscillation.Yaw.Frequency = 20.f;
 
 	RotOscillation.Roll.Amplitude = 0.7f;
-	RotOscillation.Roll.Frequency = 60.f;
+	RotOscillation.Roll.Frequency = 30.f;
 }

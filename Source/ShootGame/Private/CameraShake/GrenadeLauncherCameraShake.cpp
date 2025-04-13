@@ -13,5 +13,5 @@ UGrenadeLauncherCameraShake::UGrenadeLauncherCameraShake()
 	RotOscillation.Yaw.Frequency = 0.1f;
 
 	RotOscillation.Roll.Amplitude = 0.6f;
-	RotOscillation.Roll.Frequency = 60.f;
+	RotOscillation.Roll.Frequency = 30.f;
 }

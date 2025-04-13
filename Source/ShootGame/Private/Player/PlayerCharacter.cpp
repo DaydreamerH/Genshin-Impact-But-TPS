@@ -374,7 +374,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	float CharacterSpeed = GetVelocity().Size();  
 	
-	CameraBoom->CameraLagSpeed = FMath::Clamp(CharacterSpeed / 200.f, 30.f, 100.f);
+	CameraBoom->CameraLagSpeed = FMath::Clamp(CharacterSpeed / 200.f, 30.f, 80.f);
 }
 
 void APlayerCharacter::OnActionMoveForward(const FInputActionValue& InputActionValue)
@@ -410,14 +410,14 @@ void APlayerCharacter::OnActionLookUp(const FInputActionValue& InputActionValue)
 {
 	if(bDisableGameplay)return;
 	const float inputValue = InputActionValue.Get<float>();
-	AddControllerPitchInput(MouseSensitivity * inputValue);
+	AddControllerPitchInput(MouseSensitivity * inputValue * 0.8);
 }
 
 void APlayerCharacter::OnActionLookRight(const FInputActionValue& InputActionValue)
 {
 	if(bDisableGameplay)return;
 	float inputValue = InputActionValue.Get<float>();
-	AddControllerYawInput(inputValue);
+	AddControllerYawInput(MouseSensitivity * inputValue * 0.8);
 }
 
 void APlayerCharacter::OnActionJump(const FInputActionValue& InputActionValue)
