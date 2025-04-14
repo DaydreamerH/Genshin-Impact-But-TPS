@@ -713,6 +713,15 @@ void APlayerCharacter::PollInit()
 			ShowFriendOverheadWidget();
 		}
 	}
+	if(PlayerController == nullptr)
+	{
+		PlayerController = Cast<AMyPlayerController>(GetController());
+		if(PlayerController)
+		{
+			UpdateHUDHealth();
+			UpdateHUDShield();
+		}
+	}
 }
 
 void APlayerCharacter::SetSpawnPoint()
