@@ -355,7 +355,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		else
 		{
 			RecoilOffset = FMath::RInterpTo(RecoilOffset, FRotator::ZeroRotator, DeltaTime, RecoilRecoverySpeed);
-			if (RecoilOffset.Equals(FRotator::ZeroRotator, 0.1f))
+			if (RecoilOffset.Equals(FRotator::ZeroRotator, 0.5f))
 			{
 				RecoilOffset = FRotator::ZeroRotator;
 			}

@@ -12,6 +12,6 @@ UFireCameraShake::UFireCameraShake()
 	RotOscillation.Yaw.Amplitude = 0.2f;
 	RotOscillation.Yaw.Frequency = 0.5f;
 
-	RotOscillation.Roll.Amplitude = 0.5f;
-	RotOscillation.Roll.Frequency = 30.f;
+	RotOscillation.Roll.Amplitude = 0.3f;
+	RotOscillation.Roll.Frequency = 60.f;
 }

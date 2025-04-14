@@ -11,12 +11,12 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 	Super::PostLogin(NewPlayer);
 
 	if(int32 numberOfPlayers =  GameState.Get()->PlayerArray.Num();
-		numberOfPlayers == 6)
+		numberOfPlayers == 2)
 	{
 		if(UWorld* world = GetWorld())
 		{
 			bUseSeamlessTravel = true;
-			world->ServerTravel(FString("/Game/_Game/Maps/TeamMap?listen"));
+			world->ServerTravel(FString("/Game/_Game/Maps/TestMap?listen"));
 		}
 	}
 	if(AMyPlayerState* MyPlayerState = NewPlayer->GetPlayerState<AMyPlayerState>())
