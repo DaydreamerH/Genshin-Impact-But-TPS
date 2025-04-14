@@ -15,7 +15,6 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 	{
 		if(UWorld* world = GetWorld())
 		{
-			bUseSeamlessTravel = true;
 			world->ServerTravel(FString("/Game/_Game/Maps/TestMap?listen"));
 		}
 	}
