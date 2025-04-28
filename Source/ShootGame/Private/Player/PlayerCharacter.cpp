@@ -782,7 +782,8 @@ void APlayerCharacter::PlayHitReactMontage() const
 {
 	if(Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
 	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		AnimInstance && HitReactMontage && ElimMontage && !AnimInstance->Montage_IsPlaying(ElimMontage))
+		AnimInstance && HitReactMontage && ElimMontage
+		&& !AnimInstance->IsAnyMontagePlaying())
 	{
 		AnimInstance->Montage_Play(HitReactMontage);
 		const FName SectionName ("FromFront");
