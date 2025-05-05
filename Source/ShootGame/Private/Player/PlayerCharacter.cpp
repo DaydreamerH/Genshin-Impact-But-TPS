@@ -355,7 +355,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		else
 		{
 			RecoilOffset = FMath::RInterpTo(RecoilOffset, FRotator::ZeroRotator, DeltaTime, RecoilRecoverySpeed);
-			if (RecoilOffset.Equals(FRotator::ZeroRotator, 0.5f))
+			if (RecoilOffset.Equals(FRotator::ZeroRotator, 0.1f))
 			{
 				RecoilOffset = FRotator::ZeroRotator;
 			}
@@ -770,7 +770,8 @@ void APlayerCharacter::OnPlayerStateInitialized()
 void APlayerCharacter::PlayFireMontage(bool bAiming) const
 {
 	if(Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
-	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && FireWeaponMontage && !AnimInstance->Montage_IsPlaying(FireWeaponMontage))
+	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance && FireWeaponMontage && !AnimInstance->IsAnyMontagePlaying())
 	{
 		AnimInstance->Montage_Play(FireWeaponMontage);
 		const FName SectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
@@ -793,7 +794,8 @@ void APlayerCharacter::PlayHitReactMontage() const
 
 void APlayerCharacter::PlayElimMontage() const
 {
-	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && ElimMontage)
+	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance && ElimMontage)
 	{
 		AnimInstance->Montage_Play(ElimMontage);
 	}
@@ -840,7 +842,8 @@ void APlayerCharacter::PlayReloadMontage() const
 
 void APlayerCharacter::PlayTossGrenadeMontage() const
 {
-	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && TossGrenadeMontage)
+	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance && TossGrenadeMontage)
 	{
 		AnimInstance->Montage_Play(TossGrenadeMontage);
 	}
@@ -849,7 +852,7 @@ void APlayerCharacter::PlayTossGrenadeMontage() const
 void APlayerCharacter::PlaySwapMontage() const
 {
 	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		AnimInstance && SwapMontage && !AnimInstance->Montage_IsPlaying(SwapMontage))
+		AnimInstance && SwapMontage && !AnimInstance->IsAnyMontagePlaying())
 	{
 		AnimInstance->Montage_Play(SwapMontage);
 	}
