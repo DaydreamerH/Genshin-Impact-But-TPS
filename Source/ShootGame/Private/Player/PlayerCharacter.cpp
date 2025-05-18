@@ -21,6 +21,7 @@
 #include "Materials/MaterialParameterCollectionInstance.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/MyPlayerState.h"
+#include "Player/PlayerAnimInstance.h"
 #include "PlayerController/MyPlayerController.h"
 #include "PlayerStart/TeamPlayerStart.h"
 #include "ShootGame/ShootGame.h"
@@ -301,6 +302,18 @@ void APlayerCharacter::SetTeamColor()
 	}
 }
 
+void APlayerCharacter::StopReloadMontage()
+{
+	if(UPlayerAnimInstance* PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance()))
+	{
+		if(ReloadMontage && PlayerAnimInstance->Montage_IsPlaying(ReloadMontage))
+		{
+			PlayerAnimInstance->Montage_Stop(0.f, ReloadMontage);
+			if(IsLocallyControlled())Combat->bLocallyReloading = false;
+		}
+	}
+}
+
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -502,6 +515,14 @@ void APlayerCharacter::OnActionTossGrenade(const FInputActionValue& InputActionV
 
 void APlayerCharacter::OnActionSwapWeapons(const FInputActionValue& InputActionValue)
 {
+	if(UPlayerAnimInstance* PlayerAnimInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance()))
+	{
+		if(ReloadMontage && PlayerAnimInstance->Montage_IsPlaying(ReloadMontage))
+		{
+			StopReloadMontage();
+		}
+		else if(PlayerAnimInstance->IsAnyMontagePlaying())return;
+	}
 	if(bDisableGameplay || Combat==nullptr || !Combat->CouldSwapWeapons() || Combat->bHoldingBomb)return;
 	ServerOnActionSwapWeapons();
 	if(!HasAuthority())
@@ -855,7 +876,7 @@ void APlayerCharacter::PlayTossGrenadeMontage() const
 void APlayerCharacter::PlaySwapMontage() const
 {
 	if(UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		AnimInstance && SwapMontage && !AnimInstance->IsAnyMontagePlaying())
+		AnimInstance && SwapMontage)
 	{
 		AnimInstance->Montage_Play(SwapMontage);
 	}

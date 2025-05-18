@@ -60,7 +60,8 @@ public:
 	FOnLeftGame OnLeftGame;
 
 	void SetTeamColor();
-	
+
+	void StopReloadMontage();
 protected:
 	virtual void BeginPlay() override;
 

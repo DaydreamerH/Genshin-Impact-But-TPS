@@ -211,7 +211,9 @@ private:
 
 	UFUNCTION()
 	void OnRep_HoldingBomb();
-	
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_StopReloadMontage();
 public:	
 	
 	void SetCrosshairShootingFactor(float f);

@@ -8,6 +8,7 @@
 #include "HUD/PlayerHUD.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/PlayerAnimInstance.h"
 #include "Player/PlayerCharacter.h"
 #include "PlayerController/MyPlayerController.h"
 #include "Sound/SoundCue.h"
@@ -814,7 +815,7 @@ bool UCombatComponent::CouldSwapWeapons() const
 {
 	return EquippedWeapon!=nullptr
 		&& SecondaryWeapon!=nullptr
-		&& CombatState == ECombatState::ECS_Unoccupied;
+		&& (CombatState == ECombatState::ECS_Unoccupied || CombatState == ECombatState::ECS_Reloading);
 }
 
 void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
@@ -950,6 +951,11 @@ void UCombatComponent::Reload()
 
 void UCombatComponent::SwapWeapons()
 {
+	if(CombatState == ECombatState::ECS_Reloading)
+	{
+		CombatState = ECombatState::ECS_Unoccupied;
+		Multicast_StopReloadMontage();
+	}
 	if(CombatState != ECombatState::ECS_Unoccupied || Character == nullptr)return;
 	Character->PlaySwapMontage();
 	CombatState = ECombatState::ECS_SwappingWeapons;
@@ -1003,5 +1009,13 @@ void UCombatComponent::OnRep_HoldingBomb()
 				Character->bUseControllerRotationYaw = true;
 			}
 		}
+	}
+}
+
+void UCombatComponent::Multicast_StopReloadMontage_Implementation()
+{
+	if(Character && !Character->IsLocallyControlled())
+	{
+		Character->StopReloadMontage();
 	}
 }
