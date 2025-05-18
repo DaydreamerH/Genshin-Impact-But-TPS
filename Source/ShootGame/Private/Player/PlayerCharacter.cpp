@@ -36,6 +36,7 @@ APlayerCharacter::APlayerCharacter()
 	
 	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverheadWidget->SetupAttachment(RootComponent);
+	OverheadWidget->SetVisibility(false);
 	
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetMesh());
@@ -709,8 +710,10 @@ void APlayerCharacter::PollInit()
 		if(MyPlayerState)
 		{
 			OnPlayerStateInitialized();
-			SetOverheadWidgetPlayerName();
-			ShowFriendOverheadWidget();
+			FTimerHandle OverheadWidgetTimerHandle;
+			GetWorldTimerManager().SetTimer(OverheadWidgetTimerHandle, this, &APlayerCharacter::SetOverheadWidgetPlayerName, 0.2f, false);
+			FTimerHandle FriendOverheadWidgetTimerHandle;
+			GetWorldTimerManager().SetTimer(FriendOverheadWidgetTimerHandle, this, &APlayerCharacter::ShowFriendOverheadWidget, 0.2f, false);
 		}
 	}
 	if(PlayerController == nullptr)
@@ -1142,7 +1145,10 @@ void APlayerCharacter::SetOverheadWidgetPlayerName()
 			{
 				bool bUseRedColor =
 					MyPlayerState->GetTeam() != GetWorld()->GetFirstPlayerController()->GetPlayerState<AMyPlayerState>()->GetTeam();
-				Widget->InitOverheadWidget(PlayerName, bUseRedColor);
+				if(Widget!=nullptr)
+				{
+					Widget->InitOverheadWidget(PlayerName, bUseRedColor);
+				}
 			}
 		}
 	}

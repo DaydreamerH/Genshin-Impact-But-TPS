@@ -51,11 +51,15 @@ void AGenericSpawnPoint::OnWeaponStateChanged(const EWeaponState WeaponState)
 
 void AGenericSpawnPoint::StartSpawnWeaponTimer(AActor* DestroyedActor)
 {
-	GetWorld()->GetTimerManager().SetTimer
-		(SpawnTimerHandle,
-			this,
-			&AGenericSpawnPoint::SpawnWeaponTimerFinished,
-			SpawnInterval, false);
+	float RandomizedInterval = FMath::FRandRange(SpawnInterval, SpawnInterval + 10.0f);
+
+	GetWorld()->GetTimerManager().SetTimer(
+		SpawnTimerHandle,
+		this,
+		&AGenericSpawnPoint::SpawnWeaponTimerFinished,
+		RandomizedInterval,
+		false
+	);
 }
 
 void AGenericSpawnPoint::SpawnWeaponTimerFinished()
