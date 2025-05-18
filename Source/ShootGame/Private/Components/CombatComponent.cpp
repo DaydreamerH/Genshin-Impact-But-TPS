@@ -85,6 +85,8 @@ void UCombatComponent::SetAiming(bool bIsAiming)
 		&& EquippedWeapon->GetWeaponType()==EWeaponType::EWT_SniperRifle)
 	{
 		Character->ShowSniperScopeWidget(bIsAiming);
+		Character->GetMesh()->SetOwnerNoSee(bIsAiming);
+		EquippedWeapon->GetWeaponMesh()->SetVisibility(!bIsAiming);
 	}
 	if(Character->IsLocallyControlled())
 	{
@@ -601,7 +603,14 @@ void UCombatComponent::InterpFOV(float DeltaTime)
 	}
 	if(Character && Character->IsLocallyControlled())
 	{
-		Character->SetMouseSensitivity(DefaultFOV/CurrentFOV);
+		if(EquippedWeapon->GetWeaponType() == EWeaponType::EWT_SniperRifle)
+		{
+			Character->SetMouseSensitivity(DefaultFOV/CurrentFOV/2.f);
+		}
+		else
+		{
+			Character->SetMouseSensitivity(DefaultFOV/CurrentFOV);
+		}
 	}
 }
 
