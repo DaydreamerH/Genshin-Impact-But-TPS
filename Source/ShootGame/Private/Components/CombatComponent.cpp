@@ -87,6 +87,10 @@ void UCombatComponent::SetAiming(bool bIsAiming)
 		Character->ShowSniperScopeWidget(bIsAiming);
 		Character->GetMesh()->SetOwnerNoSee(bIsAiming);
 		EquippedWeapon->GetWeaponMesh()->SetVisibility(!bIsAiming);
+		if(Controller && bAiming)
+		{
+			Controller->RemoveCrosshair();
+		}
 	}
 	if(Character->IsLocallyControlled())
 	{
@@ -364,6 +368,7 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 {
 	if(EquippedWeapon == nullptr)return;
+	if(EquippedWeapon->GetWeaponType() == EWeaponType::EWT_SniperRifle && bAiming)return;
 	if(Character == nullptr || Character->Controller == nullptr || Character->GetElimmed())return;
 	Controller = Controller == nullptr?Cast<AMyPlayerController>(Character->Controller):Controller;
 
