@@ -2,6 +2,8 @@
 
 你说的对，但是 Genshin Impact: Modern Warfare 是一款基于 Unreal Engine 开发的多人在线对战游戏。
 
+演示视频：[【拼好游】原神：现代战争](https://www.bilibili.com/video/BV1YNEDzoEMk)
+
 # 所有素材均来自互联网，仅用于学习交流，不以任何方式盈利或商业化使用，在没有作者允许的情况下不能进行二次开发。
 
 ## 1. 游戏简介
