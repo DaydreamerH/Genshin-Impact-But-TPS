@@ -247,6 +247,10 @@ void UCombatComponent::ShotGunLocalFire(const TArray<FVector_NetQuantize>& Trace
 	if(CombatState == ECombatState::ECS_Reloading
 		|| CombatState == ECombatState::ECS_Unoccupied)
 	{
+		if(CombatState == ECombatState::ECS_Reloading)
+		{
+			Character->StopReloadMontage();
+		}
 		ShotGunWeapon->FireShotGun(TraceHitTarget);
 		CombatState = ECombatState::ECS_Unoccupied;
 	}
@@ -627,6 +631,7 @@ bool UCombatComponent::CanFire()
 		&& CombatState == ECombatState::ECS_Reloading)
 	{
 		bLocallyReloading = false;
+		Character->StopReloadMontage();
 		return true;
 	}
 	if(bLocallyReloading) return false;
